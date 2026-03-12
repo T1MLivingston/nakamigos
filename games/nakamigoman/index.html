@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nakamigo Man</title>
+  <meta name="description" content="Nakamigo Man - A retro Pac-Man style arcade game. Navigate the maze, collect tokens, dodge the Cloaks!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #020052;
+      color: #d0d4f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    /* ========================
+       GRID BACKGROUND
+    ======================== */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-grid-floor {
+      position: absolute;
+      bottom: -20%;
+      left: -50%;
+      width: 200%;
+      height: 80%;
+      background:
+        linear-gradient(rgba(0, 163, 255, 0.2) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 163, 255, 0.2) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(400px) rotateX(60deg);
+      transform-origin: center top;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
+      animation: grid-scroll 8s linear infinite;
+    }
+
+    @keyframes grid-scroll {
+      0%   { background-position: 0 0, 0 0; }
+      100% { background-position: 0 60px, 0 60px; }
+    }
+
+    .bg-grid-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, #020052 100%);
+    }
+
+    .bg-grid-stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(0,163,255,0.3), transparent),
+        radial-gradient(1px 1px at 40% 22%, rgba(255,255,255,0.15), transparent),
+        radial-gradient(1px 1px at 70% 18%, rgba(235,0,255,0.15), transparent),
+        radial-gradient(1px 1px at 90% 28%, rgba(255,255,255,0.1), transparent);
+    }
+
+    /* ========================
+       NAV BAR
+    ======================== */
+    .game-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: 100%;
+      background: rgba(2, 0, 60, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0, 163, 255, 0.15);
+    }
+
+    .game-nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 52px;
+      padding: 0 20px;
+    }
+
+    .game-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #00A3FF;
+    }
+
+    .game-nav-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 163, 255, 0.3);
+    }
+
+    .game-nav-title {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-shadow: 0 0 14px rgba(0, 163, 255, 0.5);
+    }
+
+    .game-nav-back {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #7a7eb0;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .game-nav-back:hover {
+      color: #00A3FF;
+      background: rgba(0, 163, 255, 0.08);
+    }
+
+    /* ========================
+       MAIN CONTAINER
+    ======================== */
+    .game-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 900px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    /* ========================
+       PLAYER NAME INPUT (like Bean Wars)
+    ======================== */
+    .player-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .player-bar label {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #5c608e;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .player-bar input {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      background: rgba(10, 6, 56, 0.8);
+      border: 1px solid rgba(0, 163, 255, 0.2);
+      color: #00A3FF;
+      padding: 6px 14px;
+      border-radius: 6px;
+      outline: none;
+      width: 180px;
+      letter-spacing: 1px;
+      transition: border-color 0.2s;
+    }
+
+    .player-bar input:focus {
+      border-color: #00A3FF;
+      box-shadow: 0 0 12px rgba(0, 163, 255, 0.15);
+    }
+
+    .player-bar input::placeholder {
+      color: #3a3e6a;
+    }
+
+    /* ========================
+       SCORE / LIVES BAR
+    ======================== */
+    .hud-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 16px;
+      background: rgba(10, 6, 56, 0.7);
+      border: 1px solid rgba(0, 163, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .hud-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hud-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      color: #5c608e;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .hud-value {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.9rem;
+      color: #00A3FF;
+      text-shadow: 0 0 10px rgba(0, 163, 255, 0.4);
+    }
+
+    .hud-value--lives {
+      color: #EB00FF;
+      text-shadow: 0 0 10px rgba(235, 0, 255, 0.4);
+    }
+
+    .hud-value--level {
+      color: #FFD700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+
+    /* ========================
+       GAME BOARD WRAPPER
+    ======================== */
+    .game-board-wrapper {
+      position: relative;
+      background: linear-gradient(160deg, rgba(12, 8, 64, 0.92) 0%, rgba(4, 2, 48, 0.96) 100%);
+      border: 2px solid rgba(0, 163, 255, 0.15);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 0 40px rgba(0, 163, 255, 0.06), 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .game-board-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00A3FF, #EB00FF);
+      border-radius: 14px 14px 0 0;
+    }
+
+    /* ========================
+       CORNER PORTRAITS
+    ======================== */
+    .corner-portraits {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .corner-portrait {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      border: 2px solid rgba(0, 163, 255, 0.25);
+      background: rgba(10, 6, 56, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.7rem;
+      color: #5c608e;
+      overflow: hidden;
+    }
+
+    .corner-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .corner-portrait--tl { top: -8px; left: -8px; }
+    .corner-portrait--tr { top: -8px; right: -8px; }
+    .corner-portrait--bl { bottom: -8px; left: -8px; }
+    .corner-portrait--br { bottom: -8px; right: -8px; }
+
+    .corner-portrait-label {
+      position: absolute;
+      bottom: -16px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'VT323', monospace;
+      font-size: 0.65rem;
+      color: #5c608e;
+      white-space: nowrap;
+    }
+
+    /* ========================
+       CANVAS
+    ======================== */
+    #gameCanvas {
+      display: block;
+      border-radius: 8px;
+      image-rendering: pixelated;
+    }
+
+    /* ========================
+       START OVERLAY
+    ======================== */
+    .game-overlay {
+      position: absolute;
+      inset: 16px;
+      background: rgba(2, 0, 52, 0.92);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      z-index: 20;
+      backdrop-filter: blur(4px);
+    }
+
+    .game-overlay.hidden { display: none; }
+
+    .game-overlay h2 {
+      font-family: 'Silkscreen', cursive;
+      font-size: clamp(1.2rem, 4vw, 2rem);
+      background: linear-gradient(135deg, #00A3FF 0%, #EB00FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-align: center;
+      animation: title-glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes title-glow {
+      0%   { filter: drop-shadow(0 0 10px rgba(0, 163, 255, 0.4)); }
+      100% { filter: drop-shadow(0 0 20px rgba(235, 0, 255, 0.4)); }
+    }
+
+    .game-overlay p {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #7a7eb0;
+      text-align: center;
+      max-width: 320px;
+      line-height: 1.5;
+    }
+
+    .game-overlay .final-score {
+      font-family: 'Silkscreen', cursive;
+      font-size: 1.3rem;
+      color: #FFD700;
+      text-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+    }
+
+    .start-btn {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.8rem;
+      padding: 12px 32px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 1px;
+      background-size: 200% 100%;
+      background-image: linear-gradient(135deg, #FF8A00 0%, #AF00DB 50%, #FF8A00 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(255, 138, 0, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .start-btn:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 28px rgba(255, 138, 0, 0.5);
+    }
+
+    .start-btn:active { transform: scale(0.96); }
+
+    /* ========================
+       MOBILE JOYSTICK
+    ======================== */
+    .mobile-controls {
+      display: none;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .joystick-area {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+
+    .dpad {
+      position: relative;
+      width: 140px;
+      height: 140px;
+    }
+
+    .dpad-btn {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      background: rgba(0, 163, 255, 0.12);
+      border: 2px solid rgba(0, 163, 255, 0.25);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00A3FF;
+      font-size: 1.4rem;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .dpad-btn:active, .dpad-btn.active {
+      background: rgba(0, 163, 255, 0.3);
+      border-color: #00A3FF;
+      box-shadow: 0 0 12px rgba(0, 163, 255, 0.3);
+    }
+
+    .dpad-up    { top: 0; left: 50%; transform: translateX(-50%); }
+    .dpad-down  { bottom: 0; left: 50%; transform: translateX(-50%); }
+    .dpad-left  { top: 50%; left: 0; transform: translateY(-50%); }
+    .dpad-right { top: 50%; right: 0; transform: translateY(-50%); }
+
+    .dpad-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 36px;
+      height: 36px;
+      background: rgba(0, 163, 255, 0.06);
+      border: 1px solid rgba(0, 163, 255, 0.1);
+      border-radius: 50%;
+    }
+
+    .mobile-start-btn {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.65rem;
+      padding: 14px 22px;
+      border-radius: 50%;
+      border: 2px solid rgba(235, 0, 255, 0.3);
+      background: rgba(235, 0, 255, 0.1);
+      color: #EB00FF;
+      cursor: pointer;
+      letter-spacing: 1px;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      transition: background 0.1s;
+    }
+
+    .mobile-start-btn:active {
+      background: rgba(235, 0, 255, 0.3);
+      box-shadow: 0 0 12px rgba(235, 0, 255, 0.3);
+    }
+
+    .controls-hint {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: #5c608e;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .mobile-controls { display: flex; }
+      .controls-hint { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .game-container { padding: 12px 8px; }
+      .game-board-wrapper { padding: 10px; }
+      .corner-portrait { width: 36px; height: 36px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-grid" aria-hidden="true">
+    <div class="bg-grid-stars"></div>
+    <div class="bg-grid-floor"></div>
+    <div class="bg-grid-vignette"></div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="game-nav">
+    <div class="game-nav-inner">
+      <a href="/games/nakamigos/" class="game-nav-brand">
+        <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="Nakamigo" class="game-nav-avatar">
+        <span class="game-nav-title">NAKAMIGO MAN</span>
+      </a>
+      <a href="/games/nakamigos/" class="game-nav-back">BACK TO HUB</a>
+    </div>
+  </nav>
+
+  <div class="game-container">
+    <!-- Player Name -->
+    <div class="player-bar">
+      <label for="playerName">Player Name:</label>
+      <input type="text" id="playerName" placeholder="Enter your name" maxlength="16" autocomplete="off">
+    </div>
+
+    <!-- HUD -->
+    <div class="hud-bar">
+      <div class="hud-item">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="hudScore">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Level</span>
+        <span class="hud-value hud-value--level" id="hudLevel">1</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Lives</span>
+        <span class="hud-value hud-value--lives" id="hudLives">3</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">High</span>
+        <span class="hud-value" id="hudHigh">0</span>
+      </div>
+    </div>
+
+    <!-- Game Board -->
+    <div class="game-board-wrapper">
+      <!-- Corner Portraits (placeholders 1-4) -->
+      <div class="corner-portraits">
+        <div class="corner-portrait corner-portrait--tl" title="Player 1">
+          <span>1</span>
+          <span class="corner-portrait-label">P1</span>
+        </div>
+        <div class="corner-portrait corner-portrait--tr" title="Player 2">
+          <span>2</span>
+          <span class="corner-portrait-label">P2</span>
+        </div>
+        <div class="corner-portrait corner-portrait--bl" title="Player 3">
+          <span>3</span>
+          <span class="corner-portrait-label">P3</span>
+        </div>
+        <div class="corner-portrait corner-portrait--br" title="Player 4">
+          <span>4</span>
+          <span class="corner-portrait-label">P4</span>
+        </div>
+      </div>
+
+      <canvas id="gameCanvas" width="560" height="620"></canvas>
+
+      <!-- Start Overlay -->
+      <div class="game-overlay" id="startOverlay">
+        <h2>Nakamigo Man</h2>
+        <p>Navigate the maze. Collect tokens. Dodge the Cloaks. Arrow keys or WASD to move.</p>
+        <button class="start-btn" id="startBtn">START</button>
+      </div>
+
+      <!-- Game Over Overlay -->
+      <div class="game-overlay hidden" id="gameOverOverlay">
+        <h2>Game Over</h2>
+        <p class="final-score" id="finalScore">Score: 0</p>
+        <p id="finalName"></p>
+        <button class="start-btn" id="restartBtn">PLAY AGAIN</button>
+      </div>
+
+      <!-- Win Overlay -->
+      <div class="game-overlay hidden" id="winOverlay">
+        <h2>Level Clear!</h2>
+        <p class="final-score" id="levelScore">Score: 0</p>
+        <button class="start-btn" id="nextLevelBtn">NEXT LEVEL</button>
+      </div>
+    </div>
+
+    <!-- Controls hint (desktop) -->
+    <p class="controls-hint">Arrow keys or WASD to move</p>
+
+    <!-- Mobile Controls -->
+    <div class="mobile-controls">
+      <div class="joystick-area">
+        <div class="dpad">
+          <div class="dpad-btn dpad-up" data-dir="up">&#9650;</div>
+          <div class="dpad-btn dpad-down" data-dir="down">&#9660;</div>
+          <div class="dpad-btn dpad-left" data-dir="left">&#9664;</div>
+          <div class="dpad-btn dpad-right" data-dir="right">&#9654;</div>
+          <div class="dpad-center"></div>
+        </div>
+      </div>
+      <button class="mobile-start-btn" id="mobileStartBtn">START</button>
+    </div>
+  </div>
+
+  <script>
+  (function() {
+    // ========================
+    // CONSTANTS
+    // ========================
+    var TILE = 20;
+    var COLS = 28;
+    var ROWS = 31;
+    var CANVAS_W = COLS * TILE;
+    var CANVAS_H = ROWS * TILE;
+
+    var canvas = document.getElementById('gameCanvas');
+    var ctx = canvas.getContext('2d');
+    canvas.width = CANVAS_W;
+    canvas.height = CANVAS_H;
+
+    // Colors (matching Bean Wars / Nakamigos theme)
+    var C = {
+      bg:       '#0a0636',
+      wall:     '#00A3FF',
+      wallDark: '#003366',
+      dot:      '#FFD700',
+      powerDot: '#EB00FF',
+      player:   '#FFD700',
+      playerOutline: '#FF8A00',
+      ghost1:   '#FF5252',  // Red cloak
+      ghost2:   '#EB00FF',  // Pink cloak
+      ghost3:   '#00E676',  // Green cloak
+      ghost4:   '#00A3FF',  // Blue cloak
+      ghostScared: '#2222AA',
+      ghostEyes: '#FFFFFF',
+      text:     '#FFFFFF',
+      gate:     '#EB00FF'
+    };
+
+    // Maze layout: 0=empty, 1=wall, 2=dot, 3=power dot, 4=ghost gate, 5=ghost house
+    var MAZE_TEMPLATE = [
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+      [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
+      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+      [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
+      [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+      [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
+      [0,0,0,0,0,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,0,0,0,0,0],
+      [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
+      [0,0,0,0,0,1,2,1,1,0,1,1,1,4,4,1,1,1,0,1,1,2,1,0,0,0,0,0],
+      [1,1,1,1,1,1,2,1,1,0,1,5,5,5,5,5,5,1,0,1,1,2,1,1,1,1,1,1],
+      [0,0,0,0,0,0,2,0,0,0,1,5,5,5,5,5,5,1,0,0,0,2,0,0,0,0,0,0],
+      [1,1,1,1,1,1,2,1,1,0,1,5,5,5,5,5,5,1,0,1,1,2,1,1,1,1,1,1],
+      [0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0],
+      [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
+      [0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0],
+      [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
+      [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
+      [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+      [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
+      [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
+      [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+      [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    ];
+
+    // ========================
+    // GAME STATE
+    // ========================
+    var maze = [];
+    var score = 0;
+    var lives = 3;
+    var level = 1;
+    var highScore = parseInt(localStorage.getItem('nakamigoman_high') || '0');
+    var totalDots = 0;
+    var dotsEaten = 0;
+    var gameRunning = false;
+    var gamePaused = false;
+    var ghostScaredTimer = 0;
+    var GHOST_SCARED_DURATION = 360; // frames
+    var animFrame = 0;
+
+    // Player
+    var player = {
+      x: 14, y: 23,
+      dir: 0, // 0=right, 1=down, 2=left, 3=up
+      nextDir: -1,
+      mouthOpen: 0,
+      mouthDir: 1
+    };
+
+    // Ghosts (Cloaks)
+    var ghosts = [];
+
+    function initGhosts() {
+      ghosts = [
+        { x: 13, y: 14, dir: 2, color: C.ghost1, scared: false, inHouse: false, speed: 1, name: 'Red' },
+        { x: 14, y: 14, dir: 0, color: C.ghost2, scared: false, inHouse: true,  speed: 0.9, name: 'Pink' },
+        { x: 13, y: 15, dir: 2, color: C.ghost3, scared: false, inHouse: true,  speed: 0.85, name: 'Green' },
+        { x: 14, y: 15, dir: 0, color: C.ghost4, scared: false, inHouse: true,  speed: 0.8, name: 'Blue' }
+      ];
+    }
+
+    function resetMaze() {
+      maze = [];
+      totalDots = 0;
+      dotsEaten = 0;
+      for (var r = 0; r < ROWS; r++) {
+        maze[r] = [];
+        for (var c = 0; c < COLS; c++) {
+          maze[r][c] = MAZE_TEMPLATE[r][c];
+          if (maze[r][c] === 2 || maze[r][c] === 3) totalDots++;
+        }
+      }
+    }
+
+    function resetPlayer() {
+      player.x = 14;
+      player.y = 23;
+      player.dir = 0;
+      player.nextDir = -1;
+    }
+
+    // ========================
+    // DRAWING
+    // ========================
+    function drawMaze() {
+      for (var r = 0; r < ROWS; r++) {
+        for (var c = 0; c < COLS; c++) {
+          var x = c * TILE;
+          var y = r * TILE;
+          var cell = maze[r][c];
+
+          if (cell === 1) {
+            // Wall
+            ctx.fillStyle = C.wallDark;
+            ctx.fillRect(x, y, TILE, TILE);
+            // Draw neon border on exposed edges
+            ctx.strokeStyle = C.wall;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = 0.6;
+            // Check neighbors
+            if (r > 0 && maze[r-1][c] !== 1) { ctx.beginPath(); ctx.moveTo(x, y+0.5); ctx.lineTo(x+TILE, y+0.5); ctx.stroke(); }
+            if (r < ROWS-1 && maze[r+1][c] !== 1) { ctx.beginPath(); ctx.moveTo(x, y+TILE-0.5); ctx.lineTo(x+TILE, y+TILE-0.5); ctx.stroke(); }
+            if (c > 0 && maze[r][c-1] !== 1) { ctx.beginPath(); ctx.moveTo(x+0.5, y); ctx.lineTo(x+0.5, y+TILE); ctx.stroke(); }
+            if (c < COLS-1 && maze[r][c+1] !== 1) { ctx.beginPath(); ctx.moveTo(x+TILE-0.5, y); ctx.lineTo(x+TILE-0.5, y+TILE); ctx.stroke(); }
+            ctx.globalAlpha = 1;
+          } else if (cell === 4) {
+            // Ghost gate
+            ctx.fillStyle = C.gate;
+            ctx.globalAlpha = 0.6 + Math.sin(animFrame * 0.1) * 0.2;
+            ctx.fillRect(x, y + TILE/2 - 2, TILE, 4);
+            ctx.globalAlpha = 1;
+          } else if (cell === 2) {
+            // Dot
+            ctx.fillStyle = C.dot;
+            ctx.beginPath();
+            ctx.arc(x + TILE/2, y + TILE/2, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+          } else if (cell === 3) {
+            // Power dot (pulsing)
+            var pulse = 4 + Math.sin(animFrame * 0.15) * 2;
+            ctx.fillStyle = C.powerDot;
+            ctx.shadowColor = C.powerDot;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(x + TILE/2, y + TILE/2, pulse, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+        }
+      }
+    }
+
+    function drawPlayer() {
+      var px = player.x * TILE + TILE/2;
+      var py = player.y * TILE + TILE/2;
+      var r = TILE/2 - 1;
+
+      // Mouth animation
+      player.mouthOpen += 0.15 * player.mouthDir;
+      if (player.mouthOpen > 0.8) player.mouthDir = -1;
+      if (player.mouthOpen < 0.05) player.mouthDir = 1;
+
+      var mouthAngle = player.mouthOpen * 0.4;
+      var startAngle = 0;
+
+      // Direction rotation
+      switch (player.dir) {
+        case 0: startAngle = 0; break;       // right
+        case 1: startAngle = Math.PI/2; break;   // down
+        case 2: startAngle = Math.PI; break;     // left
+        case 3: startAngle = -Math.PI/2; break;  // up
+      }
+
+      // Glow
+      ctx.shadowColor = C.player;
+      ctx.shadowBlur = 10;
+
+      // Body
+      ctx.fillStyle = C.player;
+      ctx.beginPath();
+      ctx.arc(px, py, r, startAngle + mouthAngle, startAngle + Math.PI * 2 - mouthAngle);
+      ctx.lineTo(px, py);
+      ctx.fill();
+
+      // Outline
+      ctx.strokeStyle = C.playerOutline;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(px, py, r, startAngle + mouthAngle, startAngle + Math.PI * 2 - mouthAngle);
+      ctx.lineTo(px, py);
+      ctx.stroke();
+
+      ctx.shadowBlur = 0;
+    }
+
+    function drawGhost(ghost) {
+      var gx = ghost.x * TILE + TILE/2;
+      var gy = ghost.y * TILE + TILE/2;
+      var r = TILE/2 - 1;
+
+      var color = ghost.scared ? C.ghostScared : ghost.color;
+
+      // Glow
+      ctx.shadowColor = color;
+      ctx.shadowBlur = ghost.scared ? 4 : 8;
+
+      // Body (rounded top, wavy bottom)
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.arc(gx, gy - 2, r, Math.PI, 0);
+      ctx.lineTo(gx + r, gy + r);
+      // Wavy bottom
+      var wave = Math.sin(animFrame * 0.2) * 2;
+      for (var i = r; i >= -r; i -= 4) {
+        ctx.lineTo(gx + i, gy + r + (i % 8 === 0 ? wave : -wave));
+      }
+      ctx.lineTo(gx - r, gy - 2);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+
+      // Eyes
+      if (!ghost.scared) {
+        var eyeOffX = 0, eyeOffY = 0;
+        switch (ghost.dir) {
+          case 0: eyeOffX = 2; break;
+          case 1: eyeOffY = 2; break;
+          case 2: eyeOffX = -2; break;
+          case 3: eyeOffY = -2; break;
+        }
+
+        // White
+        ctx.fillStyle = C.ghostEyes;
+        ctx.beginPath();
+        ctx.ellipse(gx - 4, gy - 3, 3.5, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(gx + 4, gy - 3, 3.5, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Pupils
+        ctx.fillStyle = '#111';
+        ctx.beginPath();
+        ctx.arc(gx - 4 + eyeOffX, gy - 3 + eyeOffY, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(gx + 4 + eyeOffX, gy - 3 + eyeOffY, 2, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        // Scared face
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(gx - 3, gy - 3, 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(gx + 3, gy - 3, 2, 0, Math.PI * 2);
+        ctx.fill();
+        // Wavy mouth
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(gx - 5, gy + 3);
+        for (var w = -5; w <= 5; w += 2) {
+          ctx.lineTo(gx + w, gy + 3 + (w % 4 === 0 ? -2 : 2));
+        }
+        ctx.stroke();
+      }
+    }
+
+    // ========================
+    // MOVEMENT / COLLISION
+    // ========================
+    var DX = [1, 0, -1, 0];
+    var DY = [0, 1, 0, -1];
+
+    function canMove(x, y) {
+      if (y < 0 || y >= ROWS) return false;
+      // Tunnel wrapping
+      if (x < 0 || x >= COLS) return true;
+      var cell = maze[y][x];
+      return cell !== 1 && cell !== 4;
+    }
+
+    function canMoveGhost(x, y, isInHouse) {
+      if (y < 0 || y >= ROWS) return false;
+      if (x < 0 || x >= COLS) return true;
+      var cell = maze[y][x];
+      if (cell === 1) return false;
+      if (cell === 4 && !isInHouse) return false;
+      return true;
+    }
+
+    function movePlayer() {
+      // Try next direction first
+      if (player.nextDir >= 0) {
+        var nx = player.x + DX[player.nextDir];
+        var ny = player.y + DY[player.nextDir];
+        if (canMove(nx, ny)) {
+          player.dir = player.nextDir;
+          player.nextDir = -1;
+        }
+      }
+
+      var nx2 = player.x + DX[player.dir];
+      var ny2 = player.y + DY[player.dir];
+
+      // Tunnel
+      if (nx2 < 0) nx2 = COLS - 1;
+      if (nx2 >= COLS) nx2 = 0;
+
+      if (canMove(nx2, ny2)) {
+        player.x = nx2;
+        player.y = ny2;
+      }
+
+      // Eat dots
+      var cell = maze[player.y][player.x];
+      if (cell === 2) {
+        maze[player.y][player.x] = 0;
+        score += 10;
+        dotsEaten++;
+      } else if (cell === 3) {
+        maze[player.y][player.x] = 0;
+        score += 50;
+        dotsEaten++;
+        // Scare ghosts
+        ghostScaredTimer = GHOST_SCARED_DURATION;
+        ghosts.forEach(function(g) { g.scared = true; });
+      }
+
+      // Check win
+      if (dotsEaten >= totalDots) {
+        levelWin();
+      }
+    }
+
+    function moveGhosts() {
+      ghosts.forEach(function(ghost, idx) {
+        // Release from house over time
+        if (ghost.inHouse) {
+          if (animFrame > 60 * (idx + 1)) {
+            ghost.inHouse = false;
+            ghost.y = 11;
+            ghost.x = 14;
+          }
+          return;
+        }
+
+        // Move every N frames based on speed
+        if (animFrame % Math.round(8 / ghost.speed) !== 0) return;
+
+        // Simple AI: chase player or run if scared
+        var bestDir = ghost.dir;
+        var bestDist = Infinity;
+
+        var targetX = player.x;
+        var targetY = player.y;
+
+        if (ghost.scared) {
+          // Run away: pick direction that maximizes distance
+          bestDist = -Infinity;
+          for (var d = 0; d < 4; d++) {
+            // Don't reverse direction
+            if (d === (ghost.dir + 2) % 4) continue;
+            var tx = ghost.x + DX[d];
+            var ty = ghost.y + DY[d];
+            if (tx < 0) tx = COLS - 1;
+            if (tx >= COLS) tx = 0;
+            if (!canMoveGhost(tx, ty, false)) continue;
+            var dist = Math.abs(tx - targetX) + Math.abs(ty - targetY);
+            if (dist > bestDist) {
+              bestDist = dist;
+              bestDir = d;
+            }
+          }
+        } else {
+          // Different targeting per ghost
+          switch (idx) {
+            case 0: // Direct chase
+              break;
+            case 1: // Ahead of player
+              targetX = player.x + DX[player.dir] * 4;
+              targetY = player.y + DY[player.dir] * 4;
+              break;
+            case 2: // Random-ish
+              if (Math.random() < 0.3) {
+                targetX = Math.floor(Math.random() * COLS);
+                targetY = Math.floor(Math.random() * ROWS);
+              }
+              break;
+            case 3: // Ambush from bottom
+              targetX = player.x;
+              targetY = player.y + 4;
+              break;
+          }
+
+          for (var d2 = 0; d2 < 4; d2++) {
+            if (d2 === (ghost.dir + 2) % 4) continue;
+            var tx2 = ghost.x + DX[d2];
+            var ty2 = ghost.y + DY[d2];
+            if (tx2 < 0) tx2 = COLS - 1;
+            if (tx2 >= COLS) tx2 = 0;
+            if (!canMoveGhost(tx2, ty2, false)) continue;
+            var dist2 = Math.abs(tx2 - targetX) + Math.abs(ty2 - targetY);
+            if (dist2 < bestDist) {
+              bestDist = dist2;
+              bestDir = d2;
+            }
+          }
+        }
+
+        ghost.dir = bestDir;
+        var newX = ghost.x + DX[ghost.dir];
+        var newY = ghost.y + DY[ghost.dir];
+        if (newX < 0) newX = COLS - 1;
+        if (newX >= COLS) newX = 0;
+
+        if (canMoveGhost(newX, newY, false)) {
+          ghost.x = newX;
+          ghost.y = newY;
+        }
+      });
+
+      // Scared timer
+      if (ghostScaredTimer > 0) {
+        ghostScaredTimer--;
+        if (ghostScaredTimer <= 0) {
+          ghosts.forEach(function(g) { g.scared = false; });
+        }
+      }
+    }
+
+    function checkCollisions() {
+      ghosts.forEach(function(ghost) {
+        if (ghost.inHouse) return;
+        if (ghost.x === player.x && ghost.y === player.y) {
+          if (ghost.scared) {
+            // Eat ghost
+            score += 200;
+            ghost.x = 14;
+            ghost.y = 14;
+            ghost.inHouse = true;
+            ghost.scared = false;
+          } else {
+            // Player dies
+            lives--;
+            updateHUD();
+            if (lives <= 0) {
+              gameOver();
+            } else {
+              resetPlayer();
+              initGhosts();
+            }
+          }
+        }
+      });
+    }
+
+    // ========================
+    // HUD
+    // ========================
+    function updateHUD() {
+      document.getElementById('hudScore').textContent = score;
+      document.getElementById('hudLives').textContent = lives;
+      document.getElementById('hudLevel').textContent = level;
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('nakamigoman_high', String(highScore));
+      }
+      document.getElementById('hudHigh').textContent = highScore;
+    }
+
+    // ========================
+    // GAME FLOW
+    // ========================
+    var overlayStart = document.getElementById('startOverlay');
+    var overlayGameOver = document.getElementById('gameOverOverlay');
+    var overlayWin = document.getElementById('winOverlay');
+
+    function startGame() {
+      score = 0;
+      lives = 3;
+      level = 1;
+      ghostScaredTimer = 0;
+      animFrame = 0;
+      resetMaze();
+      resetPlayer();
+      initGhosts();
+      updateHUD();
+      overlayStart.classList.add('hidden');
+      overlayGameOver.classList.add('hidden');
+      overlayWin.classList.add('hidden');
+      gameRunning = true;
+    }
+
+    function gameOver() {
+      gameRunning = false;
+      var name = document.getElementById('playerName').value || 'Player';
+      document.getElementById('finalScore').textContent = 'Score: ' + score;
+      document.getElementById('finalName').textContent = name + ' - Level ' + level;
+      overlayGameOver.classList.remove('hidden');
+    }
+
+    function levelWin() {
+      gameRunning = false;
+      level++;
+      document.getElementById('levelScore').textContent = 'Score: ' + score;
+      overlayWin.classList.remove('hidden');
+    }
+
+    function startNextLevel() {
+      ghostScaredTimer = 0;
+      animFrame = 0;
+      resetMaze();
+      resetPlayer();
+      initGhosts();
+      // Ghosts get faster each level
+      ghosts.forEach(function(g) {
+        g.speed = Math.min(g.speed + 0.1, 2);
+      });
+      updateHUD();
+      overlayWin.classList.add('hidden');
+      gameRunning = true;
+    }
+
+    // ========================
+    // INPUT
+    // ========================
+    document.addEventListener('keydown', function(e) {
+      switch (e.key) {
+        case 'ArrowRight': case 'd': case 'D': player.nextDir = 0; e.preventDefault(); break;
+        case 'ArrowDown':  case 's': case 'S': player.nextDir = 1; e.preventDefault(); break;
+        case 'ArrowLeft':  case 'a': case 'A': player.nextDir = 2; e.preventDefault(); break;
+        case 'ArrowUp':    case 'w': case 'W': player.nextDir = 3; e.preventDefault(); break;
+      }
+    });
+
+    // Mobile d-pad
+    var dpadBtns = document.querySelectorAll('.dpad-btn');
+    var dirMap = { up: 3, down: 1, left: 2, right: 0 };
+    dpadBtns.forEach(function(btn) {
+      var dir = dirMap[btn.getAttribute('data-dir')];
+      btn.addEventListener('touchstart', function(e) {
+        e.preventDefault();
+        player.nextDir = dir;
+        btn.classList.add('active');
+      });
+      btn.addEventListener('touchend', function() {
+        btn.classList.remove('active');
+      });
+    });
+
+    // Button handlers
+    document.getElementById('startBtn').addEventListener('click', startGame);
+    document.getElementById('restartBtn').addEventListener('click', startGame);
+    document.getElementById('nextLevelBtn').addEventListener('click', startNextLevel);
+    document.getElementById('mobileStartBtn').addEventListener('click', function() {
+      if (!gameRunning) {
+        if (!overlayStart.classList.contains('hidden')) startGame();
+        else if (!overlayGameOver.classList.contains('hidden')) startGame();
+        else if (!overlayWin.classList.contains('hidden')) startNextLevel();
+      }
+    });
+
+    // ========================
+    // GAME LOOP
+    // ========================
+    var moveCounter = 0;
+    var MOVE_RATE = 6; // Player moves every N frames
+
+    function gameLoop() {
+      // Clear
+      ctx.fillStyle = C.bg;
+      ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+      drawMaze();
+
+      if (gameRunning) {
+        animFrame++;
+        moveCounter++;
+
+        if (moveCounter >= MOVE_RATE) {
+          moveCounter = 0;
+          movePlayer();
+          checkCollisions();
+        }
+
+        moveGhosts();
+        checkCollisions();
+        updateHUD();
+      }
+
+      drawPlayer();
+      ghosts.forEach(drawGhost);
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Initialize display
+    resetMaze();
+    resetPlayer();
+    initGhosts();
+    updateHUD();
+    gameLoop();
+  })();
+  </script>
+
+</body>
+</html>
