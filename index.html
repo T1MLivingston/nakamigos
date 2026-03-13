@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Hub</title>
+  <meta name="description" content="Explore the Nakamigos community hub. Play Bean Wars, Nakamigo Man, learn about the MEEGSTR strategy token, read the whitepaper, and discover the lore.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Inter:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: #020052;
+      color: #d0d4f0;
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+    /* ==============================
+       DEEP PERSPECTIVE GRID BG
+    ============================== */
+    .naka-grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .naka-grid-floor {
+      position: absolute;
+      bottom: -20%;
+      left: -50%;
+      width: 200%;
+      height: 80%;
+      background:
+        linear-gradient(rgba(0, 163, 255, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 163, 255, 0.28) 1px, transparent 1px);
+      background-size: 60px 60px;
+      transform: perspective(400px) rotateX(60deg);
+      transform-origin: center top;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 70%);
+      animation: naka-grid-scroll 8s linear infinite;
+    }
+    @keyframes naka-grid-scroll {
+      0%   { background-position: 0 0, 0 0; }
+      100% { background-position: 0 60px, 0 60px; }
+    }
+    .naka-grid-vertical {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(0, 163, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 163, 255, 0.07) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 90% 70% at 50% 50%, rgba(0,0,0,0.7) 0%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 50%, rgba(0,0,0,0.7) 0%, transparent 100%);
+    }
+    .naka-grid-glow {
+      position: absolute;
+      bottom: 30%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 5%, rgba(0, 163, 255, 0.4) 25%, rgba(235, 0, 255, 0.3) 50%, rgba(0, 163, 255, 0.4) 75%, transparent 95%);
+      box-shadow: 0 0 80px 20px rgba(0, 163, 255, 0.1);
+    }
+    .naka-grid-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px);
+    }
+    .naka-grid-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, #020052 100%);
+    }
+    .naka-grid-stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at 10% 15%, rgba(0,163,255,0.3), transparent),
+        radial-gradient(1px 1px at 25% 8%, rgba(235,0,255,0.2), transparent),
+        radial-gradient(1px 1px at 40% 22%, rgba(255,255,255,0.15), transparent),
+        radial-gradient(1px 1px at 55% 5%, rgba(0,163,255,0.25), transparent),
+        radial-gradient(1px 1px at 70% 18%, rgba(255,255,255,0.12), transparent),
+        radial-gradient(1px 1px at 85% 12%, rgba(235,0,255,0.15), transparent),
+        radial-gradient(1px 1px at 15% 35%, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 60% 30%, rgba(0,163,255,0.2), transparent),
+        radial-gradient(1px 1px at 90% 28%, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1.5px 1.5px at 33% 42%, rgba(0,163,255,0.15), transparent),
+        radial-gradient(1px 1px at 78% 38%, rgba(235,0,255,0.12), transparent),
+        radial-gradient(1px 1px at 5% 48%, rgba(255,255,255,0.08), transparent);
+    }
+    /* ========================
+       STICKY NAV
+    ======================== */
+    .naka-nav {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: rgba(2, 0, 60, 0.92);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(0, 163, 255, 0.15);
+    }
+    .naka-nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 58px;
+      padding: 0 24px;
+    }
+    .naka-nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .naka-nav-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 163, 255, 0.3);
+      object-fit: cover;
+    }
+    .naka-nav-logo {
+      font-family: 'Silkscreen', cursive;
+      font-size: 1rem;
+      color: #00A3FF;
+      letter-spacing: 1px;
+      text-shadow: 0 0 14px rgba(0, 163, 255, 0.5);
+      white-space: nowrap;
+    }
+    .naka-nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .naka-nav-links a {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #7a7eb0;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: color 0.2s, background 0.2s;
+      letter-spacing: 0.5px;
+    }
+    .naka-nav-links a:hover,
+    .naka-nav-links a:focus-visible {
+      color: #00A3FF;
+      background: rgba(0, 163, 255, 0.08);
+    }
+    /* ========================
+       HERO (two-column split)
+    ======================== */
+    .naka-hero {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 70px 24px 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    .naka-hero-left {
+      padding-top: 16px;
+    }
+    .naka-hero-left h1 {
+      font-family: 'Silkscreen', cursive;
+      font-size: clamp(1.6rem, 5vw, 2.8rem);
+      line-height: 1.35;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, #00A3FF 0%, #EB00FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(0, 163, 255, 0.35));
+      animation: naka-hero-glow 3s ease-in-out infinite alternate, naka-float 6s ease-in-out infinite;
+    }
+    @keyframes naka-hero-glow {
+      0%   { filter: drop-shadow(0 0 20px rgba(0, 163, 255, 0.3)) drop-shadow(0 0 40px rgba(235, 0, 255, 0.1)); }
+      100% { filter: drop-shadow(0 0 32px rgba(235, 0, 255, 0.35)) drop-shadow(0 0 60px rgba(0, 163, 255, 0.15)); }
+    }
+    @keyframes naka-float {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-4px); }
+    }
+    .naka-hero-left p {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      color: #9498c4;
+      max-width: 480px;
+      line-height: 1.75;
+    }
+    .naka-hero-right {
+      background: linear-gradient(160deg, rgba(12, 8, 64, 0.9) 0%, rgba(4, 2, 48, 0.95) 100%);
+      border: 1px solid rgba(0, 163, 255, 0.12);
+      border-radius: 14px;
+      padding: 24px 22px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .naka-hero-right:hover {
+      border-color: rgba(0, 163, 255, 0.3);
+      box-shadow: 0 0 24px rgba(0, 163, 255, 0.1);
+    }
+    /* ========================
+       CRYPTO TICKER (below hero)
+    ======================== */
+    .naka-ticker {
+      position: relative;
+      z-index: 1;
+      background: rgba(0, 0, 30, 0.85);
+      border-top: 1px solid rgba(0, 163, 255, 0.08);
+      border-bottom: 1px solid rgba(0, 163, 255, 0.08);
+      overflow: hidden;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+    .naka-ticker-track {
+      display: flex;
+      animation: naka-ticker-scroll 40s linear infinite;
+      white-space: nowrap;
+    }
+    .naka-ticker-set {
+      display: flex;
+      flex-shrink: 0;
+    }
+    @keyframes naka-ticker-scroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+    .naka-ticker-item {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: #7a7eb0;
+      padding: 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+    }
+    .naka-ticker-coin-symbol {
+      font-size: 1rem;
+      color: #00A3FF;
+      font-weight: 700;
+    }
+    .naka-ticker-name {
+      color: #9498c4;
+    }
+    .naka-ticker-price {
+      color: #b8bce0;
+      font-weight: 700;
+    }
+    .naka-ticker-change {
+      font-size: 0.85rem;
+    }
+    .naka-ticker-change--up { color: #00e676; }
+    .naka-ticker-change--down { color: #ff5252; }
+    .naka-ticker-sep {
+      color: rgba(0, 163, 255, 0.15);
+      padding: 0 4px;
+    }
+    /* ========================
+       HERO TOKEN CARD (right side)
+    ======================== */
+    .naka-hero-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.8rem;
+      color: #5c608e;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .naka-hero-token-title {
+      font-family: 'Silkscreen', cursive;
+      font-size: 1rem;
+      color: #fff;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .naka-hero-token-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      border: 1px solid rgba(0, 163, 255, 0.2);
+      object-fit: cover;
+    }
+    .naka-hero-detail {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 7px 0;
+      border-bottom: 1px solid rgba(0, 163, 255, 0.06);
+    }
+    .naka-hero-detail:last-of-type { border-bottom: none; }
+    .naka-hero-detail-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      color: #5c608e;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .naka-hero-detail-value {
+      font-size: 0.85rem;
+      color: #b8bce0;
+      font-weight: 500;
+      word-break: break-all;
+      text-align: right;
+    }
+    .naka-hero-detail-value a {
+      color: #00A3FF;
+      text-decoration: none;
+    }
+    .naka-hero-detail-value a:hover { text-decoration: underline; }
+    .naka-hero-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+    .naka-hero-divider {
+      border: none;
+      height: 1px;
+      background: rgba(0, 163, 255, 0.08);
+      margin: 14px 0;
+    }
+    .naka-hero-extra-links {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    /* ========================
+       SHARED SECTION STYLES
+    ======================== */
+    .naka-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 56px 24px;
+    }
+    .naka-divider {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, rgba(0, 163, 255, 0.22) 30%, rgba(235, 0, 255, 0.12) 70%, transparent 100%);
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .naka-heading {
+      font-family: 'Silkscreen', cursive;
+      font-size: clamp(1.05rem, 3vw, 1.5rem);
+      color: #fff;
+      margin-bottom: 6px;
+      text-shadow: 0 0 18px rgba(0, 163, 255, 0.25);
+    }
+    .naka-subheading {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #5c608e;
+      margin-bottom: 32px;
+      letter-spacing: 0.5px;
+    }
+    /* ========================
+       SECTION WITH CHARACTER
+    ======================== */
+    .naka-section-with-char {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+    .naka-section-char {
+      width: 100px;
+      height: 100px;
+      border-radius: 10px;
+      border: 2px solid rgba(0, 163, 255, 0.15);
+      object-fit: cover;
+      flex-shrink: 0;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+    .naka-section-char:hover {
+      transform: scale(1.08);
+      border-color: #00A3FF;
+    }
+    .naka-section-char-content {
+      flex: 1;
+      min-width: 0;
+    }
+    /* ========================
+       GAME CARDS -- WIDER
+    ======================== */
+    .naka-games-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .naka-game-card {
+      background: linear-gradient(160deg, rgba(12, 8, 64, 0.92) 0%, rgba(4, 2, 48, 0.96) 100%);
+      border: 2px solid rgba(0, 163, 255, 0.12);
+      border-radius: 14px;
+      padding: 0;
+      transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .naka-game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00A3FF, #EB00FF);
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 2;
+    }
+    .naka-game-card:hover::before { opacity: 1; }
+    .naka-game-card:hover {
+      transform: translateY(-6px);
+      border-color: #00A3FF;
+      box-shadow: 0 0 28px rgba(0, 163, 255, 0.12), 0 18px 44px rgba(0, 0, 0, 0.35);
+    }
+    .naka-game-card--featured { border-color: rgba(235, 0, 255, 0.2); }
+    .naka-game-card--featured:hover {
+      border-color: #EB00FF;
+      box-shadow: 0 0 28px rgba(235, 0, 255, 0.12), 0 18px 44px rgba(0, 0, 0, 0.35);
+    }
+    .naka-game-card--coming {
+      border-style: dashed;
+      border-color: rgba(0, 163, 255, 0.08);
+      opacity: 0.7;
+    }
+    .naka-game-card--coming:hover {
+      opacity: 0.85;
+      transform: translateY(-3px);
+      border-color: rgba(0, 163, 255, 0.15);
+      box-shadow: none;
+    }
+    .naka-game-poster {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px 12px 0 0;
+    }
+    .naka-game-poster-placeholder {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      background: linear-gradient(135deg, rgba(0, 163, 255, 0.06) 0%, rgba(235, 0, 255, 0.04) 100%);
+      border-bottom: 1px solid rgba(0, 163, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .naka-game-poster-placeholder span {
+      font-family: 'VT323', monospace;
+      font-size: 0.8rem;
+      color: #3a3e6a;
+      letter-spacing: 1px;
+    }
+    .naka-game-body {
+      padding: 18px 20px 22px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+    .naka-badge {
+      font-family: 'VT323', monospace;
+      font-size: 0.88rem;
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      background: rgba(235, 0, 255, 0.12);
+      color: #EB00FF;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+      align-self: flex-start;
+    }
+    .naka-badge--muted {
+      background: rgba(0, 163, 255, 0.06);
+      color: #4a4e7a;
+    }
+    .naka-game-body h3 {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.9rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .naka-game-card--coming .naka-game-body h3 { color: #5c608e; }
+    .naka-game-body p {
+      font-size: 0.85rem;
+      color: #7a7ea8;
+      margin-bottom: 18px;
+      line-height: 1.55;
+      flex: 1;
+    }
+    .naka-game-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+    /* ========================
+       BUTTONS
+    ======================== */
+    .naka-btn {
+      display: inline-block;
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.7rem;
+      padding: 9px 20px;
+      border-radius: 6px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      letter-spacing: 1px;
+    }
+    .naka-btn:hover { transform: scale(1.05); }
+    .naka-btn:active { transform: scale(0.97); }
+    .naka-btn--primary {
+      background-size: 200% 100%;
+      background-image: linear-gradient(135deg, #FF8A00 0%, #AF00DB 50%, #FF8A00 100%);
+      color: #fff;
+      box-shadow: 0 4px 18px rgba(255, 138, 0, 0.25);
+    }
+    .naka-btn--primary:hover {
+      box-shadow: 0 6px 28px rgba(255, 138, 0, 0.4);
+      animation: naka-shimmer 1.5s ease-in-out infinite;
+    }
+    @keyframes naka-shimmer {
+      0%   { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .naka-btn--ghost {
+      background: transparent;
+      color: #00A3FF;
+      border: 1px solid rgba(0, 163, 255, 0.25);
+    }
+    .naka-btn--ghost:hover {
+      background: rgba(0, 163, 255, 0.06);
+      border-color: #00A3FF;
+    }
+    .naka-btn--small {
+      font-size: 0.65rem;
+      padding: 7px 14px;
+    }
+    /* ========================
+       LORE
+    ======================== */
+    .naka-lore-content {
+      flex: 1;
+      min-width: 0;
+    }
+    .naka-lore-content p {
+      color: #9498c4;
+      margin-bottom: 18px;
+      line-height: 1.75;
+    }
+    .naka-lore-content strong {
+      color: #00A3FF;
+      font-weight: 600;
+    }
+    /* ========================
+       COMING SOON
+    ======================== */
+    .naka-coming-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .naka-coming-card {
+      background: rgba(8, 4, 48, 0.45);
+      border: 2px dashed rgba(0, 163, 255, 0.1);
+      border-radius: 14px;
+      padding: 0;
+      text-align: center;
+      opacity: 0.75;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .naka-coming-card-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: contain;
+      background: #0a0636;
+      border-bottom: 1px solid rgba(0, 163, 255, 0.06);
+    }
+    .naka-coming-card-body {
+      padding: 24px 24px 28px;
+    }
+    .naka-coming-card-body h3 {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.9rem;
+      color: #5c608e;
+      margin-bottom: 10px;
+    }
+    .naka-coming-card-body p {
+      font-size: 0.85rem;
+      color: #444878;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+    .naka-coming-card-body a {
+      color: #00A3FF;
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+    .naka-coming-card-body a:hover { text-decoration: underline; }
+    .naka-coming-badge {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: #444878;
+      border: 1px solid rgba(0, 163, 255, 0.08);
+      padding: 4px 14px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    /* ========================
+       LINKS
+    ======================== */
+    .naka-links-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .naka-links-col h3 {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #5c608e;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .naka-links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .naka-link-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(10, 6, 56, 0.55);
+      border: 1px solid rgba(0, 163, 255, 0.08);
+      border-radius: 8px;
+      color: #b8bce0;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .naka-link-item:hover {
+      border-color: #00A3FF;
+      background: rgba(0, 163, 255, 0.05);
+      color: #fff;
+    }
+    .naka-link-label {
+      font-family: 'VT323', monospace;
+      font-size: 0.75rem;
+      color: #3a3e6a;
+      margin-left: auto;
+      letter-spacing: 0.5px;
+    }
+    /* ========================
+       CREDITS + FOOTER
+    ======================== */
+    .naka-credits { text-align: center; }
+    .naka-credits p {
+      color: #5c608e;
+      font-size: 0.88rem;
+      line-height: 1.7;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .naka-credits a {
+      color: #00A3FF;
+      text-decoration: none;
+    }
+    .naka-credits a:hover { text-decoration: underline; }
+    .naka-footer {
+      text-align: center;
+      padding: 32px 24px;
+      border-top: 1px solid rgba(0, 163, 255, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+    .naka-footer p {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: #3a3e6a;
+    }
+    /* ========================
+       RESPONSIVE
+    ======================== */
+    @media (max-width: 800px) {
+      .naka-games-grid { grid-template-columns: 1fr 1fr; }
+      .naka-links-section { grid-template-columns: 1fr; gap: 24px; }
+      .naka-section-with-char { flex-direction: column; gap: 20px; }
+      .naka-section-char { width: 80px; height: 80px; }
+    }
+    @media (max-width: 700px) {
+      .naka-nav-inner {
+        flex-direction: column;
+        height: auto;
+        padding: 10px 16px;
+        gap: 6px;
+      }
+      .naka-nav-links { justify-content: center; }
+      .naka-nav-links a { font-size: 0.88rem; padding: 4px 8px; }
+      .naka-hero { padding: 50px 16px 20px; grid-template-columns: 1fr; }
+      .naka-hero-left { padding-top: 0; }
+      .naka-section { padding: 40px 16px; }
+    }
+    @media (max-width: 560px) {
+      .naka-games-grid { grid-template-columns: 1fr; }
+    }
+    a:focus-visible,
+    .naka-btn:focus-visible {
+      outline: 2px solid #00A3FF;
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ========== DEEP PERSPECTIVE GRID BG ========== -->
+  <div class="naka-grid-bg" aria-hidden="true">
+    <div class="naka-grid-stars"></div>
+    <div class="naka-grid-vertical"></div>
+    <div class="naka-grid-floor"></div>
+    <div class="naka-grid-glow"></div>
+    <div class="naka-grid-scanlines"></div>
+    <div class="naka-grid-vignette"></div>
+  </div>
+  <!-- ========== STICKY NAV ========== -->
+  <nav class="naka-nav" role="navigation" aria-label="Main navigation">
+    <div class="naka-nav-inner">
+      <a href="/games/nakamigos/" class="naka-nav-brand">
+        <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="Nakamigo" class="naka-nav-avatar">
+        <span class="naka-nav-logo">NAKAMIGOS</span>
+      </a>
+      <ul class="naka-nav-links">
+        <li><a href="#play">PLAY</a></li>
+        <li><a href="#lore">LORE</a></li>
+        <li><a href="#links">LINKS</a></li>
+      </ul>
+    </div>
+  </nav>
+  <!-- ========== HERO (two-column: Community Hub left, MEEGSTR right) ========== -->
+  <header class="naka-hero">
+    <div class="naka-hero-left">
+      <h1>Community Hub</h1>
+      <p>The Nakamigos community, the games being built, the MEEGSTR strategy token, the whitepaper, and the lore that ties it all together.</p>
+    </div>
+    <div class="naka-hero-right" id="token">
+      <div class="naka-hero-label">Strategy Token</div>
+      <div class="naka-hero-token-title">
+        <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="MEEGSTR" class="naka-hero-token-icon">
+        MEEGSTR
+      </div>
+      <div class="naka-hero-detail">
+        <span class="naka-hero-detail-label">Token</span>
+        <span class="naka-hero-detail-value">MEEGSTR</span>
+      </div>
+      <div class="naka-hero-detail">
+        <span class="naka-hero-detail-label">Chain</span>
+        <span class="naka-hero-detail-value">Base (ERC-20)</span>
+      </div>
+      <div class="naka-hero-detail">
+        <span class="naka-hero-detail-label">Contract</span>
+        <span class="naka-hero-detail-value"><a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer">0x4f1dE1...14B77</a></span>
+      </div>
+      <div class="naka-hero-detail">
+        <span class="naka-hero-detail-label">Status</span>
+        <span class="naka-hero-detail-value">Live</span>
+      </div>
+      <div class="naka-hero-actions">
+        <a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Basescan</a>
+        <a href="https://dexscreener.com/base/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Dexscreener</a>
+        <a href="https://nakamigo.ai/migostrategy" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">MigoStrategy</a>
+      </div>
+      <hr class="naka-hero-divider">
+      <div class="naka-hero-extra-links">
+        <a href="https://nakamigo.ai/wp" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary naka-btn--small">Whitepaper</a>
+        <a href="https://nakamigo.ai" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Nakamigo.ai</a>
+      </div>
+    </div>
+  </header>
+  <!-- ========== CRYPTO TICKER (below hero) ========== -->
+  <div class="naka-ticker" id="naka-ticker" aria-label="Crypto price ticker">
+    <div class="naka-ticker-track">
+      <div class="naka-ticker-set" id="naka-ticker-set-1">
+        <span class="naka-ticker-item" data-coin="bitcoin"><span class="naka-ticker-coin-symbol">&#8383;</span> <span class="naka-ticker-name">BTC</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ethereum"><span class="naka-ticker-coin-symbol">&Xi;</span> <span class="naka-ticker-name">ETH</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ripple"><span class="naka-ticker-coin-symbol">XRP</span> <span class="naka-ticker-name">XRP</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="solana"><span class="naka-ticker-coin-symbol">&#9678;</span> <span class="naka-ticker-name">SOL</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="dogecoin"><span class="naka-ticker-coin-symbol">&ETH;</span> <span class="naka-ticker-name">DOGE</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="bitcoin"><span class="naka-ticker-coin-symbol">&#8383;</span> <span class="naka-ticker-name">BTC</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ethereum"><span class="naka-ticker-coin-symbol">&Xi;</span> <span class="naka-ticker-name">ETH</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ripple"><span class="naka-ticker-coin-symbol">XRP</span> <span class="naka-ticker-name">XRP</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="solana"><span class="naka-ticker-coin-symbol">&#9678;</span> <span class="naka-ticker-name">SOL</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="dogecoin"><span class="naka-ticker-coin-symbol">&ETH;</span> <span class="naka-ticker-name">DOGE</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+      </div>
+      <div class="naka-ticker-set" id="naka-ticker-set-2" aria-hidden="true">
+        <span class="naka-ticker-item" data-coin="bitcoin"><span class="naka-ticker-coin-symbol">&#8383;</span> <span class="naka-ticker-name">BTC</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ethereum"><span class="naka-ticker-coin-symbol">&Xi;</span> <span class="naka-ticker-name">ETH</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ripple"><span class="naka-ticker-coin-symbol">XRP</span> <span class="naka-ticker-name">XRP</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="solana"><span class="naka-ticker-coin-symbol">&#9678;</span> <span class="naka-ticker-name">SOL</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="dogecoin"><span class="naka-ticker-coin-symbol">&ETH;</span> <span class="naka-ticker-name">DOGE</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="bitcoin"><span class="naka-ticker-coin-symbol">&#8383;</span> <span class="naka-ticker-name">BTC</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ethereum"><span class="naka-ticker-coin-symbol">&Xi;</span> <span class="naka-ticker-name">ETH</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="ripple"><span class="naka-ticker-coin-symbol">XRP</span> <span class="naka-ticker-name">XRP</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="solana"><span class="naka-ticker-coin-symbol">&#9678;</span> <span class="naka-ticker-name">SOL</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+        <span class="naka-ticker-item" data-coin="dogecoin"><span class="naka-ticker-coin-symbol">&ETH;</span> <span class="naka-ticker-name">DOGE</span> <span class="naka-ticker-price">--</span> <span class="naka-ticker-change">--</span></span>
+        <span class="naka-ticker-sep">|</span>
+      </div>
+    </div>
+  </div>
+  <hr class="naka-divider">
+  <!-- ========== GAME HUB ========== -->
+  <section id="play" class="naka-section">
+    <h2 class="naka-heading">Game Hub</h2>
+    <p class="naka-subheading">Community-built games. Pick one and play.</p>
+    <div class="naka-games-grid">
+      <!-- Bean Wars (Featured) -->
+      <article class="naka-game-card naka-game-card--featured">
+        <img
+          src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/699e759c474f4e9bcd66b9d9_image.jpeg"
+          alt="Bean Wars game poster"
+          class="naka-game-poster"
+        >
+        <div class="naka-game-body">
+          <span class="naka-badge">FEATURED</span>
+          <h3>Bean Wars</h3>
+          <p>Cloaks vs Migos battle arena. Choose a side, build your loadout, and survive the bean battlefield.</p>
+          <div class="naka-game-actions">
+            <a href="https://bean-wars.vercel.app/" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary">Play</a>
+            <a href="#" class="naka-btn naka-btn--ghost">How to Play</a>
+          </div>
+        </div>
+      </article>
+      <!-- Nakamigo Man (zoomed White Shag as poster) -->
+      <article class="naka-game-card">
+        <img
+          src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg"
+          alt="Nakamigo Man - White Shag character"
+          class="naka-game-poster"
+          style="object-position: center 20%;"
+        >
+        <div class="naka-game-body">
+          <h3>Nakamigo Man</h3>
+          <p>Retro arcade runner. Collect crypto tokens, dodge enemies, and chase the high score.</p>
+          <div class="naka-game-actions">
+            <a href="/games/nakamigoman" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary">Play</a>
+            <a href="#" class="naka-btn naka-btn--ghost">How to Play</a>
+          </div>
+        </div>
+      </article>
+      <!-- Coming Soon -->
+      <article class="naka-game-card naka-game-card--coming">
+        <div class="naka-game-poster-placeholder">
+          <span>TBA</span>
+        </div>
+        <div class="naka-game-body">
+          <span class="naka-badge naka-badge--muted">COMING SOON</span>
+          <h3>New Game</h3>
+          <p>Something new is being built. Stay tuned for the next community game drop.</p>
+          <div class="naka-game-actions">
+            <span class="naka-btn naka-btn--ghost" style="opacity: 0.4; pointer-events: none;">Play</span>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+  <hr class="naka-divider">
+  <!-- ========== LORE (Gator on left) ========== -->
+  <section id="lore" class="naka-section">
+    <div class="naka-section-with-char">
+      <img
+        src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fcd62d13e75c5d526_N_9770%20Small.jpeg"
+        alt="Gator Nakamigo"
+        class="naka-section-char"
+      >
+      <div class="naka-section-char-content">
+        <h2 class="naka-heading">Lore</h2>
+        <p class="naka-subheading">The story behind Nakamigos, HiFo Labs, and the community.</p>
+        <div class="naka-lore-content">
+          <p><strong>Nakamigos</strong> are 20,000 unique 24x24 pixel characters on Ethereum, "friends of Nakamoto." Created by the anonymous HiFo Labs, the collection appeared on October 31, 2022, the 14th anniversary of the Bitcoin whitepaper.</p>
+          <p><strong>HiFo Labs</strong> went on to release Nakamigos-CLOAKS (20,000 characters with worldwide gaming rights), Crypto Trading Cards (1880-1979), Hal Froggy Bobbleheads, and Fukuhedrons on Bitcoin Ordinals. Holders receive full commercial rights to their NFTs.</p>
+          <p><strong>Nakamigo.ai</strong> emerged as a community-driven AI project, not affiliated with HiFo Labs, but rooted in the same culture. It brings together the MigoStrategy token, community tools, and a growing ecosystem of games and experiments built by Nakamigos holders.</p>
+          <p>The lore is still being written. Every game shipped, every tool built, every community call, it all adds to the story.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="naka-divider">
+  <!-- ========== LINKS (Frog on left) ========== -->
+  <section id="links" class="naka-section">
+    <div class="naka-section-with-char">
+      <img
+        src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9b2f46f39f77faade70b_2869%20Small.jpeg"
+        alt="Frog Nakamigo"
+        class="naka-section-char"
+      >
+      <div class="naka-section-char-content">
+        <h2 class="naka-heading">Links</h2>
+        <p class="naka-subheading">Official channels and community resources.</p>
+        <div class="naka-links-section">
+          <div class="naka-links-col">
+            <h3>HiFo Labs Official</h3>
+            <div class="naka-links-list">
+              <a href="https://nakamigos.io" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Nakamigos <span class="naka-link-label">nakamigos.io</span>
+              </a>
+              <a href="https://nakamigos-cloaks.io/" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Nakamigos Cloaks <span class="naka-link-label">nakamigos-cloaks.io</span>
+              </a>
+              <a href="https://hifolabs.com" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                HiFo Labs <span class="naka-link-label">hifolabs.com</span>
+              </a>
+              <a href="https://x.com/Nakamigos" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                X / Twitter <span class="naka-link-label">@Nakamigos</span>
+              </a>
+              <a href="https://mirror.xyz/nakamigos.eth" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Mirror Blog <span class="naka-link-label">mirror.xyz</span>
+              </a>
+              <a href="https://opensea.io/collection/nakamigos" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                OpenSea <span class="naka-link-label">collection</span>
+              </a>
+            </div>
+          </div>
+          <div class="naka-links-col">
+            <h3>Community</h3>
+            <div class="naka-links-list">
+              <a href="https://nakamigo.ai" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Nakamigo.ai <span class="naka-link-label">community hub</span>
+              </a>
+              <a href="https://bean-wars.vercel.app/" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Cloaks vs Migos <span class="naka-link-label">bean wars</span>
+              </a>
+              <a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                MEEGSTR Token <span class="naka-link-label">basescan</span>
+              </a>
+              <a href="https://dexscreener.com/base/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Token Chart <span class="naka-link-label">dexscreener</span>
+              </a>
+              <a href="https://etherscan.io/token/0xd774557b647330c91bf44cfeab205095f7e6c367" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                NKMGS NFT Contract <span class="naka-link-label">etherscan</span>
+              </a>
+              <a href="https://x.com/beeple" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Beeple <span class="naka-link-label">@beeple</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="naka-divider">
+  <!-- ========== COLLABS (Snowman on left) -- below Links ========== -->
+  <section class="naka-section">
+    <div class="naka-section-with-char">
+      <img
+        src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4faee3726ca69abf46_N_19130%20Small.jpeg"
+        alt="Snowman Nakamigo"
+        class="naka-section-char"
+      >
+      <div class="naka-section-char-content">
+        <h2 class="naka-heading">Art</h2>
+        <p class="naka-subheading">The artists and creative work behind Nakamigos.</p>
+        <div class="naka-coming-grid">
+          <article class="naka-coming-card">
+            <img
+              src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/699e7fbb698fe26c8318b86e_Screenshot%202026-02-24%20at%2011.50.58%E2%80%AFPM.png"
+              alt="Mills - Artist of Nakamigos"
+              class="naka-coming-card-img"
+            >
+            <div class="naka-coming-card-body">
+              <h3>Mills</h3>
+              <p>Artist of Nakamigos. <a href="https://x.com/MillsxArt" target="_blank" rel="noopener noreferrer">@MillsxArt</a></p>
+            </div>
+          </article>
+          <article class="naka-coming-card">
+            <div class="naka-coming-card-body">
+              <h3>Beeple</h3>
+              <p>Beeple teased "Chapter 2" for Nakamigos. The community watches and waits. <a href="https://x.com/beeple" target="_blank" rel="noopener noreferrer">@beeple</a></p>
+              <span class="naka-coming-badge">Coming Soon</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="naka-divider">
+  <!-- ========== CREDITS ========== -->
+  <section id="credits" class="naka-section naka-credits">
+    <h2 class="naka-heading">Credits</h2>
+    <p>Built by the Nakamigos community. <a href="https://nakamigo.ai">Nakamigo.ai</a> is a community project not affiliated with HiFo Labs.</p>
+  </section>
+  <!-- ========== FOOTER ========== -->
+  <footer class="naka-footer">
+    <p>Community Hub</p>
+  </footer>
+  <!-- ========== LIVE PRICE TICKER SCRIPT ========== -->
+  <script>
+    (function() {
+      var API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,ripple,solana,dogecoin&vs_currencies=usd&include_24hr_change=true';
+      function formatPrice(price) {
+        if (price >= 1000) return '$' + price.toLocaleString('en-US', { maximumFractionDigits: 0 });
+        if (price >= 1) return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+      }
+      function formatChange(change) {
+        var sign = change >= 0 ? '+' : '';
+        return sign + change.toFixed(2) + '%';
+      }
+      function updateTicker(data) {
+        var items = document.querySelectorAll('.naka-ticker-item');
+        items.forEach(function(item) {
+          var coin = item.getAttribute('data-coin');
+          if (data[coin]) {
+            var priceEl = item.querySelector('.naka-ticker-price');
+            var changeEl = item.querySelector('.naka-ticker-change');
+            if (priceEl) priceEl.textContent = formatPrice(data[coin].usd);
+            if (changeEl) {
+              var change = data[coin].usd_24h_change || 0;
+              changeEl.textContent = formatChange(change);
+              changeEl.className = 'naka-ticker-change ' + (change >= 0 ? 'naka-ticker-change--up' : 'naka-ticker-change--down');
+            }
+          }
+        });
+      }
+      function fetchPrices() {
+        fetch(API_URL)
+          .then(function(res) { return res.json(); })
+          .then(function(data) { updateTicker(data); })
+          .catch(function() {});
+      }
+      fetchPrices();
+      setInterval(fetchPrices, 60000);
+    })();
+  </script>
+</body>
+</html>
