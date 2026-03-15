@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nakamigo Man</title>
-  <meta name="description" content="Nakamigo Man - A retro Pac-Man style arcade game. Navigate the maze, collect tokens, dodge the Cloaks!">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Nakamigo Man - Blackbird Café</title>
+  <meta name="description" content="Blackbird Café presents Nakamigo Man - A retro arcade game. Choose your Migo, navigate the maze, collect beans, dodge the Cloaks!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      background: #020052;
+      background: #0a0e1a;
       color: #d0d4f0;
       min-height: 100vh;
       display: flex;
@@ -23,7 +24,7 @@
     }
 
     /* ========================
-       GRID BACKGROUND
+       BACKGROUND
     ======================== */
     .bg-grid {
       position: fixed;
@@ -39,13 +40,13 @@
       width: 200%;
       height: 80%;
       background:
-        linear-gradient(rgba(0, 163, 255, 0.2) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 163, 255, 0.2) 1px, transparent 1px);
+        linear-gradient(rgba(0, 163, 255, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 163, 255, 0.12) 1px, transparent 1px);
       background-size: 60px 60px;
       transform: perspective(400px) rotateX(60deg);
       transform-origin: center top;
-      mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
-      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%);
       animation: grid-scroll 8s linear infinite;
     }
 
@@ -57,7 +58,7 @@
     .bg-grid-vignette {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, #020052 100%);
+      background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, #0a0e1a 100%);
     }
 
     .bg-grid-stars {
@@ -67,150 +68,474 @@
         radial-gradient(1px 1px at 10% 15%, rgba(0,163,255,0.3), transparent),
         radial-gradient(1px 1px at 40% 22%, rgba(255,255,255,0.15), transparent),
         radial-gradient(1px 1px at 70% 18%, rgba(235,0,255,0.15), transparent),
-        radial-gradient(1px 1px at 90% 28%, rgba(255,255,255,0.1), transparent);
+        radial-gradient(1px 1px at 90% 28%, rgba(255,255,255,0.1), transparent),
+        radial-gradient(1px 1px at 25% 60%, rgba(255,215,0,0.15), transparent),
+        radial-gradient(1px 1px at 55% 75%, rgba(0,163,255,0.2), transparent),
+        radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,0.1), transparent);
     }
 
     /* ========================
-       NAV BAR
+       MAIN WRAPPER
     ======================== */
-    .game-nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      width: 100%;
-      background: rgba(2, 0, 60, 0.92);
-      backdrop-filter: blur(14px);
-      border-bottom: 1px solid rgba(0, 163, 255, 0.15);
-    }
-
-    .game-nav-inner {
-      max-width: 900px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      height: 52px;
-      padding: 0 20px;
-    }
-
-    .game-nav-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      text-decoration: none;
-      color: #00A3FF;
-    }
-
-    .game-nav-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 6px;
-      border: 1px solid rgba(0, 163, 255, 0.3);
-    }
-
-    .game-nav-title {
-      font-family: 'Silkscreen', cursive;
-      font-size: 0.9rem;
-      letter-spacing: 1px;
-      text-shadow: 0 0 14px rgba(0, 163, 255, 0.5);
-    }
-
-    .game-nav-back {
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: #7a7eb0;
-      text-decoration: none;
-      padding: 6px 12px;
-      border-radius: 4px;
-      transition: color 0.2s, background 0.2s;
-    }
-
-    .game-nav-back:hover {
-      color: #00A3FF;
-      background: rgba(0, 163, 255, 0.08);
-    }
-
-    /* ========================
-       MAIN CONTAINER
-    ======================== */
-    .game-container {
+    .main-wrapper {
       position: relative;
       z-index: 1;
       width: 100%;
-      max-width: 900px;
-      padding: 24px 20px;
+      max-width: 480px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0;
+    }
+
+    /* ========================
+       INTRO SCREEN
+    ======================== */
+    .intro-screen {
+      width: 100%;
+      padding: 24px 20px 40px;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 20px;
     }
 
-    /* ========================
-       PLAYER NAME INPUT (like Bean Wars)
-    ======================== */
-    .player-bar {
+    .intro-screen.hidden { display: none; }
+
+    /* Header / Branding */
+    .brand-header {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 8px;
+    }
+
+    .brand-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #1a1e2e;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-logo-placeholder {
+      font-family: 'Silkscreen', cursive;
+      font-size: 1.4rem;
+      color: #FFD700;
+    }
+
+    .brand-text {
+      flex: 1;
+    }
+
+    .brand-title {
+      font-family: 'Silkscreen', cursive;
+      font-size: clamp(1rem, 4vw, 1.3rem);
+      color: #e8e4d4;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    }
+
+    .brand-nakamigo-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #1a1e2e;
+      border: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .brand-nakamigo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Subtitle */
+    .intro-subtitle {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #7a7eb0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-align: center;
+    }
+
+    .intro-subtitle-gold {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      color: #c4a84d;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* Input Fields */
+    .input-group {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .input-field {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 10px 14px;
+      background: rgba(20, 24, 40, 0.8);
+      border: 1px solid rgba(255, 215, 0, 0.15);
+      border-radius: 8px;
+    }
+
+    .input-field label {
+      font-family: 'VT323', monospace;
+      font-size: 0.8rem;
+      color: #c4a84d;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .input-field input {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      background: transparent;
+      border: none;
+      color: #e8e4d4;
+      outline: none;
+      letter-spacing: 1px;
+      padding: 2px 0;
+    }
+
+    .input-field input::placeholder {
+      color: #4a4e6a;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .input-row .input-field {
+      flex: 1;
+    }
+
+    /* Character Selection */
+    .character-section {
+      width: 100%;
+      text-align: center;
+    }
+
+    .character-section-label {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.75rem;
+      color: #7a7eb0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+
+    .character-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .character-card {
+      width: 72px;
+      height: 72px;
+      background: rgba(20, 24, 40, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .character-card:hover {
+      border-color: rgba(255, 215, 0, 0.4);
+      transform: scale(1.05);
+    }
+
+    .character-card.selected {
+      border-color: #FFD700;
+      box-shadow: 0 0 16px rgba(255, 215, 0, 0.3);
+      background: rgba(255, 215, 0, 0.08);
+    }
+
+    .character-card.locked {
+      opacity: 0.4;
+      cursor: default;
+      filter: grayscale(1);
+    }
+
+    .character-card.locked:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+      transform: none;
+    }
+
+    .character-card canvas {
+      image-rendering: pixelated;
+    }
+
+    .character-card .lock-icon {
+      font-family: 'Silkscreen', cursive;
+      font-size: 1.6rem;
+      color: #4a4e6a;
+    }
+
+    .character-card .char-name {
+      position: absolute;
+      bottom: 2px;
+      left: 0;
+      right: 0;
+      font-family: 'VT323', monospace;
+      font-size: 0.6rem;
+      color: #7a7eb0;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .character-card.selected .char-name {
+      color: #FFD700;
+    }
+
+    /* Play Button */
+    .play-btn {
+      width: 100%;
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.9rem;
+      padding: 16px 32px;
+      border-radius: 8px;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      cursor: pointer;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: rgba(180, 155, 60, 0.15);
+      color: #e8e4d4;
+      transition: all 0.2s;
+    }
+
+    .play-btn:hover {
+      background: rgba(180, 155, 60, 0.3);
+      border-color: #FFD700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+      transform: scale(1.02);
+    }
+
+    .play-btn:active { transform: scale(0.98); }
+
+    /* Character ability text */
+    .ability-text {
+      font-family: 'VT323', monospace;
+      font-size: 0.85rem;
+      color: #c4a84d;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* VS Banner */
+    .vs-banner {
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      gap: 16px;
+      padding: 4px 0;
     }
 
-    .player-bar label {
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      color: #5c608e;
-      letter-spacing: 1px;
+    .vs-banner-team {
+      font-family: 'Silkscreen', cursive;
+      font-size: clamp(1.1rem, 5vw, 1.6rem);
       text-transform: uppercase;
+      letter-spacing: 3px;
     }
 
-    .player-bar input {
-      font-family: 'VT323', monospace;
-      font-size: 1rem;
-      background: rgba(10, 6, 56, 0.8);
-      border: 1px solid rgba(0, 163, 255, 0.2);
+    .vs-banner-team.migos {
+      color: #e8e4d4;
+    }
+
+    .vs-banner-team.cloaks {
+      color: #e8e4d4;
+    }
+
+    .vs-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 2px solid rgba(0, 163, 255, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.6rem;
       color: #00A3FF;
-      padding: 6px 14px;
-      border-radius: 6px;
-      outline: none;
-      width: 180px;
-      letter-spacing: 1px;
-      transition: border-color 0.2s;
+      background: rgba(0, 163, 255, 0.08);
     }
 
-    .player-bar input:focus {
-      border-color: #00A3FF;
-      box-shadow: 0 0 12px rgba(0, 163, 255, 0.15);
+    .game-mode-label {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.7rem;
+      color: #c4a84d;
+      text-transform: uppercase;
+      letter-spacing: 3px;
     }
 
-    .player-bar input::placeholder {
-      color: #3a3e6a;
+    /* Ghost Row */
+    .ghost-section {
+      width: 100%;
+      text-align: center;
+    }
+
+    .ghost-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .ghost-card {
+      width: 72px;
+      height: 72px;
+      background: rgba(20, 24, 40, 0.8);
+      border: 2px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .ghost-card canvas {
+      image-rendering: pixelated;
+    }
+
+    /* How to play */
+    .how-to-play {
+      width: 100%;
+      padding: 16px;
+      background: rgba(20, 24, 40, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+    }
+
+    .how-to-play h3 {
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.7rem;
+      color: #c4a84d;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .how-to-play ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .how-to-play li {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: #7a7eb0;
+      padding-left: 16px;
+      position: relative;
+    }
+
+    .how-to-play li::before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: #c4a84d;
+    }
+
+    /* View Leaderboard & Back buttons */
+    .secondary-btn {
+      width: 100%;
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.7rem;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: transparent;
+      color: #7a7eb0;
+      text-decoration: none;
+      text-align: center;
+      display: block;
+      transition: all 0.2s;
+    }
+
+    .secondary-btn:hover {
+      color: #e8e4d4;
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.04);
     }
 
     /* ========================
-       SCORE / LIVES BAR
+       GAME SCREEN
     ======================== */
+    .game-screen {
+      width: 100%;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .game-screen.hidden { display: none; }
+
+    /* HUD */
     .hud-bar {
       width: 100%;
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 8px 16px;
-      background: rgba(10, 6, 56, 0.7);
-      border: 1px solid rgba(0, 163, 255, 0.1);
+      background: rgba(20, 24, 40, 0.8);
+      border: 1px solid rgba(255, 215, 0, 0.1);
       border-radius: 10px;
     }
 
     .hud-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .hud-label {
       font-family: 'VT323', monospace;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: #5c608e;
       letter-spacing: 1px;
       text-transform: uppercase;
@@ -218,9 +543,9 @@
 
     .hud-value {
       font-family: 'Silkscreen', cursive;
-      font-size: 0.9rem;
-      color: #00A3FF;
-      text-shadow: 0 0 10px rgba(0, 163, 255, 0.4);
+      font-size: 0.8rem;
+      color: #FFD700;
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
     }
 
     .hud-value--lives {
@@ -229,121 +554,60 @@
     }
 
     .hud-value--level {
-      color: #FFD700;
-      text-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+      color: #00A3FF;
+      text-shadow: 0 0 10px rgba(0, 163, 255, 0.4);
     }
 
-    /* ========================
-       GAME BOARD WRAPPER
-    ======================== */
+    /* Game Board */
     .game-board-wrapper {
       position: relative;
-      background: linear-gradient(160deg, rgba(12, 8, 64, 0.92) 0%, rgba(4, 2, 48, 0.96) 100%);
-      border: 2px solid rgba(0, 163, 255, 0.15);
+      background: linear-gradient(160deg, rgba(12, 14, 28, 0.95) 0%, rgba(6, 8, 18, 0.98) 100%);
+      border: 2px solid rgba(255, 215, 0, 0.12);
       border-radius: 14px;
-      padding: 16px;
-      box-shadow: 0 0 40px rgba(0, 163, 255, 0.06), 0 20px 60px rgba(0, 0, 0, 0.4);
+      padding: 12px;
+      box-shadow: 0 0 40px rgba(255, 215, 0, 0.04), 0 20px 60px rgba(0, 0, 0, 0.5);
     }
 
     .game-board-wrapper::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #00A3FF, #EB00FF);
+      height: 2px;
+      background: linear-gradient(90deg, #FFD700, #00A3FF);
       border-radius: 14px 14px 0 0;
     }
 
-    /* ========================
-       CORNER PORTRAITS
-    ======================== */
-    .corner-portraits {
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .corner-portrait {
-      position: absolute;
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      border: 2px solid rgba(0, 163, 255, 0.25);
-      background: rgba(10, 6, 56, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Silkscreen', cursive;
-      font-size: 0.7rem;
-      color: #5c608e;
-      overflow: hidden;
-    }
-
-    .corner-portrait img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .corner-portrait--tl { top: -8px; left: -8px; }
-    .corner-portrait--tr { top: -8px; right: -8px; }
-    .corner-portrait--bl { bottom: -8px; left: -8px; }
-    .corner-portrait--br { bottom: -8px; right: -8px; }
-
-    .corner-portrait-label {
-      position: absolute;
-      bottom: -16px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'VT323', monospace;
-      font-size: 0.65rem;
-      color: #5c608e;
-      white-space: nowrap;
-    }
-
-    /* ========================
-       CANVAS
-    ======================== */
     #gameCanvas {
       display: block;
-      border-radius: 8px;
+      border-radius: 6px;
       image-rendering: pixelated;
     }
 
-    /* ========================
-       START OVERLAY
-    ======================== */
+    /* Overlay */
     .game-overlay {
       position: absolute;
-      inset: 16px;
-      background: rgba(2, 0, 52, 0.92);
-      border-radius: 8px;
+      inset: 12px;
+      background: rgba(10, 14, 26, 0.94);
+      border-radius: 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 16px;
       z-index: 20;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(6px);
     }
 
     .game-overlay.hidden { display: none; }
 
     .game-overlay h2 {
       font-family: 'Silkscreen', cursive;
-      font-size: clamp(1.2rem, 4vw, 2rem);
-      background: linear-gradient(135deg, #00A3FF 0%, #EB00FF 100%);
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
+      background: linear-gradient(135deg, #FFD700 0%, #00A3FF 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-align: center;
-      animation: title-glow 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes title-glow {
-      0%   { filter: drop-shadow(0 0 10px rgba(0, 163, 255, 0.4)); }
-      100% { filter: drop-shadow(0 0 20px rgba(235, 0, 255, 0.4)); }
     }
 
     .game-overlay p {
@@ -351,141 +615,159 @@
       font-size: 1rem;
       color: #7a7eb0;
       text-align: center;
-      max-width: 320px;
-      line-height: 1.5;
     }
 
     .game-overlay .final-score {
       font-family: 'Silkscreen', cursive;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       color: #FFD700;
       text-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
     }
 
-    .start-btn {
+    .overlay-btn {
       font-family: 'Silkscreen', cursive;
-      font-size: 0.8rem;
-      padding: 12px 32px;
+      font-size: 0.75rem;
+      padding: 12px 28px;
       border-radius: 8px;
-      border: none;
+      border: 2px solid rgba(255, 215, 0, 0.3);
       cursor: pointer;
       letter-spacing: 1px;
-      background-size: 200% 100%;
-      background-image: linear-gradient(135deg, #FF8A00 0%, #AF00DB 50%, #FF8A00 100%);
-      color: #fff;
-      box-shadow: 0 4px 18px rgba(255, 138, 0, 0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
+      background: rgba(180, 155, 60, 0.15);
+      color: #e8e4d4;
+      transition: all 0.2s;
     }
 
-    .start-btn:hover {
-      transform: scale(1.06);
-      box-shadow: 0 6px 28px rgba(255, 138, 0, 0.5);
+    .overlay-btn:hover {
+      background: rgba(180, 155, 60, 0.3);
+      border-color: #FFD700;
     }
 
-    .start-btn:active { transform: scale(0.96); }
+    .overlay-btn:active { transform: scale(0.96); }
 
-    /* ========================
-       MOBILE JOYSTICK
-    ======================== */
-    .mobile-controls {
-      display: none;
-      gap: 16px;
-      align-items: center;
-      justify-content: center;
+    /* Joystick */
+    .controls-area {
       width: 100%;
-    }
-
-    .joystick-area {
-      position: relative;
-      width: 140px;
-      height: 140px;
-    }
-
-    .dpad {
-      position: relative;
-      width: 140px;
-      height: 140px;
-    }
-
-    .dpad-btn {
-      position: absolute;
-      width: 44px;
-      height: 44px;
-      background: rgba(0, 163, 255, 0.12);
-      border: 2px solid rgba(0, 163, 255, 0.25);
-      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #00A3FF;
-      font-size: 1.4rem;
-      cursor: pointer;
+      gap: 40px;
+      padding: 8px 0;
+    }
+
+    .joystick-container {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(20, 24, 40, 0.6);
+      border: 2px solid rgba(255, 215, 0, 0.12);
+      touch-action: none;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
-      transition: background 0.1s, border-color 0.1s;
     }
 
-    .dpad-btn:active, .dpad-btn.active {
-      background: rgba(0, 163, 255, 0.3);
-      border-color: #00A3FF;
-      box-shadow: 0 0 12px rgba(0, 163, 255, 0.3);
-    }
-
-    .dpad-up    { top: 0; left: 50%; transform: translateX(-50%); }
-    .dpad-down  { bottom: 0; left: 50%; transform: translateX(-50%); }
-    .dpad-left  { top: 50%; left: 0; transform: translateY(-50%); }
-    .dpad-right { top: 50%; right: 0; transform: translateY(-50%); }
-
-    .dpad-center {
+    .joystick-base {
       position: absolute;
+      inset: 0;
+      border-radius: 50%;
+    }
+
+    .joystick-stick {
+      position: absolute;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 35%, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.08));
+      border: 2px solid rgba(255, 215, 0, 0.3);
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 36px;
-      height: 36px;
-      background: rgba(0, 163, 255, 0.06);
-      border: 1px solid rgba(0, 163, 255, 0.1);
-      border-radius: 50%;
+      transition: transform 0.08s ease-out;
+      pointer-events: none;
     }
 
-    .mobile-start-btn {
-      font-family: 'Silkscreen', cursive;
-      font-size: 0.65rem;
-      padding: 14px 22px;
+    .joystick-arrows {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .joystick-arrow {
+      position: absolute;
+      font-size: 0.7rem;
+      color: rgba(255, 215, 0, 0.2);
+    }
+
+    .joystick-arrow.up { top: 6px; left: 50%; transform: translateX(-50%); }
+    .joystick-arrow.down { bottom: 6px; left: 50%; transform: translateX(-50%); }
+    .joystick-arrow.left { left: 6px; top: 50%; transform: translateY(-50%); }
+    .joystick-arrow.right { right: 6px; top: 50%; transform: translateY(-50%); }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .action-btn {
+      width: 48px;
+      height: 48px;
       border-radius: 50%;
-      border: 2px solid rgba(235, 0, 255, 0.3);
-      background: rgba(235, 0, 255, 0.1);
-      color: #EB00FF;
+      border: 2px solid rgba(255, 215, 0, 0.2);
+      background: rgba(255, 215, 0, 0.06);
+      font-family: 'Silkscreen', cursive;
+      font-size: 0.55rem;
+      color: #c4a84d;
       cursor: pointer;
-      letter-spacing: 1px;
+      touch-action: manipulation;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
-      transition: background 0.1s;
+      transition: all 0.1s;
     }
 
-    .mobile-start-btn:active {
-      background: rgba(235, 0, 255, 0.3);
-      box-shadow: 0 0 12px rgba(235, 0, 255, 0.3);
+    .action-btn:active {
+      background: rgba(255, 215, 0, 0.2);
+      border-color: #FFD700;
     }
 
     .controls-hint {
       font-family: 'VT323', monospace;
-      font-size: 0.9rem;
-      color: #5c608e;
+      font-size: 0.85rem;
+      color: #4a4e6a;
       text-align: center;
     }
 
+    .back-to-intro {
+      font-family: 'VT323', monospace;
+      font-size: 0.9rem;
+      color: #5c608e;
+      background: none;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      transition: color 0.2s;
+    }
+
+    .back-to-intro:hover { color: #FFD700; }
+
+    /* ========================
+       RESPONSIVE
+    ======================== */
+    @media (min-width: 601px) {
+      .joystick-container { display: none; }
+      .action-buttons { display: none; }
+    }
+
     @media (max-width: 600px) {
-      .mobile-controls { display: flex; }
       .controls-hint { display: none; }
     }
 
-    @media (max-width: 480px) {
-      .game-container { padding: 12px 8px; }
-      .game-board-wrapper { padding: 10px; }
-      .corner-portrait { width: 36px; height: 36px; }
+    @media (max-width: 400px) {
+      .intro-screen { padding: 16px 12px 32px; }
+      .character-card { width: 60px; height: 60px; }
+      .ghost-card { width: 60px; height: 60px; }
     }
   </style>
 </head>
@@ -498,113 +780,381 @@
     <div class="bg-grid-vignette"></div>
   </div>
 
-  <!-- Nav -->
-  <nav class="game-nav">
-    <div class="game-nav-inner">
-      <a href="/games/nakamigos/" class="game-nav-brand">
-        <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="Nakamigo" class="game-nav-avatar">
-        <span class="game-nav-title">NAKAMIGO MAN</span>
-      </a>
-      <a href="/games/nakamigos/" class="game-nav-back">BACK TO HUB</a>
-    </div>
-  </nav>
+  <div class="main-wrapper">
 
-  <div class="game-container">
-    <!-- Player Name -->
-    <div class="player-bar">
-      <label for="playerName">Player Name:</label>
-      <input type="text" id="playerName" placeholder="Enter your name" maxlength="16" autocomplete="off">
-    </div>
+    <!-- ============================
+         INTRO / SELECTION SCREEN
+    ============================ -->
+    <div class="intro-screen" id="introScreen">
 
-    <!-- HUD -->
-    <div class="hud-bar">
-      <div class="hud-item">
-        <span class="hud-label">Score</span>
-        <span class="hud-value" id="hudScore">0</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">Level</span>
-        <span class="hud-value hud-value--level" id="hudLevel">1</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">Lives</span>
-        <span class="hud-value hud-value--lives" id="hudLives">3</span>
-      </div>
-      <div class="hud-item">
-        <span class="hud-label">High</span>
-        <span class="hud-value" id="hudHigh">0</span>
-      </div>
-    </div>
-
-    <!-- Game Board -->
-    <div class="game-board-wrapper">
-      <!-- Corner Portraits (placeholders 1-4) -->
-      <div class="corner-portraits">
-        <div class="corner-portrait corner-portrait--tl" title="Player 1">
-          <span>1</span>
-          <span class="corner-portrait-label">P1</span>
+      <!-- Blackbird Header -->
+      <div class="brand-header">
+        <div class="brand-logo">
+          <span class="brand-logo-placeholder">B</span>
         </div>
-        <div class="corner-portrait corner-portrait--tr" title="Player 2">
-          <span>2</span>
-          <span class="corner-portrait-label">P2</span>
+        <div class="brand-text">
+          <div class="brand-title">Blackbird Café Presents</div>
         </div>
-        <div class="corner-portrait corner-portrait--bl" title="Player 3">
-          <span>3</span>
-          <span class="corner-portrait-label">P3</span>
-        </div>
-        <div class="corner-portrait corner-portrait--br" title="Player 4">
-          <span>4</span>
-          <span class="corner-portrait-label">P4</span>
+        <div class="brand-nakamigo-icon">
+          <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="Nakamigo">
         </div>
       </div>
 
-      <canvas id="gameCanvas" width="560" height="620"></canvas>
+      <!-- Subtitle -->
+      <div class="intro-subtitle">Play a Nakamigos-Inspired Game to Earn</div>
+      <div class="intro-subtitle-gold">Enter Name + Email or Wallet to Join Prize Leaderboard</div>
 
-      <!-- Start Overlay -->
-      <div class="game-overlay" id="startOverlay">
-        <h2>Nakamigo Man</h2>
-        <p>Navigate the maze. Collect tokens. Dodge the Cloaks. Arrow keys or WASD to move.</p>
-        <button class="start-btn" id="startBtn">START</button>
-      </div>
-
-      <!-- Game Over Overlay -->
-      <div class="game-overlay hidden" id="gameOverOverlay">
-        <h2>Game Over</h2>
-        <p class="final-score" id="finalScore">Score: 0</p>
-        <p id="finalName"></p>
-        <button class="start-btn" id="restartBtn">PLAY AGAIN</button>
-      </div>
-
-      <!-- Win Overlay -->
-      <div class="game-overlay hidden" id="winOverlay">
-        <h2>Level Clear!</h2>
-        <p class="final-score" id="levelScore">Score: 0</p>
-        <button class="start-btn" id="nextLevelBtn">NEXT LEVEL</button>
-      </div>
-    </div>
-
-    <!-- Controls hint (desktop) -->
-    <p class="controls-hint">Arrow keys or WASD to move</p>
-
-    <!-- Mobile Controls -->
-    <div class="mobile-controls">
-      <div class="joystick-area">
-        <div class="dpad">
-          <div class="dpad-btn dpad-up" data-dir="up">&#9650;</div>
-          <div class="dpad-btn dpad-down" data-dir="down">&#9660;</div>
-          <div class="dpad-btn dpad-left" data-dir="left">&#9664;</div>
-          <div class="dpad-btn dpad-right" data-dir="right">&#9654;</div>
-          <div class="dpad-center"></div>
+      <!-- Input Fields -->
+      <div class="input-group">
+        <div class="input-field">
+          <label for="playerName">Your Name</label>
+          <input type="text" id="playerName" placeholder="Enter your name..." maxlength="20" autocomplete="off">
+        </div>
+        <div class="input-row">
+          <div class="input-field">
+            <label for="playerEmail">Email (Gift Card)</label>
+            <input type="email" id="playerEmail" placeholder="email@..." autocomplete="off">
+          </div>
+          <div class="input-field">
+            <label for="playerWallet">Wallet (ETH)</label>
+            <input type="text" id="playerWallet" placeholder="0x..." maxlength="42" autocomplete="off">
+          </div>
         </div>
       </div>
-      <button class="mobile-start-btn" id="mobileStartBtn">START</button>
+
+      <!-- Play as Migos button -->
+      <button class="play-btn" id="playBtn">Play as Migos</button>
+      <div class="ability-text" id="abilityText">Navigate the maze, collect beans</div>
+
+      <!-- Character Selection - Migos -->
+      <div class="character-section">
+        <div class="character-row" id="characterRow">
+          <!-- Characters rendered by JS -->
+        </div>
+      </div>
+
+      <!-- VS Banner -->
+      <div class="vs-banner">
+        <span class="vs-banner-team migos">Migos</span>
+        <div class="vs-circle">VS</div>
+        <span class="vs-banner-team cloaks">Cloaks</span>
+      </div>
+      <div class="game-mode-label">Bean Wars</div>
+
+      <!-- Ghost Row - Cloaks -->
+      <div class="ghost-section">
+        <div class="ghost-row" id="ghostRow">
+          <!-- Ghosts rendered by JS -->
+        </div>
+      </div>
+
+      <div class="ability-text">The Cloaks hunt you down in the maze</div>
+
+      <!-- How to Play -->
+      <div class="how-to-play">
+        <h3>How to Play</h3>
+        <ul>
+          <li>Choose your Migo character above</li>
+          <li>Navigate the maze using arrow keys, WASD, or the joystick</li>
+          <li>Collect all the beans to clear the level</li>
+          <li>Grab power beans to turn the tables on the Cloaks</li>
+          <li>Avoid the Cloaks - they get faster each level!</li>
+          <li>Earn the highest score to top the leaderboard</li>
+        </ul>
+      </div>
+
+      <!-- Secondary Buttons -->
+      <button class="secondary-btn" id="leaderboardBtn">View Leaderboard</button>
+      <a href="/games/nakamigos/" class="secondary-btn">Back to All Games</a>
     </div>
+
+    <!-- ============================
+         GAME SCREEN
+    ============================ -->
+    <div class="game-screen hidden" id="gameScreen">
+
+      <!-- HUD -->
+      <div class="hud-bar">
+        <div class="hud-item">
+          <span class="hud-label">Score</span>
+          <span class="hud-value" id="hudScore">0</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Lvl</span>
+          <span class="hud-value hud-value--level" id="hudLevel">1</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Lives</span>
+          <span class="hud-value hud-value--lives" id="hudLives">3</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">Best</span>
+          <span class="hud-value" id="hudHigh">0</span>
+        </div>
+      </div>
+
+      <!-- Game Board -->
+      <div class="game-board-wrapper">
+        <canvas id="gameCanvas" width="560" height="620"></canvas>
+
+        <!-- Pause Overlay -->
+        <div class="game-overlay hidden" id="pauseOverlay">
+          <h2>Paused</h2>
+          <button class="overlay-btn" id="resumeBtn">Resume</button>
+          <button class="overlay-btn" id="quitBtn">Quit</button>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div class="game-overlay hidden" id="gameOverOverlay">
+          <h2>Game Over</h2>
+          <p class="final-score" id="finalScore">Score: 0</p>
+          <p id="finalName"></p>
+          <button class="overlay-btn" id="restartBtn">Play Again</button>
+          <button class="overlay-btn" id="backToMenuBtn">Back to Menu</button>
+        </div>
+
+        <!-- Level Clear Overlay -->
+        <div class="game-overlay hidden" id="winOverlay">
+          <h2>Level Clear!</h2>
+          <p class="final-score" id="levelScore">Score: 0</p>
+          <button class="overlay-btn" id="nextLevelBtn">Next Level</button>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <p class="controls-hint">Arrow keys or WASD to move &middot; P to pause</p>
+
+      <div class="controls-area">
+        <div class="joystick-container" id="joystickContainer">
+          <div class="joystick-base"></div>
+          <div class="joystick-arrows">
+            <span class="joystick-arrow up">&#9650;</span>
+            <span class="joystick-arrow down">&#9660;</span>
+            <span class="joystick-arrow left">&#9664;</span>
+            <span class="joystick-arrow right">&#9654;</span>
+          </div>
+          <div class="joystick-stick" id="joystickStick"></div>
+        </div>
+        <div class="action-buttons">
+          <button class="action-btn" id="pauseMobileBtn">II</button>
+        </div>
+      </div>
+
+      <button class="back-to-intro" id="backToIntroBtn">Back to Menu</button>
+    </div>
+
   </div>
 
   <script>
   (function() {
     // ========================
-    // CONSTANTS
+    // CHARACTERS (Migos - drawn as pixel art)
+    // ========================
+    var CHARACTERS = [
+      {
+        name: 'Frog',
+        color: '#00C853',
+        accent: '#1B5E20',
+        eyes: '#FFD700',
+        desc: 'Quick and agile'
+      },
+      {
+        name: 'Ape',
+        color: '#FF8A00',
+        accent: '#BF360C',
+        eyes: '#FFFFFF',
+        desc: 'Strong and steady'
+      },
+      {
+        name: 'Cat',
+        color: '#AB47BC',
+        accent: '#4A148C',
+        eyes: '#00E676',
+        desc: 'Sneaky and fast'
+      },
+      {
+        name: '???',
+        color: '#3a3e5a',
+        accent: '#2a2e4a',
+        eyes: '#4a4e6a',
+        locked: true,
+        desc: 'Tip to unlock'
+      }
+    ];
+
+    var GHOST_TYPES = [
+      { name: 'Red', color: '#FF5252', accent: '#B71C1C' },
+      { name: 'Pink', color: '#EB00FF', accent: '#7B1FA2' },
+      { name: 'Green', color: '#00E676', accent: '#1B5E20' },
+      { name: 'Blue', color: '#00A3FF', accent: '#01579B' }
+    ];
+
+    var selectedCharacter = 0;
+
+    // ========================
+    // DRAW CHARACTER SPRITES
+    // ========================
+    function drawCharacterSprite(canvas, char, size) {
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      var s = size / 16; // scale factor
+
+      // Body
+      ctx.fillStyle = char.color;
+      ctx.beginPath();
+      ctx.roundRect(3*s, 3*s, 10*s, 11*s, 2*s);
+      ctx.fill();
+
+      // Head highlight
+      ctx.fillStyle = char.accent;
+      ctx.beginPath();
+      ctx.roundRect(4*s, 4*s, 8*s, 4*s, 1.5*s);
+      ctx.fill();
+
+      // Eyes
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(6*s, 7*s, 1.5*s, 0, Math.PI*2);
+      ctx.arc(10*s, 7*s, 1.5*s, 0, Math.PI*2);
+      ctx.fill();
+
+      // Pupils
+      ctx.fillStyle = char.eyes === '#FFFFFF' ? '#111' : char.eyes;
+      ctx.beginPath();
+      ctx.arc(6.5*s, 7*s, 0.8*s, 0, Math.PI*2);
+      ctx.arc(10.5*s, 7*s, 0.8*s, 0, Math.PI*2);
+      ctx.fill();
+
+      // Mouth
+      ctx.fillStyle = char.accent;
+      ctx.fillRect(6*s, 10*s, 4*s, 1*s);
+
+      if (char.locked) {
+        // Question mark overlay
+        ctx.fillStyle = 'rgba(10,14,26,0.6)';
+        ctx.fillRect(0, 0, size, size);
+        ctx.fillStyle = '#4a4e6a';
+        ctx.font = 'bold ' + (6*s) + 'px Silkscreen, monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('?', size/2, size/2);
+      }
+    }
+
+    function drawGhostSprite(canvas, ghost, size) {
+      canvas.width = size;
+      canvas.height = size;
+      var ctx = canvas.getContext('2d');
+      var s = size / 16;
+
+      // Body
+      ctx.fillStyle = ghost.color;
+      ctx.beginPath();
+      ctx.arc(8*s, 7*s, 5*s, Math.PI, 0);
+      ctx.lineTo(13*s, 13*s);
+      // Wavy bottom
+      ctx.lineTo(12*s, 11.5*s);
+      ctx.lineTo(10.5*s, 13*s);
+      ctx.lineTo(9*s, 11.5*s);
+      ctx.lineTo(7*s, 13*s);
+      ctx.lineTo(5.5*s, 11.5*s);
+      ctx.lineTo(4*s, 13*s);
+      ctx.lineTo(3*s, 13*s);
+      ctx.lineTo(3*s, 7*s);
+      ctx.fill();
+
+      // Eyes
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.ellipse(6*s, 6.5*s, 1.8*s, 2.2*s, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(10*s, 6.5*s, 1.8*s, 2.2*s, 0, 0, Math.PI*2);
+      ctx.fill();
+
+      // Pupils
+      ctx.fillStyle = '#111';
+      ctx.beginPath();
+      ctx.arc(6.5*s, 7*s, 1*s, 0, Math.PI*2);
+      ctx.arc(10.5*s, 7*s, 1*s, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    // ========================
+    // RENDER INTRO CHARACTERS
+    // ========================
+    function renderCharacterCards() {
+      var row = document.getElementById('characterRow');
+      row.innerHTML = '';
+      CHARACTERS.forEach(function(char, idx) {
+        var card = document.createElement('div');
+        card.className = 'character-card' + (idx === selectedCharacter ? ' selected' : '') + (char.locked ? ' locked' : '');
+
+        var cvs = document.createElement('canvas');
+        drawCharacterSprite(cvs, char, 56);
+        card.appendChild(cvs);
+
+        var nameEl = document.createElement('div');
+        nameEl.className = 'char-name';
+        nameEl.textContent = char.name;
+        card.appendChild(nameEl);
+
+        if (!char.locked) {
+          card.addEventListener('click', function() {
+            selectedCharacter = idx;
+            renderCharacterCards();
+            document.getElementById('abilityText').textContent = char.desc;
+          });
+        }
+
+        row.appendChild(card);
+      });
+    }
+
+    function renderGhostCards() {
+      var row = document.getElementById('ghostRow');
+      row.innerHTML = '';
+      GHOST_TYPES.forEach(function(ghost) {
+        var card = document.createElement('div');
+        card.className = 'ghost-card';
+
+        var cvs = document.createElement('canvas');
+        drawGhostSprite(cvs, ghost, 56);
+        card.appendChild(cvs);
+
+        row.appendChild(card);
+      });
+    }
+
+    renderCharacterCards();
+    renderGhostCards();
+
+    // ========================
+    // SCREEN NAVIGATION
+    // ========================
+    var introScreen = document.getElementById('introScreen');
+    var gameScreen = document.getElementById('gameScreen');
+
+    function showIntro() {
+      gameRunning = false;
+      gameScreen.classList.add('hidden');
+      introScreen.classList.remove('hidden');
+    }
+
+    function showGame() {
+      introScreen.classList.add('hidden');
+      gameScreen.classList.remove('hidden');
+      startGame();
+    }
+
+    document.getElementById('playBtn').addEventListener('click', showGame);
+    document.getElementById('backToMenuBtn').addEventListener('click', showIntro);
+    document.getElementById('backToIntroBtn').addEventListener('click', showIntro);
+    document.getElementById('quitBtn').addEventListener('click', showIntro);
+
+    // ========================
+    // GAME CONSTANTS
     // ========================
     var TILE = 20;
     var COLS = 28;
@@ -617,57 +1167,50 @@
     canvas.width = CANVAS_W;
     canvas.height = CANVAS_H;
 
-    // Colors (matching Bean Wars / Nakamigos theme)
+    // Colors
     var C = {
-      bg:       '#0a0636',
-      wall:     '#00A3FF',
-      wallDark: '#003366',
+      bg:       '#0a0e1a',
+      wall:     '#1a3a5c',
+      wallGlow: '#00A3FF',
       dot:      '#FFD700',
       powerDot: '#EB00FF',
-      player:   '#FFD700',
-      playerOutline: '#FF8A00',
-      ghost1:   '#FF5252',  // Red cloak
-      ghost2:   '#EB00FF',  // Pink cloak
-      ghost3:   '#00E676',  // Green cloak
-      ghost4:   '#00A3FF',  // Blue cloak
-      ghostScared: '#2222AA',
-      ghostEyes: '#FFFFFF',
-      text:     '#FFFFFF',
-      gate:     '#EB00FF'
+      gate:     '#c4a84d',
+      text:     '#FFFFFF'
     };
 
-    // Maze layout: 0=empty, 1=wall, 2=dot, 3=power dot, 4=ghost gate, 5=ghost house
+    // Maze: completely redesigned - arena style with ghost house in center
+    // 0=empty, 1=wall, 2=dot, 3=power dot, 4=ghost gate, 5=ghost house
     var MAZE_TEMPLATE = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-      [1,3,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,3,1],
-      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-      [1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,2,1],
-      [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-      [1,1,1,1,1,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,1,1,1,1,1],
-      [0,0,0,0,0,1,2,1,1,1,1,1,0,1,1,0,1,1,1,1,1,2,1,0,0,0,0,0],
-      [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
-      [0,0,0,0,0,1,2,1,1,0,1,1,1,4,4,1,1,1,0,1,1,2,1,0,0,0,0,0],
-      [1,1,1,1,1,1,2,1,1,0,1,5,5,5,5,5,5,1,0,1,1,2,1,1,1,1,1,1],
-      [0,0,0,0,0,0,2,0,0,0,1,5,5,5,5,5,5,1,0,0,0,2,0,0,0,0,0,0],
-      [1,1,1,1,1,1,2,1,1,0,1,5,5,5,5,5,5,1,0,1,1,2,1,1,1,1,1,1],
-      [0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0],
-      [0,0,0,0,0,1,2,1,1,0,0,0,0,0,0,0,0,0,0,1,1,2,1,0,0,0,0,0],
-      [0,0,0,0,0,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,0,0,0,0,0],
-      [1,1,1,1,1,1,2,1,1,0,1,1,1,1,1,1,1,1,0,1,1,2,1,1,1,1,1,1],
-      [1,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-      [1,2,1,1,1,1,2,1,1,1,1,1,2,1,1,2,1,1,1,1,1,2,1,1,1,1,2,1],
-      [1,3,2,2,1,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,2,1,1,2,2,3,1],
-      [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-      [1,1,1,2,1,1,2,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,1,2,1,1,1],
-      [1,2,2,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,1],
-      [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
-      [1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1],
+      [1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,1,2,1,1,1,2,1,2,1,1,1,2,1],
+      [1,3,1,1,1,2,1,2,1,1,1,2,1,1,1,1,2,1,1,1,2,1,2,1,1,1,3,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,2,1,2,1,1,2,1,1,1,0,0,1,1,1,2,1,1,2,1,2,1,1,2,1],
+      [1,2,2,2,2,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,1,2,2,2,2,2,1],
+      [1,1,1,1,2,1,1,1,2,1,1,2,0,0,0,0,2,1,1,2,1,1,1,2,1,1,1,1],
+      [0,0,0,1,2,2,2,2,2,1,2,2,0,0,0,0,2,2,1,2,2,2,2,2,1,0,0,0],
+      [1,1,1,1,2,1,2,1,2,1,2,0,0,0,0,0,0,2,1,2,1,2,1,2,1,1,1,1],
+      [0,0,0,0,2,0,2,1,2,0,2,0,1,1,1,1,0,2,0,2,1,2,0,2,0,0,0,0],
+      [1,1,1,1,2,1,2,1,2,0,2,0,1,5,5,1,0,2,0,2,1,2,1,2,1,1,1,1],
+      [0,0,0,0,2,0,2,0,2,0,0,0,4,5,5,4,0,0,0,2,0,2,0,2,0,0,0,0],
+      [1,1,1,1,2,1,2,0,2,0,2,0,1,5,5,1,0,2,0,2,0,2,1,2,1,1,1,1],
+      [0,0,0,0,2,0,2,1,2,0,2,0,1,1,1,1,0,2,0,2,1,2,0,2,0,0,0,0],
+      [1,1,1,1,2,1,2,1,2,1,2,0,0,0,0,0,0,2,1,2,1,2,1,2,1,1,1,1],
+      [0,0,0,1,2,2,2,2,2,1,2,2,0,0,0,0,2,2,1,2,2,2,2,2,1,0,0,0],
+      [1,1,1,1,2,1,1,1,2,1,1,2,0,0,0,0,2,1,1,2,1,1,1,2,1,1,1,1],
+      [1,2,2,2,2,1,2,2,2,2,2,2,2,0,0,2,2,2,2,2,2,1,2,2,2,2,2,1],
+      [1,2,1,1,2,1,2,1,1,2,1,1,1,0,0,1,1,1,2,1,1,2,1,2,1,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,3,1,1,1,2,1,2,1,1,1,2,1,1,1,1,2,1,1,1,2,1,2,1,1,1,3,1],
+      [1,2,1,1,1,2,1,2,1,1,1,2,1,1,1,1,2,1,1,1,2,1,2,1,1,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,2,1,1,1,2,1,2,1,1,1,1,1,1,2,1,2,1,1,1,2,1,1,2,1],
+      [1,2,1,1,2,2,2,2,2,1,2,2,2,1,1,2,2,2,1,2,2,2,2,2,1,1,2,1],
+      [1,2,2,2,2,1,1,1,2,2,2,1,2,1,1,2,1,2,2,2,1,1,1,2,2,2,2,1],
+      [1,2,1,1,1,1,1,1,1,1,2,1,2,2,2,2,1,2,1,1,1,1,1,1,1,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,2,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
 
@@ -682,29 +1225,32 @@
     var totalDots = 0;
     var dotsEaten = 0;
     var gameRunning = false;
-    var gamePaused = false;
     var ghostScaredTimer = 0;
-    var GHOST_SCARED_DURATION = 360; // frames
+    var GHOST_SCARED_DURATION = 360;
     var animFrame = 0;
 
     // Player
     var player = {
       x: 14, y: 23,
-      dir: 0, // 0=right, 1=down, 2=left, 3=up
+      dir: 0,
       nextDir: -1,
       mouthOpen: 0,
       mouthDir: 1
     };
 
-    // Ghosts (Cloaks)
+    // Ghosts
     var ghosts = [];
+
+    function getPlayerChar() {
+      return CHARACTERS[selectedCharacter] || CHARACTERS[0];
+    }
 
     function initGhosts() {
       ghosts = [
-        { x: 13, y: 14, dir: 2, color: C.ghost1, scared: false, inHouse: false, speed: 1, name: 'Red' },
-        { x: 14, y: 14, dir: 0, color: C.ghost2, scared: false, inHouse: true,  speed: 0.9, name: 'Pink' },
-        { x: 13, y: 15, dir: 2, color: C.ghost3, scared: false, inHouse: true,  speed: 0.85, name: 'Green' },
-        { x: 14, y: 15, dir: 0, color: C.ghost4, scared: false, inHouse: true,  speed: 0.8, name: 'Blue' }
+        { x: 13, y: 12, dir: 2, color: GHOST_TYPES[0].color, scared: false, inHouse: false, speed: 1, name: 'Red' },
+        { x: 14, y: 12, dir: 0, color: GHOST_TYPES[1].color, scared: false, inHouse: true,  speed: 0.9, name: 'Pink' },
+        { x: 13, y: 13, dir: 2, color: GHOST_TYPES[2].color, scared: false, inHouse: true,  speed: 0.85, name: 'Green' },
+        { x: 14, y: 13, dir: 0, color: GHOST_TYPES[3].color, scared: false, inHouse: true,  speed: 0.8, name: 'Blue' }
       ];
     }
 
@@ -739,33 +1285,32 @@
           var cell = maze[r][c];
 
           if (cell === 1) {
-            // Wall
-            ctx.fillStyle = C.wallDark;
+            ctx.fillStyle = C.wall;
             ctx.fillRect(x, y, TILE, TILE);
-            // Draw neon border on exposed edges
-            ctx.strokeStyle = C.wall;
-            ctx.lineWidth = 1.5;
-            ctx.globalAlpha = 0.6;
-            // Check neighbors
+            // Glow on exposed edges
+            ctx.strokeStyle = C.wallGlow;
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.35;
             if (r > 0 && maze[r-1][c] !== 1) { ctx.beginPath(); ctx.moveTo(x, y+0.5); ctx.lineTo(x+TILE, y+0.5); ctx.stroke(); }
             if (r < ROWS-1 && maze[r+1][c] !== 1) { ctx.beginPath(); ctx.moveTo(x, y+TILE-0.5); ctx.lineTo(x+TILE, y+TILE-0.5); ctx.stroke(); }
             if (c > 0 && maze[r][c-1] !== 1) { ctx.beginPath(); ctx.moveTo(x+0.5, y); ctx.lineTo(x+0.5, y+TILE); ctx.stroke(); }
             if (c < COLS-1 && maze[r][c+1] !== 1) { ctx.beginPath(); ctx.moveTo(x+TILE-0.5, y); ctx.lineTo(x+TILE-0.5, y+TILE); ctx.stroke(); }
             ctx.globalAlpha = 1;
           } else if (cell === 4) {
-            // Ghost gate
             ctx.fillStyle = C.gate;
             ctx.globalAlpha = 0.6 + Math.sin(animFrame * 0.1) * 0.2;
             ctx.fillRect(x, y + TILE/2 - 2, TILE, 4);
             ctx.globalAlpha = 1;
+          } else if (cell === 5) {
+            // Ghost house interior - subtle fill
+            ctx.fillStyle = 'rgba(255, 82, 82, 0.04)';
+            ctx.fillRect(x, y, TILE, TILE);
           } else if (cell === 2) {
-            // Dot
             ctx.fillStyle = C.dot;
             ctx.beginPath();
             ctx.arc(x + TILE/2, y + TILE/2, 2.5, 0, Math.PI * 2);
             ctx.fill();
           } else if (cell === 3) {
-            // Power dot (pulsing)
             var pulse = 4 + Math.sin(animFrame * 0.15) * 2;
             ctx.fillStyle = C.powerDot;
             ctx.shadowColor = C.powerDot;
@@ -783,8 +1328,8 @@
       var px = player.x * TILE + TILE/2;
       var py = player.y * TILE + TILE/2;
       var r = TILE/2 - 1;
+      var ch = getPlayerChar();
 
-      // Mouth animation
       player.mouthOpen += 0.15 * player.mouthDir;
       if (player.mouthOpen > 0.8) player.mouthDir = -1;
       if (player.mouthOpen < 0.05) player.mouthDir = 1;
@@ -792,27 +1337,26 @@
       var mouthAngle = player.mouthOpen * 0.4;
       var startAngle = 0;
 
-      // Direction rotation
       switch (player.dir) {
-        case 0: startAngle = 0; break;       // right
-        case 1: startAngle = Math.PI/2; break;   // down
-        case 2: startAngle = Math.PI; break;     // left
-        case 3: startAngle = -Math.PI/2; break;  // up
+        case 0: startAngle = 0; break;
+        case 1: startAngle = Math.PI/2; break;
+        case 2: startAngle = Math.PI; break;
+        case 3: startAngle = -Math.PI/2; break;
       }
 
       // Glow
-      ctx.shadowColor = C.player;
+      ctx.shadowColor = ch.color;
       ctx.shadowBlur = 10;
 
-      // Body
-      ctx.fillStyle = C.player;
+      // Body - use character color
+      ctx.fillStyle = ch.color;
       ctx.beginPath();
       ctx.arc(px, py, r, startAngle + mouthAngle, startAngle + Math.PI * 2 - mouthAngle);
       ctx.lineTo(px, py);
       ctx.fill();
 
       // Outline
-      ctx.strokeStyle = C.playerOutline;
+      ctx.strokeStyle = ch.accent;
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.arc(px, py, r, startAngle + mouthAngle, startAngle + Math.PI * 2 - mouthAngle);
@@ -820,6 +1364,17 @@
       ctx.stroke();
 
       ctx.shadowBlur = 0;
+
+      // Eyes (small, on the character)
+      var eyeOffX = 0, eyeOffY = -2;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.arc(px - 2 + eyeOffX, py + eyeOffY, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = ch.eyes === '#FFFFFF' ? '#111' : ch.eyes;
+      ctx.beginPath();
+      ctx.arc(px - 1.5 + eyeOffX, py + eyeOffY, 1, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     function drawGhost(ghost) {
@@ -827,56 +1382,46 @@
       var gy = ghost.y * TILE + TILE/2;
       var r = TILE/2 - 1;
 
-      var color = ghost.scared ? C.ghostScared : ghost.color;
+      var color = ghost.scared ? '#2222AA' : ghost.color;
 
-      // Glow
       ctx.shadowColor = color;
       ctx.shadowBlur = ghost.scared ? 4 : 8;
 
-      // Body (rounded top, wavy bottom)
       ctx.fillStyle = color;
       ctx.beginPath();
       ctx.arc(gx, gy - 2, r, Math.PI, 0);
       ctx.lineTo(gx + r, gy + r);
-      // Wavy bottom
       var wave = Math.sin(animFrame * 0.2) * 2;
       for (var i = r; i >= -r; i -= 4) {
         ctx.lineTo(gx + i, gy + r + (i % 8 === 0 ? wave : -wave));
       }
       ctx.lineTo(gx - r, gy - 2);
       ctx.fill();
-
       ctx.shadowBlur = 0;
 
-      // Eyes
       if (!ghost.scared) {
-        var eyeOffX = 0, eyeOffY = 0;
+        var eyeOX = 0, eyeOY = 0;
         switch (ghost.dir) {
-          case 0: eyeOffX = 2; break;
-          case 1: eyeOffY = 2; break;
-          case 2: eyeOffX = -2; break;
-          case 3: eyeOffY = -2; break;
+          case 0: eyeOX = 2; break;
+          case 1: eyeOY = 2; break;
+          case 2: eyeOX = -2; break;
+          case 3: eyeOY = -2; break;
         }
-
-        // White
-        ctx.fillStyle = C.ghostEyes;
+        ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.ellipse(gx - 4, gy - 3, 3.5, 4, 0, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
         ctx.ellipse(gx + 4, gy - 3, 3.5, 4, 0, 0, Math.PI * 2);
         ctx.fill();
-
-        // Pupils
         ctx.fillStyle = '#111';
         ctx.beginPath();
-        ctx.arc(gx - 4 + eyeOffX, gy - 3 + eyeOffY, 2, 0, Math.PI * 2);
+        ctx.arc(gx - 4 + eyeOX, gy - 3 + eyeOY, 2, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(gx + 4 + eyeOffX, gy - 3 + eyeOffY, 2, 0, Math.PI * 2);
+        ctx.arc(gx + 4 + eyeOX, gy - 3 + eyeOY, 2, 0, Math.PI * 2);
         ctx.fill();
       } else {
-        // Scared face
         ctx.fillStyle = '#fff';
         ctx.beginPath();
         ctx.arc(gx - 3, gy - 3, 2, 0, Math.PI * 2);
@@ -884,7 +1429,6 @@
         ctx.beginPath();
         ctx.arc(gx + 3, gy - 3, 2, 0, Math.PI * 2);
         ctx.fill();
-        // Wavy mouth
         ctx.strokeStyle = '#fff';
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -904,7 +1448,6 @@
 
     function canMove(x, y) {
       if (y < 0 || y >= ROWS) return false;
-      // Tunnel wrapping
       if (x < 0 || x >= COLS) return true;
       var cell = maze[y][x];
       return cell !== 1 && cell !== 4;
@@ -920,7 +1463,6 @@
     }
 
     function movePlayer() {
-      // Try next direction first
       if (player.nextDir >= 0) {
         var nx = player.x + DX[player.nextDir];
         var ny = player.y + DY[player.nextDir];
@@ -933,7 +1475,6 @@
       var nx2 = player.x + DX[player.dir];
       var ny2 = player.y + DY[player.dir];
 
-      // Tunnel
       if (nx2 < 0) nx2 = COLS - 1;
       if (nx2 >= COLS) nx2 = 0;
 
@@ -942,7 +1483,6 @@
         player.y = ny2;
       }
 
-      // Eat dots
       var cell = maze[player.y][player.x];
       if (cell === 2) {
         maze[player.y][player.x] = 0;
@@ -952,12 +1492,10 @@
         maze[player.y][player.x] = 0;
         score += 50;
         dotsEaten++;
-        // Scare ghosts
         ghostScaredTimer = GHOST_SCARED_DURATION;
         ghosts.forEach(function(g) { g.scared = true; });
       }
 
-      // Check win
       if (dotsEaten >= totalDots) {
         levelWin();
       }
@@ -965,31 +1503,25 @@
 
     function moveGhosts() {
       ghosts.forEach(function(ghost, idx) {
-        // Release from house over time
         if (ghost.inHouse) {
           if (animFrame > 60 * (idx + 1)) {
             ghost.inHouse = false;
-            ghost.y = 11;
+            ghost.y = 10;
             ghost.x = 14;
           }
           return;
         }
 
-        // Move every N frames based on speed
         if (animFrame % Math.round(8 / ghost.speed) !== 0) return;
 
-        // Simple AI: chase player or run if scared
         var bestDir = ghost.dir;
         var bestDist = Infinity;
-
         var targetX = player.x;
         var targetY = player.y;
 
         if (ghost.scared) {
-          // Run away: pick direction that maximizes distance
           bestDist = -Infinity;
           for (var d = 0; d < 4; d++) {
-            // Don't reverse direction
             if (d === (ghost.dir + 2) % 4) continue;
             var tx = ghost.x + DX[d];
             var ty = ghost.y + DY[d];
@@ -997,32 +1529,26 @@
             if (tx >= COLS) tx = 0;
             if (!canMoveGhost(tx, ty, false)) continue;
             var dist = Math.abs(tx - targetX) + Math.abs(ty - targetY);
-            if (dist > bestDist) {
-              bestDist = dist;
-              bestDir = d;
-            }
+            if (dist > bestDist) { bestDist = dist; bestDir = d; }
           }
         } else {
-          // Different targeting per ghost
           switch (idx) {
-            case 0: // Direct chase
-              break;
-            case 1: // Ahead of player
+            case 0: break;
+            case 1:
               targetX = player.x + DX[player.dir] * 4;
               targetY = player.y + DY[player.dir] * 4;
               break;
-            case 2: // Random-ish
+            case 2:
               if (Math.random() < 0.3) {
                 targetX = Math.floor(Math.random() * COLS);
                 targetY = Math.floor(Math.random() * ROWS);
               }
               break;
-            case 3: // Ambush from bottom
+            case 3:
               targetX = player.x;
               targetY = player.y + 4;
               break;
           }
-
           for (var d2 = 0; d2 < 4; d2++) {
             if (d2 === (ghost.dir + 2) % 4) continue;
             var tx2 = ghost.x + DX[d2];
@@ -1031,10 +1557,7 @@
             if (tx2 >= COLS) tx2 = 0;
             if (!canMoveGhost(tx2, ty2, false)) continue;
             var dist2 = Math.abs(tx2 - targetX) + Math.abs(ty2 - targetY);
-            if (dist2 < bestDist) {
-              bestDist = dist2;
-              bestDir = d2;
-            }
+            if (dist2 < bestDist) { bestDist = dist2; bestDir = d2; }
           }
         }
 
@@ -1043,14 +1566,12 @@
         var newY = ghost.y + DY[ghost.dir];
         if (newX < 0) newX = COLS - 1;
         if (newX >= COLS) newX = 0;
-
         if (canMoveGhost(newX, newY, false)) {
           ghost.x = newX;
           ghost.y = newY;
         }
       });
 
-      // Scared timer
       if (ghostScaredTimer > 0) {
         ghostScaredTimer--;
         if (ghostScaredTimer <= 0) {
@@ -1064,14 +1585,12 @@
         if (ghost.inHouse) return;
         if (ghost.x === player.x && ghost.y === player.y) {
           if (ghost.scared) {
-            // Eat ghost
             score += 200;
             ghost.x = 14;
-            ghost.y = 14;
+            ghost.y = 13;
             ghost.inHouse = true;
             ghost.scared = false;
           } else {
-            // Player dies
             lives--;
             updateHUD();
             if (lives <= 0) {
@@ -1102,7 +1621,7 @@
     // ========================
     // GAME FLOW
     // ========================
-    var overlayStart = document.getElementById('startOverlay');
+    var overlayPause = document.getElementById('pauseOverlay');
     var overlayGameOver = document.getElementById('gameOverOverlay');
     var overlayWin = document.getElementById('winOverlay');
 
@@ -1116,7 +1635,7 @@
       resetPlayer();
       initGhosts();
       updateHUD();
-      overlayStart.classList.add('hidden');
+      overlayPause.classList.add('hidden');
       overlayGameOver.classList.add('hidden');
       overlayWin.classList.add('hidden');
       gameRunning = true;
@@ -1143,19 +1662,33 @@
       resetMaze();
       resetPlayer();
       initGhosts();
-      // Ghosts get faster each level
-      ghosts.forEach(function(g) {
-        g.speed = Math.min(g.speed + 0.1, 2);
-      });
+      ghosts.forEach(function(g) { g.speed = Math.min(g.speed + 0.1, 2); });
       updateHUD();
       overlayWin.classList.add('hidden');
       gameRunning = true;
     }
 
+    function togglePause() {
+      if (!gameRunning && overlayPause.classList.contains('hidden')) return;
+      if (gameRunning) {
+        gameRunning = false;
+        overlayPause.classList.remove('hidden');
+      } else {
+        gameRunning = true;
+        overlayPause.classList.add('hidden');
+      }
+    }
+
     // ========================
-    // INPUT
+    // INPUT - Keyboard
     // ========================
     document.addEventListener('keydown', function(e) {
+      if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
+        if (!overlayGameOver.classList.contains('hidden') || !overlayWin.classList.contains('hidden')) return;
+        togglePause();
+        e.preventDefault();
+        return;
+      }
       switch (e.key) {
         case 'ArrowRight': case 'd': case 'D': player.nextDir = 0; e.preventDefault(); break;
         case 'ArrowDown':  case 's': case 'S': player.nextDir = 1; e.preventDefault(); break;
@@ -1164,41 +1697,95 @@
       }
     });
 
-    // Mobile d-pad
-    var dpadBtns = document.querySelectorAll('.dpad-btn');
-    var dirMap = { up: 3, down: 1, left: 2, right: 0 };
-    dpadBtns.forEach(function(btn) {
-      var dir = dirMap[btn.getAttribute('data-dir')];
-      btn.addEventListener('touchstart', function(e) {
-        e.preventDefault();
-        player.nextDir = dir;
-        btn.classList.add('active');
-      });
-      btn.addEventListener('touchend', function() {
-        btn.classList.remove('active');
-      });
+    // ========================
+    // INPUT - Joystick (Mobile)
+    // ========================
+    var joystickEl = document.getElementById('joystickContainer');
+    var stickEl = document.getElementById('joystickStick');
+    var joystickActive = false;
+    var joystickCenterX = 0;
+    var joystickCenterY = 0;
+    var JOYSTICK_RADIUS = 30;
+
+    function joystickStart(clientX, clientY) {
+      joystickActive = true;
+      var rect = joystickEl.getBoundingClientRect();
+      joystickCenterX = rect.left + rect.width / 2;
+      joystickCenterY = rect.top + rect.height / 2;
+      joystickMove(clientX, clientY);
+    }
+
+    function joystickMove(clientX, clientY) {
+      if (!joystickActive) return;
+      var dx = clientX - joystickCenterX;
+      var dy = clientY - joystickCenterY;
+      var dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (dist > JOYSTICK_RADIUS) {
+        dx = (dx / dist) * JOYSTICK_RADIUS;
+        dy = (dy / dist) * JOYSTICK_RADIUS;
+      }
+
+      stickEl.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
+
+      // Determine direction
+      if (dist > 12) {
+        if (Math.abs(dx) > Math.abs(dy)) {
+          player.nextDir = dx > 0 ? 0 : 2;
+        } else {
+          player.nextDir = dy > 0 ? 1 : 3;
+        }
+      }
+    }
+
+    function joystickEnd() {
+      joystickActive = false;
+      stickEl.style.transform = 'translate(-50%, -50%)';
+    }
+
+    joystickEl.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      var t = e.touches[0];
+      joystickStart(t.clientX, t.clientY);
     });
 
+    joystickEl.addEventListener('touchmove', function(e) {
+      e.preventDefault();
+      var t = e.touches[0];
+      joystickMove(t.clientX, t.clientY);
+    });
+
+    joystickEl.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      joystickEnd();
+    });
+
+    // Mouse support for joystick (testing)
+    joystickEl.addEventListener('mousedown', function(e) {
+      joystickStart(e.clientX, e.clientY);
+    });
+    document.addEventListener('mousemove', function(e) {
+      joystickMove(e.clientX, e.clientY);
+    });
+    document.addEventListener('mouseup', function() {
+      joystickEnd();
+    });
+
+    // Mobile pause button
+    document.getElementById('pauseMobileBtn').addEventListener('click', togglePause);
+
     // Button handlers
-    document.getElementById('startBtn').addEventListener('click', startGame);
     document.getElementById('restartBtn').addEventListener('click', startGame);
     document.getElementById('nextLevelBtn').addEventListener('click', startNextLevel);
-    document.getElementById('mobileStartBtn').addEventListener('click', function() {
-      if (!gameRunning) {
-        if (!overlayStart.classList.contains('hidden')) startGame();
-        else if (!overlayGameOver.classList.contains('hidden')) startGame();
-        else if (!overlayWin.classList.contains('hidden')) startNextLevel();
-      }
-    });
+    document.getElementById('resumeBtn').addEventListener('click', togglePause);
 
     // ========================
     // GAME LOOP
     // ========================
     var moveCounter = 0;
-    var MOVE_RATE = 6; // Player moves every N frames
+    var MOVE_RATE = 6;
 
     function gameLoop() {
-      // Clear
       ctx.fillStyle = C.bg;
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
@@ -1207,13 +1794,11 @@
       if (gameRunning) {
         animFrame++;
         moveCounter++;
-
         if (moveCounter >= MOVE_RATE) {
           moveCounter = 0;
           movePlayer();
           checkCollisions();
         }
-
         moveGhosts();
         checkCollisions();
         updateHUD();
@@ -1225,12 +1810,13 @@
       requestAnimationFrame(gameLoop);
     }
 
-    // Initialize display
+    // Initialize (just draw the maze preview, don't start)
     resetMaze();
     resetPlayer();
     initGhosts();
     updateHUD();
     gameLoop();
+
   })();
   </script>
 
