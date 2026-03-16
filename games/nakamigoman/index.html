@@ -85,6 +85,10 @@
     .game-screen { width: 100%; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
     .game-screen.hidden { display: none; }
     .hud-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: rgba(20,24,40,0.8); border: 1px solid rgba(255,215,0,0.1); border-radius: 10px; }
+    .color-key-bar { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; padding: 5px 8px; background: rgba(20,24,40,0.6); border: 1px solid rgba(255,215,0,0.06); border-radius: 8px; }
+    .color-key-item { display: flex; align-items: center; gap: 3px; }
+    .color-key-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .color-key-label { font-family: 'VT323', monospace; font-size: 0.6rem; color: #7a7eb0; letter-spacing: 0.5px; white-space: nowrap; }
     .hud-item { display: flex; align-items: center; gap: 5px; }
     .hud-label { font-family: 'VT323', monospace; font-size: 0.75rem; color: #5c608e; letter-spacing: 1px; text-transform: uppercase; }
     .hud-value { font-family: 'Silkscreen', cursive; font-size: 0.75rem; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
@@ -187,6 +191,7 @@
         <div class="hud-item"><span class="hud-label">Lives</span><span class="hud-value hud-value--lives" id="hudLives">3</span></div>
         <div class="hud-item"><span class="hud-label">Best</span><span class="hud-value" id="hudHigh">0</span></div>
       </div>
+      <div class="color-key-bar" id="colorKeyBar"></div>
       <div class="game-board-wrapper">
         <canvas id="gameCanvas"></canvas>
         <div class="game-overlay hidden" id="pauseOverlay">
@@ -331,14 +336,14 @@
     // 0=path, 1=wall, 2=dot, 3=power dot, 4=gate, 5=spawn
     // ================================
     var MAZE_TEMPLATE = [
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,2,2,2,2,2,2,1,2,2,2,2,2,2,1],
+      [1,0,1,1,1,1,1,1,1,1,1,1,1,0,1],
+      [0,3,2,2,2,2,2,1,2,2,2,2,2,3,0],
       [1,2,1,1,2,1,2,1,2,1,2,1,1,2,1],
-      [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
       [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
       [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
-      [0,0,0,2,2,2,0,1,0,2,2,2,0,0,0],
+      [1,2,2,2,2,2,0,1,0,2,2,2,2,2,1],
       [1,1,1,2,1,2,0,1,0,2,1,2,1,1,1],
       [1,2,2,2,2,2,1,1,1,2,2,2,2,2,1],
       [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
@@ -350,14 +355,14 @@
       [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
       [1,2,2,2,2,2,1,1,1,2,2,2,2,2,1],
       [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
-      [0,0,0,2,2,2,0,1,0,2,2,2,0,0,0],
+      [1,2,2,2,2,2,0,1,0,2,2,2,2,2,1],
       [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
       [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
-      [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
       [1,2,1,1,2,1,2,0,2,1,2,1,1,2,1],
-      [1,2,2,2,2,2,2,0,2,2,2,2,2,2,1],
-      [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+      [0,3,2,2,2,2,2,0,2,2,2,2,2,3,0],
+      [1,0,1,1,1,1,1,1,1,1,1,1,1,0,1]
     ];
 
     // ================================
@@ -489,16 +494,17 @@
     var POWER_RESPAWN_FRAMES = 600; // ~10 seconds at 60fps
     var animFrame = 0;
 
-    var player = { x: 7, y: 25, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1 };
+    var player = { x: 7, y: 25, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1, vx: 7, vy: 25 };
     var enemies = [];
+    var LERP_SPEED = 0.22;
 
     function initEnemies() {
       enemies = [
-        { x: 7, y: 13, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 1 },
-        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.92 },
-        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.88 },
-        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.84 },
-        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.80 }
+        { x: 7, y: 13, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.8, vx: 7, vy: 13 },
+        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.72, vx: 7, vy: 13 },
+        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.68, vx: 7, vy: 13 },
+        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.64, vx: 7, vy: 13 },
+        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.60, vx: 7, vy: 13 }
       ];
     }
 
@@ -516,14 +522,23 @@
 
     function resetPlayer() {
       player.x = 7; player.y = 25; player.dir = 3; player.nextDir = -1;
+      player.vx = 7; player.vy = 25;
     }
 
-    // Portals
+    // Portals - corners: horizontal wrapping at rows 1/25, vertical wrapping at cols 1/13
     var PORTALS = [
-      { fromR: 7, fromC: -1, toR: 7, toC: COLS - 1 },
-      { fromR: 7, fromC: COLS, toR: 7, toC: 0 },
-      { fromR: 19, fromC: -1, toR: 19, toC: COLS - 1 },
-      { fromR: 19, fromC: COLS, toR: 19, toC: 0 }
+      // Horizontal wrapping near top corners
+      { fromR: 1, fromC: -1, toR: 1, toC: COLS - 1 },
+      { fromR: 1, fromC: COLS, toR: 1, toC: 0 },
+      // Horizontal wrapping near bottom corners
+      { fromR: 25, fromC: -1, toR: 25, toC: COLS - 1 },
+      { fromR: 25, fromC: COLS, toR: 25, toC: 0 },
+      // Vertical wrapping at left corners
+      { fromR: -1, fromC: 1, toR: 25, toC: 1 },
+      { fromR: ROWS, fromC: 1, toR: 1, toC: 1 },
+      // Vertical wrapping at right corners
+      { fromR: -1, fromC: 13, toR: 25, toC: 13 },
+      { fromR: ROWS, fromC: 13, toR: 1, toC: 13 }
     ];
     function checkPortal(x, y) {
       for (var i = 0; i < PORTALS.length; i++) {
@@ -609,9 +624,18 @@
       }
     }
 
+    function lerpVisual(entity) {
+      var dx = entity.x - entity.vx;
+      var dy = entity.y - entity.vy;
+      // Snap if teleported (portal)
+      if (Math.abs(dx) > 2 || Math.abs(dy) > 2) { entity.vx = entity.x; entity.vy = entity.y; }
+      else { entity.vx += dx * LERP_SPEED; entity.vy += dy * LERP_SPEED; }
+    }
+
     function drawPlayer() {
-      var px = player.x * TILE + TILE/2;
-      var py = player.y * TILE + TILE/2;
+      lerpVisual(player);
+      var px = player.vx * TILE + TILE/2;
+      var py = player.vy * TILE + TILE/2;
       var ch = CHARACTERS[selectedCharacter] || CHARACTERS[0];
       var spr = spriteImages['player_' + selectedCharacter];
 
@@ -635,32 +659,36 @@
     }
 
     function drawEnemy(enemy) {
-      var ex = enemy.x * TILE + TILE/2;
-      var ey = enemy.y * TILE + TILE/2;
+      lerpVisual(enemy);
+      var ex = enemy.vx * TILE + TILE/2;
+      var ey = enemy.vy * TILE + TILE/2;
       var eData = ENEMIES[enemy.dataIdx] || ENEMIES[0];
       var spr = spriteImages['enemy_' + enemy.dataIdx];
 
       if (spr) {
         ctx.save();
+        ctx.globalAlpha = enemy.scared ? 0.6 : 0.75;
         ctx.shadowColor = enemy.scared ? '#2244CC' : eData.fallbackColor;
         ctx.shadowBlur = enemy.scared ? 4 : 6;
         ctx.drawImage(spr, ex - SPRITE_SIZE/2, ey - SPRITE_SIZE/2, SPRITE_SIZE, SPRITE_SIZE);
         if (enemy.scared) {
-          var flash = Math.sin(animFrame * 0.15) > 0 ? 0.5 : 0.3;
+          var flash = Math.sin(animFrame * 0.15) > 0 ? 0.45 : 0.25;
           ctx.globalAlpha = flash; ctx.fillStyle = '#2244CC';
           ctx.beginPath(); ctx.arc(ex, ey, SPRITE_SIZE/2, 0, Math.PI * 2); ctx.fill();
-          ctx.globalAlpha = 1;
         }
         ctx.restore();
       } else {
         var r2 = TILE/2 - 2;
         var color = enemy.scared ? '#2244CC' : eData.fallbackColor;
+        ctx.save();
+        ctx.globalAlpha = enemy.scared ? 0.6 : 0.75;
         ctx.fillStyle = color; ctx.shadowColor = color; ctx.shadowBlur = enemy.scared ? 4 : 8;
         ctx.beginPath(); ctx.arc(ex, ey - 2, r2, Math.PI, 0); ctx.lineTo(ex + r2, ey + r2);
         var wave = Math.sin(animFrame * 0.2) * 2;
         for (var j = r2; j >= -r2; j -= 4) ctx.lineTo(ex + j, ey + r2 + (j % 8 === 0 ? wave : -wave));
         ctx.lineTo(ex - r2, ey - 2); ctx.fill(); ctx.shadowBlur = 0;
         if (!enemy.scared) {
+          ctx.globalAlpha = 0.85;
           var eOX = [2, 0, -2, 0][enemy.dir] || 0; var eOY = [0, 2, 0, -2][enemy.dir] || 0;
           ctx.fillStyle = '#fff';
           ctx.beginPath(); ctx.ellipse(ex-3, ey-3, 3, 3.5, 0, 0, Math.PI*2); ctx.fill();
@@ -669,6 +697,7 @@
           ctx.beginPath(); ctx.arc(ex-3+eOX, ey-3+eOY, 1.5, 0, Math.PI*2); ctx.fill();
           ctx.beginPath(); ctx.arc(ex+3+eOX, ey-3+eOY, 1.5, 0, Math.PI*2); ctx.fill();
         }
+        ctx.restore();
       }
     }
 
@@ -679,15 +708,13 @@
     var DY = [0, 1, 0, -1];
 
     function canMove(x, y) {
-      if (y < 0 || y >= ROWS) return false;
-      if (x < 0 || x >= COLS) return checkPortal(x, y) !== null;
+      if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return checkPortal(x, y) !== null;
       var cell = maze[y][x];
       return cell !== 1 && cell !== 4;
     }
 
     function canMoveEnemy(x, y, isInHouse) {
-      if (y < 0 || y >= ROWS) return false;
-      if (x < 0 || x >= COLS) return checkPortal(x, y) !== null;
+      if (y < 0 || y >= ROWS || x < 0 || x >= COLS) return checkPortal(x, y) !== null;
       var cell = maze[y][x];
       if (cell === 1) return false;
       if (cell === 4 && isInHouse) return true;
@@ -767,28 +794,18 @@
       updateHUD();
     }
 
-    // Draw color key/legend
-    function drawColorKey() {
-      var keyX = 4;
-      var keyY = CANVAS_H - (DOT_COLORS.length * 14) - 6;
-      ctx.globalAlpha = 0.7;
-      ctx.fillStyle = 'rgba(8,12,24,0.85)';
-      ctx.fillRect(keyX - 2, keyY - 2, 80, DOT_COLORS.length * 14 + 4);
-      ctx.globalAlpha = 1;
-      for (var i = 0; i < DOT_COLORS.length; i++) {
-        var ky = keyY + i * 14;
-        ctx.fillStyle = DOT_COLORS[i].color;
-        ctx.shadowColor = DOT_COLORS[i].color;
-        ctx.shadowBlur = 3;
-        ctx.beginPath();
-        ctx.arc(keyX + 6, ky + 6, 3.5, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = '#d0d4f0';
-        ctx.font = '10px VT323, monospace';
-        ctx.fillText(DOT_COLORS[i].name + ' ' + DOT_COLORS[i].points + 'pt', keyX + 14, ky + 10);
-      }
-    }
+    // Populate HTML color key bar
+    (function buildColorKey() {
+      var bar = document.getElementById('colorKeyBar');
+      DOT_COLORS.forEach(function(dc) {
+        var item = document.createElement('div'); item.className = 'color-key-item';
+        var dot = document.createElement('div'); dot.className = 'color-key-dot';
+        dot.style.background = dc.color; dot.style.boxShadow = '0 0 4px ' + dc.color;
+        var label = document.createElement('span'); label.className = 'color-key-label';
+        label.textContent = dc.name + ' ' + dc.points;
+        item.appendChild(dot); item.appendChild(label); bar.appendChild(item);
+      });
+    })();
 
     function moveEnemies() {
       enemies.forEach(function(enemy, idx) {
@@ -798,7 +815,7 @@
           }
           return;
         }
-        if (animFrame % Math.round(8 / enemy.speed) !== 0) return;
+        if (animFrame % Math.round(12 / enemy.speed) !== 0) return;
         var bestDir = enemy.dir; var bestDist = Infinity;
         var targetX = player.x; var targetY = player.y;
 
@@ -955,7 +972,7 @@
     });
 
     // Game loop
-    var moveCounter = 0; var MOVE_RATE = 6;
+    var moveCounter = 0; var MOVE_RATE = 7;
     function gameLoop() {
       ctx.fillStyle = C.bg;
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
@@ -975,7 +992,6 @@
 
       drawPlayer();
       enemies.forEach(drawEnemy);
-      drawColorKey();
       requestAnimationFrame(gameLoop);
     }
 
