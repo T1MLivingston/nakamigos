@@ -82,10 +82,11 @@
     .secondary-btn:hover { color: #e8e4d4; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); }
 
     /* GAME */
-    .game-screen { width: 100%; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .game-screen { width: 100%; padding: 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100vh; height: 100dvh; }
     .game-screen.hidden { display: none; }
-    .hud-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 8px 14px; background: rgba(20,24,40,0.8); border: 1px solid rgba(255,215,0,0.1); border-radius: 10px; }
-    .color-key-bar { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; padding: 5px 8px; background: rgba(20,24,40,0.6); border: 1px solid rgba(255,215,0,0.06); border-radius: 8px; }
+    .hud-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(20,24,40,0.8); border: 1px solid rgba(255,215,0,0.1); border-radius: 8px; flex-shrink: 0; }
+    .color-key-bar { display: none; }
+    .color-key-bar.visible { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; padding: 5px 8px; background: rgba(20,24,40,0.6); border: 1px solid rgba(255,215,0,0.06); border-radius: 8px; width: 100%; }
     .color-key-item { display: flex; align-items: center; gap: 3px; }
     .color-key-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
     .color-key-label { font-family: 'VT323', monospace; font-size: 0.6rem; color: #7a7eb0; letter-spacing: 0.5px; white-space: nowrap; }
@@ -94,7 +95,7 @@
     .hud-value { font-family: 'Silkscreen', cursive; font-size: 0.75rem; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.4); }
     .hud-value--lives { color: #EB00FF; text-shadow: 0 0 10px rgba(235,0,255,0.4); }
     .hud-value--level { color: #00A3FF; text-shadow: 0 0 10px rgba(0,163,255,0.4); }
-    .game-board-wrapper { position: relative; background: linear-gradient(160deg, rgba(12,14,28,0.95), rgba(6,8,18,0.98)); border: 2px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 8px; box-shadow: 0 0 40px rgba(255,215,0,0.03), 0 20px 60px rgba(0,0,0,0.5); }
+    .game-board-wrapper { position: relative; background: linear-gradient(160deg, rgba(12,14,28,0.95), rgba(6,8,18,0.98)); border: 2px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 4px; box-shadow: 0 0 40px rgba(255,215,0,0.03), 0 20px 60px rgba(0,0,0,0.5); flex-shrink: 1; min-height: 0; }
     .game-board-wrapper::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #FFD700, #00A3FF); border-radius: 12px 12px 0 0; }
     #gameCanvas { display: block; border-radius: 4px; image-rendering: pixelated; }
     .game-overlay { position: absolute; inset: 8px; background: rgba(10,14,26,0.94); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 20; backdrop-filter: blur(6px); }
@@ -106,7 +107,20 @@
     .overlay-btn:hover { background: rgba(180,155,60,0.28); border-color: #FFD700; }
     .overlay-btn:active { transform: scale(0.96); }
 
-    .controls-area { width: 100%; display: flex; align-items: center; justify-content: center; padding: 6px 0; }
+    .controls-area { width: 100%; display: flex; align-items: center; justify-content: center; gap: 16px; padding: 6px 0; flex-shrink: 0; }
+    .ctrl-btn { width: 44px; height: 44px; border-radius: 50%; background: rgba(20,24,40,0.6); border: 1.5px solid rgba(255,215,0,0.15); color: #7a7eb0; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .ctrl-btn:hover { color: #FFD700; border-color: rgba(255,215,0,0.4); }
+    .ctrl-btn:active { transform: scale(0.92); }
+    .lives-display { display: flex; gap: 3px; align-items: center; }
+    .life-icon { width: 20px; height: 20px; border-radius: 50%; overflow: hidden; }
+    .life-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .menu-popup { position: fixed; inset: 0; background: rgba(10,14,26,0.92); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; backdrop-filter: blur(8px); }
+    .menu-popup.hidden { display: none; }
+    .menu-popup h2 { font-family: 'Silkscreen', cursive; font-size: 1.2rem; color: #FFD700; }
+    .menu-popup .color-key-popup { display: flex; flex-direction: column; gap: 8px; padding: 16px; background: rgba(20,24,40,0.8); border: 1px solid rgba(255,215,0,0.1); border-radius: 10px; }
+    .menu-popup .color-key-popup .color-key-item { gap: 8px; }
+    .menu-popup .color-key-popup .color-key-dot { width: 12px; height: 12px; }
+    .menu-popup .color-key-popup .color-key-label { font-size: 0.85rem; color: #d0d4f0; }
     .joystick-container { position: relative; width: 120px; height: 120px; border-radius: 50%; background: rgba(20,24,40,0.5); border: 2px solid rgba(255,215,0,0.1); touch-action: none; user-select: none; -webkit-user-select: none; }
     .joystick-arrows { position: absolute; inset: 0; pointer-events: none; }
     .joystick-arrow { position: absolute; font-size: 0.7rem; color: rgba(255,215,0,0.2); }
@@ -214,6 +228,7 @@
       </div>
       <p class="controls-hint">Arrow keys or WASD to move &middot; P to pause</p>
       <div class="controls-area">
+        <button class="ctrl-btn" id="menuBtn" title="Menu">&#9776;</button>
         <div class="joystick-container" id="joystickContainer">
           <div class="joystick-arrows">
             <span class="joystick-arrow up">&#9650;</span>
@@ -223,8 +238,15 @@
           </div>
           <div class="joystick-stick" id="joystickStick"></div>
         </div>
+        <div class="lives-display" id="livesDisplay"></div>
       </div>
       <button class="back-to-intro" id="backToIntroBtn">&larr; Back to Menu</button>
+      <div class="menu-popup hidden" id="menuPopup">
+        <h2>Menu</h2>
+        <div class="color-key-popup" id="colorKeyPopup"></div>
+        <button class="overlay-btn" id="menuResumeBtn">Resume</button>
+        <button class="overlay-btn" id="menuQuitBtn">Quit to Menu</button>
+      </div>
     </div>
 
   </div>
@@ -295,14 +317,18 @@
     document.getElementById('quitBtn').addEventListener('click', showIntro);
 
     // ================================
-    // GAME CONSTANTS - bigger tiles, wider corridors
+    // GAME CONSTANTS - auto-fit viewport
     // ================================
-    var TILE = 28;
     var COLS = 15;
-    var ROWS = 27;
-    var CANVAS_W = COLS * TILE;  // 420
-    var CANVAS_H = ROWS * TILE;  // 756
-    var SPRITE_SIZE = Math.round(TILE * 1.43); // 10% bigger than before
+    var ROWS = 21;
+    // Auto-size tile to fit screen: max available height minus HUD/controls ~200px
+    var maxH = Math.min(window.innerHeight - 200, 600);
+    var maxW = Math.min(window.innerWidth - 20, 440);
+    var TILE = Math.floor(Math.min(maxW / COLS, maxH / ROWS));
+    TILE = Math.max(TILE, 18); // minimum tile size
+    var CANVAS_W = COLS * TILE;
+    var CANVAS_H = ROWS * TILE;
+    var SPRITE_SIZE = Math.round(TILE * 1.4);
 
     var canvas = document.getElementById('gameCanvas');
     var ctx = canvas.getContext('2d');
@@ -329,52 +355,44 @@
     var MAX_TIER = DOT_COLORS.length; // tier goes 0..6, reaching 7 means completed
 
     // ================================
-    // MAZE (15 cols x 27 rows) - no dead ends, L-shaped & double walls, open corner portals
-    // 0=path, 1=wall, 2=dot, 3=power dot, 4=gate, 5=spawn
-    // Ghost house uses ETH diamond area in center
+    // MAZE (15 cols x 21 rows) - compact, no dead ends, big ETH diamond center
+    // 0=path, 1=wall, 2=dot, 3=power dot, 4=gate, 5=spawn, 6=1up spawn
     // ================================
     var MAZE_TEMPLATE = [
       [1,0,1,1,1,1,1,1,1,1,1,1,1,0,1],
       [0,3,2,2,2,2,2,2,2,2,2,2,2,3,0],
-      [1,2,1,1,2,1,1,2,1,1,2,1,1,2,1],
+      [1,2,1,1,2,1,2,1,2,1,2,1,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,2,1,2,2,1,2,2,1,2,1,2,1],
-      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
-      [1,2,2,2,1,1,2,2,2,1,1,2,2,2,1],
-      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
-      [1,2,2,2,1,2,2,2,2,2,1,2,2,2,1],
-      [1,2,1,2,2,2,1,1,1,2,2,2,1,2,1],
-      [1,2,2,2,1,2,0,0,0,2,1,2,2,2,1],
-      [1,2,1,2,2,2,0,0,0,2,2,2,1,2,1],
-      [1,2,2,2,2,0,4,5,4,0,2,2,2,2,1],
-      [1,2,1,2,2,0,0,5,0,0,2,2,1,2,1],
-      [1,2,2,2,1,2,0,0,0,2,1,2,2,2,1],
-      [1,2,1,2,2,2,1,1,1,2,2,2,1,2,1],
-      [1,2,2,2,1,2,2,2,2,2,1,2,2,2,1],
-      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
-      [1,2,2,2,1,1,2,2,2,1,1,2,2,2,1],
-      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
-      [1,2,1,2,1,2,2,1,2,2,1,2,1,2,1],
+      [1,2,1,2,1,1,2,2,2,1,1,2,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,1,2,1,1,2,1,1,2,1,1,2,1],
+      [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
+      [1,2,2,2,2,0,0,0,0,0,2,2,2,2,1],
+      [1,2,1,2,2,0,4,5,4,0,2,2,1,2,1],
+      [1,2,2,2,1,0,0,5,0,0,1,2,2,2,1],
+      [1,2,1,2,2,0,0,0,0,0,2,2,1,2,1],
+      [1,2,2,2,2,2,0,0,0,2,2,2,2,2,1],
+      [1,2,1,2,1,2,2,6,2,2,1,2,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,2,1,2,2,2,2,2,1,2,1,2,1],
+      [1,2,1,1,2,1,2,2,2,1,2,1,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,1,2,1,2,1,2,1,2,1,1,2,1],
       [0,3,2,2,2,2,2,2,2,2,2,2,2,3,0],
       [1,0,1,1,1,1,1,1,1,1,1,1,1,0,1]
     ];
 
     // ================================
-    // ETH DIAMOND - drawn around ghost house area
+    // ETH DIAMOND - large, prominent, drawn around ghost house
     // ================================
     function drawEthDiamond() {
-      // Center of ghost house area (rows 10-14, cols 5-9)
       var cx = 7 * TILE + TILE/2;
-      var cy = 12.5 * TILE;
-      var scale = TILE * 0.28;
+      var cy = 9 * TILE; // centered on ghost house
+      var scale = TILE * 0.38; // bigger diamond
 
       ctx.save();
 
-      var topY = -14 * scale;
+      var topY = -12 * scale;
       var midY = 0;
       var botY = 10 * scale;
       var halfW = 10 * scale;
@@ -491,7 +509,7 @@
     var POWER_RESPAWN_FRAMES = 600; // ~10 seconds at 60fps
     var animFrame = 0;
 
-    var player = { x: 7, y: 25, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1, vx: 7, vy: 25 };
+    var player = { x: 7, y: 17, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1, vx: 7, vy: 17 };
     var enemies = [];
     var LERP_SPEED = 0.35;
 
@@ -499,11 +517,11 @@
       // Speed values: player moves every MOVE_RATE(7) frames = 0.143/frame
       // Ghosts should be at or slightly below player speed
       enemies = [
-        { x: 7, y: 12, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.14, vx: 7, vy: 12, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.13, vx: 7, vy: 13, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.12, vx: 7, vy: 13, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.11, vx: 7, vy: 13, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.10, vx: 7, vy: 13, moveTimer: 0 }
+        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.14, vx: 7, vy: 8, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.13, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.12, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.11, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.10, vx: 7, vy: 9, moveTimer: 0 }
       ];
     }
 
@@ -520,23 +538,23 @@
     }
 
     function resetPlayer() {
-      player.x = 7; player.y = 25; player.dir = 3; player.nextDir = -1;
-      player.vx = 7; player.vy = 25;
+      player.x = 7; player.y = 17; player.dir = 3; player.nextDir = -1;
+      player.vx = 7; player.vy = 17;
     }
 
-    // Portals - corners: horizontal wrapping at rows 1/25, vertical wrapping at cols 1/13
+    // Portals - corners: horizontal wrapping at rows 1/19, vertical wrapping at cols 1/13
     var PORTALS = [
       // Horizontal wrapping near top corners
       { fromR: 1, fromC: -1, toR: 1, toC: COLS - 1 },
       { fromR: 1, fromC: COLS, toR: 1, toC: 0 },
       // Horizontal wrapping near bottom corners
-      { fromR: 25, fromC: -1, toR: 25, toC: COLS - 1 },
-      { fromR: 25, fromC: COLS, toR: 25, toC: 0 },
+      { fromR: 19, fromC: -1, toR: 19, toC: COLS - 1 },
+      { fromR: 19, fromC: COLS, toR: 19, toC: 0 },
       // Vertical wrapping at left corners
-      { fromR: -1, fromC: 1, toR: 25, toC: 1 },
+      { fromR: -1, fromC: 1, toR: 19, toC: 1 },
       { fromR: ROWS, fromC: 1, toR: 1, toC: 1 },
       // Vertical wrapping at right corners
-      { fromR: -1, fromC: 13, toR: 25, toC: 13 },
+      { fromR: -1, fromC: 13, toR: 19, toC: 13 },
       { fromR: ROWS, fromC: 13, toR: 1, toC: 13 }
     ];
     function checkPortal(x, y) {
@@ -616,6 +634,18 @@
               ctx.fill();
               ctx.shadowBlur = 0;
             }
+          } else if (cell === 6) {
+            // 1-up item: pulsing green star
+            var oneUpSize = TILE * 0.4 + Math.sin(animFrame * 0.08) * 2;
+            ctx.save();
+            ctx.fillStyle = '#00E676';
+            ctx.shadowColor = '#00E676';
+            ctx.shadowBlur = 12;
+            ctx.font = 'bold ' + Math.round(oneUpSize * 2) + 'px Silkscreen, monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('1UP', x + TILE/2, y + TILE/2);
+            ctx.restore();
           }
 
           // Power pellet respawning indicator (faint pulsing circle)
@@ -632,6 +662,25 @@
             }
           }
         }
+      }
+    }
+
+    function drawTrail() {
+      if (trail.length < 2) return;
+      var ch = CHARACTERS[selectedCharacter] || CHARACTERS[0];
+      for (var i = 0; i < trail.length; i++) {
+        var t = trail[i];
+        var alpha = (i / trail.length) * 0.35;
+        var size = SPRITE_SIZE * 0.3 * (i / trail.length);
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = ch.fallbackColor;
+        ctx.shadowColor = ch.fallbackColor;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
       }
     }
 
@@ -764,6 +813,16 @@
           }
           checkWinCondition();
         }
+      } else if (cell === 6) {
+        // 1-up: gain a life
+        lives++;
+        maze[player.y][player.x] = 0;
+        // Respawn 1-up after 30 seconds
+        var upr = player.y, upc = player.x;
+        setTimeout(function() {
+          if (maze[upr] && maze[upr][upc] === 0 && MAZE_TEMPLATE[upr][upc] === 6) maze[upr][upc] = 6;
+        }, 30000);
+        updateHUD(); updateLivesDisplay();
       } else if (cell === 3) {
         // Eat power pellet: trigger scared mode, pellet respawns after 10s
         score += 100;
@@ -805,18 +864,7 @@
       updateHUD();
     }
 
-    // Populate HTML color key bar
-    (function buildColorKey() {
-      var bar = document.getElementById('colorKeyBar');
-      DOT_COLORS.forEach(function(dc) {
-        var item = document.createElement('div'); item.className = 'color-key-item';
-        var dot = document.createElement('div'); dot.className = 'color-key-dot';
-        dot.style.background = dc.color; dot.style.boxShadow = '0 0 4px ' + dc.color;
-        var label = document.createElement('span'); label.className = 'color-key-label';
-        label.textContent = dc.name + ' ' + dc.points;
-        item.appendChild(dot); item.appendChild(label); bar.appendChild(item);
-      });
-    })();
+    // Color key moved to menu popup
 
     function countOpenDirs(ex, ey) {
       var count = 0;
@@ -832,8 +880,8 @@
           // Release one at a time: first at 3s, then every 5s after
           var releaseFrame = 180 + idx * 300; // ~3s, ~8s, ~13s, ~18s, ~23s
           if (animFrame > releaseFrame) {
-            enemy.inHouse = false; enemy.y = 10; enemy.x = 7; enemy.dir = 3;
-            enemy.vx = 7; enemy.vy = 10;
+            enemy.inHouse = false; enemy.y = 6; enemy.x = 7; enemy.dir = 3;
+            enemy.vx = 7; enemy.vy = 6;
           }
           return;
         }
@@ -922,11 +970,11 @@
         if (enemy.x === player.x && enemy.y === player.y) {
           if (enemy.scared) {
             score += 200;
-            enemy.x = 7; enemy.y = 13; enemy.vx = 7; enemy.vy = 13; enemy.inHouse = true; enemy.scared = false;
+            enemy.x = 7; enemy.y = 9; enemy.vx = 7; enemy.vy = 9; enemy.inHouse = true; enemy.scared = false;
           } else {
             lives--;
-            updateHUD();
-            if (lives <= 0) { gameOver(); } else { resetPlayer(); initEnemies(); }
+            updateHUD(); updateLivesDisplay();
+            if (lives <= 0) { gameOver(); } else { resetPlayer(); initEnemies(); trail = []; }
           }
         }
       });
@@ -948,8 +996,10 @@
 
     function startGame() {
       score = 0; lives = 3; level = 1; ghostScaredTimer = 0; animFrame = 0; lastLevelScore = 0;
-      resetMaze(); resetPlayer(); initEnemies(); updateHUD();
+      trail = [];
+      resetMaze(); resetPlayer(); initEnemies(); updateHUD(); updateLivesDisplay();
       overlayPause.classList.add('hidden'); overlayGameOver.classList.add('hidden'); overlayWin.classList.add('hidden');
+      menuPopup.classList.add('hidden');
       gameRunning = true;
     }
 
@@ -1022,6 +1072,54 @@
     document.addEventListener('mousemove', function(e) { joyMove(e.clientX, e.clientY); });
     document.addEventListener('mouseup', joyEnd);
 
+    // Lives display (sprite icons near joystick)
+    function updateLivesDisplay() {
+      var ld = document.getElementById('livesDisplay');
+      ld.innerHTML = '';
+      var ch = CHARACTERS[selectedCharacter] || CHARACTERS[0];
+      for (var i = 0; i < lives; i++) {
+        var icon = document.createElement('div'); icon.className = 'life-icon';
+        if (ch.sprite) {
+          var img = document.createElement('img'); img.src = ch.sprite; img.alt = ''; icon.appendChild(img);
+        } else {
+          icon.style.background = ch.fallbackColor;
+        }
+        ld.appendChild(icon);
+      }
+    }
+
+    // Menu button - pauses game and shows color key popup
+    var menuPopup = document.getElementById('menuPopup');
+    document.getElementById('menuBtn').addEventListener('click', function() {
+      if (gameRunning) { gameRunning = false; }
+      menuPopup.classList.remove('hidden');
+    });
+    document.getElementById('menuResumeBtn').addEventListener('click', function() {
+      menuPopup.classList.add('hidden');
+      gameRunning = true;
+    });
+    document.getElementById('menuQuitBtn').addEventListener('click', function() {
+      menuPopup.classList.add('hidden');
+      showIntro();
+    });
+
+    // Populate menu color key popup
+    (function buildMenuColorKey() {
+      var popup = document.getElementById('colorKeyPopup');
+      DOT_COLORS.forEach(function(dc) {
+        var item = document.createElement('div'); item.className = 'color-key-item';
+        var dot = document.createElement('div'); dot.className = 'color-key-dot';
+        dot.style.background = dc.color; dot.style.boxShadow = '0 0 6px ' + dc.color;
+        var label = document.createElement('span'); label.className = 'color-key-label';
+        label.textContent = dc.name + ' — ' + dc.points + ' pts';
+        item.appendChild(dot); item.appendChild(label); popup.appendChild(item);
+      });
+    })();
+
+    // Player trail effect
+    var trail = [];
+    var MAX_TRAIL = 8;
+
     document.getElementById('restartBtn').addEventListener('click', startGame);
     document.getElementById('resumeBtn').addEventListener('click', togglePause);
 
@@ -1047,8 +1145,12 @@
         checkCollisions();
         checkLevelUp();
         updateHUD();
+        // Update trail
+        trail.push({ x: player.vx * TILE + TILE/2, y: player.vy * TILE + TILE/2 });
+        if (trail.length > MAX_TRAIL) trail.shift();
       }
 
+      drawTrail();
       drawPlayer();
       enemies.forEach(drawEnemy);
       requestAnimationFrame(gameLoop);
