@@ -173,9 +173,9 @@
         <h3>How to Play</h3>
         <ul>
           <li>Move with arrow keys, WASD, or joystick</li>
-          <li>Collect dots — 10 color tiers, each worth more points</li>
+          <li>Collect dots — 7 color tiers, each worth more points</li>
           <li>Grab Bitcoin coins to chase the Cloaks!</li>
-          <li>Collect all 10 colors at every dot to win</li>
+          <li>Collect all 7 colors at every dot to win</li>
         </ul>
       </div>
       <div class="bottom-row">
@@ -316,78 +316,75 @@
       gate: '#c4a84d'
     };
 
-    // Dot color progression: 10 tiers - collect all colors at every position to win!
+    // Dot color progression: 7 tiers - collect all colors at every position to win!
     var DOT_COLORS = [
       { color: '#FFD700', points: 10, name: 'Gold' },
-      { color: '#00E676', points: 20, name: 'Green' },
-      { color: '#00A3FF', points: 30, name: 'Blue' },
-      { color: '#EB00FF', points: 50, name: 'Purple' },
-      { color: '#FF5252', points: 80, name: 'Red' },
-      { color: '#FF9100', points: 120, name: 'Orange' },
-      { color: '#00BCD4', points: 160, name: 'Cyan' },
-      { color: '#E040FB', points: 200, name: 'Pink' },
+      { color: '#00E676', points: 25, name: 'Green' },
+      { color: '#00A3FF', points: 50, name: 'Blue' },
+      { color: '#EB00FF', points: 80, name: 'Purple' },
+      { color: '#FF5252', points: 150, name: 'Red' },
       { color: '#FFFFFF', points: 300, name: 'White' },
       { color: '#76FF03', points: 500, name: 'Neon' }
     ];
-    var MAX_TIER = DOT_COLORS.length; // tier goes 0..9, reaching 10 means completed
+    var MAX_TIER = DOT_COLORS.length; // tier goes 0..6, reaching 7 means completed
 
     // ================================
-    // MAZE (15 cols x 27 rows) - no dead ends, more dots closer together
+    // MAZE (15 cols x 27 rows) - no dead ends, L-shaped & double walls, open corner portals
     // 0=path, 1=wall, 2=dot, 3=power dot, 4=gate, 5=spawn
+    // Ghost house uses ETH diamond area in center
     // ================================
     var MAZE_TEMPLATE = [
       [1,0,1,1,1,1,1,1,1,1,1,1,1,0,1],
-      [0,3,2,2,2,2,2,1,2,2,2,2,2,3,0],
-      [1,2,1,1,2,1,2,1,2,1,2,1,1,2,1],
+      [0,3,2,2,2,2,2,2,2,2,2,2,2,3,0],
+      [1,2,1,1,2,1,1,2,1,1,2,1,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
-      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
-      [1,2,2,2,2,2,0,1,0,2,2,2,2,2,1],
-      [1,1,1,2,1,2,0,1,0,2,1,2,1,1,1],
-      [1,2,2,2,2,2,1,1,1,2,2,2,2,2,1],
-      [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
-      [1,2,2,2,2,2,0,0,0,2,2,2,2,2,1],
-      [1,2,1,2,1,2,1,1,1,2,1,2,1,2,1],
+      [1,2,1,2,1,2,2,1,2,2,1,2,1,2,1],
+      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
+      [1,2,2,2,1,1,2,2,2,1,1,2,2,2,1],
+      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
+      [1,2,2,2,1,2,2,2,2,2,1,2,2,2,1],
+      [1,2,1,2,2,2,1,1,1,2,2,2,1,2,1],
+      [1,2,2,2,1,2,0,0,0,2,1,2,2,2,1],
+      [1,2,1,2,2,2,0,0,0,2,2,2,1,2,1],
       [1,2,2,2,2,0,4,5,4,0,2,2,2,2,1],
-      [1,2,1,2,1,0,1,5,1,0,1,2,1,2,1],
-      [1,2,2,2,2,2,0,0,0,2,2,2,2,2,1],
-      [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
-      [1,2,2,2,2,2,1,1,1,2,2,2,2,2,1],
-      [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
-      [1,2,2,2,2,2,0,1,0,2,2,2,2,2,1],
-      [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
+      [1,2,1,2,2,0,0,5,0,0,2,2,1,2,1],
+      [1,2,2,2,1,2,0,0,0,2,1,2,2,2,1],
+      [1,2,1,2,2,2,1,1,1,2,2,2,1,2,1],
+      [1,2,2,2,1,2,2,2,2,2,1,2,2,2,1],
+      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
+      [1,2,2,2,1,1,2,2,2,1,1,2,2,2,1],
+      [1,2,1,2,2,2,2,2,2,2,2,2,1,2,1],
+      [1,2,1,2,1,2,2,1,2,2,1,2,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
+      [1,2,1,1,2,1,1,2,1,1,2,1,1,2,1],
       [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,1,2,1,2,0,2,1,2,1,1,2,1],
-      [0,3,2,2,2,2,2,0,2,2,2,2,2,3,0],
+      [1,2,1,2,1,2,2,2,2,2,1,2,1,2,1],
+      [0,3,2,2,2,2,2,2,2,2,2,2,2,3,0],
       [1,0,1,1,1,1,1,1,1,1,1,1,1,0,1]
     ];
 
     // ================================
-    // ETH DIAMOND - proper SVG-style rendering
+    // ETH DIAMOND - drawn around ghost house area
     // ================================
     function drawEthDiamond() {
+      // Center of ghost house area (rows 10-14, cols 5-9)
       var cx = 7 * TILE + TILE/2;
-      var cy = 13 * TILE + TILE/2;
-      var scale = TILE * 0.18;
+      var cy = 12.5 * TILE;
+      var scale = TILE * 0.28;
 
       ctx.save();
 
-      // ETH diamond proportions (based on official logo)
-      // Top half is taller than bottom half
-      var topY = -18 * scale;
+      var topY = -14 * scale;
       var midY = 0;
-      var botY = 12 * scale;
+      var botY = 10 * scale;
       var halfW = 10 * scale;
 
-      // Shadow/glow
+      // Outer glow
       ctx.shadowColor = '#627EEA';
-      ctx.shadowBlur = 20;
+      ctx.shadowBlur = 30;
 
-      // Left top face (darker)
-      ctx.globalAlpha = 0.15;
+      // Left top face
+      ctx.globalAlpha = 0.1;
       ctx.fillStyle = '#627EEA';
       ctx.beginPath();
       ctx.moveTo(cx, cy + topY);
@@ -396,7 +393,7 @@
       ctx.closePath();
       ctx.fill();
 
-      // Right top face (lighter)
+      // Right top face
       ctx.fillStyle = '#8EA2F0';
       ctx.beginPath();
       ctx.moveTo(cx, cy + topY);
@@ -406,7 +403,7 @@
       ctx.fill();
 
       // Middle band left
-      ctx.globalAlpha = 0.12;
+      ctx.globalAlpha = 0.08;
       ctx.fillStyle = '#A9BAF5';
       ctx.beginPath();
       ctx.moveTo(cx - halfW, cy + midY);
@@ -425,7 +422,7 @@
       ctx.fill();
 
       // Left bottom face
-      ctx.globalAlpha = 0.15;
+      ctx.globalAlpha = 0.1;
       ctx.fillStyle = '#627EEA';
       ctx.beginPath();
       ctx.moveTo(cx, cy + botY);
@@ -445,7 +442,7 @@
 
       // Outline
       ctx.shadowBlur = 0;
-      ctx.globalAlpha = 0.2;
+      ctx.globalAlpha = 0.18;
       ctx.strokeStyle = '#627EEA';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
@@ -463,9 +460,9 @@
       ctx.stroke();
 
       // Inner glow pulse
-      ctx.globalAlpha = 0.03 + Math.sin(animFrame * 0.03) * 0.02;
+      ctx.globalAlpha = 0.03 + Math.sin(animFrame * 0.03) * 0.015;
       ctx.shadowColor = '#627EEA';
-      ctx.shadowBlur = 40;
+      ctx.shadowBlur = 50;
       ctx.fillStyle = '#627EEA';
       ctx.beginPath();
       ctx.moveTo(cx, cy + topY);
@@ -496,15 +493,15 @@
 
     var player = { x: 7, y: 25, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1, vx: 7, vy: 25 };
     var enemies = [];
-    var LERP_SPEED = 0.22;
+    var LERP_SPEED = 0.28;
 
     function initEnemies() {
       enemies = [
-        { x: 7, y: 13, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.8, vx: 7, vy: 13 },
-        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.72, vx: 7, vy: 13 },
-        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.68, vx: 7, vy: 13 },
-        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.64, vx: 7, vy: 13 },
-        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.60, vx: 7, vy: 13 }
+        { x: 7, y: 12, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.7, vx: 7, vy: 12, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.65, vx: 7, vy: 13, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.6, vx: 7, vy: 13, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.55, vx: 7, vy: 13, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.5, vx: 7, vy: 13, moveTimer: 0 }
       ];
     }
 
@@ -559,9 +556,21 @@
           var cell = maze[r][c];
 
           if (cell === 1) {
+            // Brick-textured wall
             ctx.fillStyle = C.wall;
             ctx.fillRect(x, y, TILE, TILE);
-            ctx.strokeStyle = C.wallGlow; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.3;
+            // Brick mortar lines
+            ctx.strokeStyle = '#0d1528'; ctx.lineWidth = 0.6; ctx.globalAlpha = 0.5;
+            // Horizontal mortar
+            ctx.beginPath(); ctx.moveTo(x, y + TILE/2); ctx.lineTo(x + TILE, y + TILE/2); ctx.stroke();
+            // Vertical mortar (offset per row for brick pattern)
+            var brickOffset = (r % 2 === 0) ? 0 : TILE/2;
+            ctx.beginPath(); ctx.moveTo(x + brickOffset, y); ctx.lineTo(x + brickOffset, y + TILE/2); ctx.stroke();
+            var v2 = brickOffset + TILE/2;
+            if (v2 <= TILE) { ctx.beginPath(); ctx.moveTo(x + v2, y + TILE/2); ctx.lineTo(x + v2, y + TILE); ctx.stroke(); }
+            ctx.globalAlpha = 1;
+            // Glow edges facing open paths
+            ctx.strokeStyle = C.wallGlow; ctx.lineWidth = 0.8; ctx.globalAlpha = 0.25;
             if (r > 0 && maze[r-1][c] !== 1) { ctx.beginPath(); ctx.moveTo(x, y+0.5); ctx.lineTo(x+TILE, y+0.5); ctx.stroke(); }
             if (r < ROWS-1 && maze[r+1][c] !== 1) { ctx.beginPath(); ctx.moveTo(x, y+TILE-0.5); ctx.lineTo(x+TILE, y+TILE-0.5); ctx.stroke(); }
             if (c > 0 && maze[r][c-1] !== 1) { ctx.beginPath(); ctx.moveTo(x+0.5, y); ctx.lineTo(x+0.5, y+TILE); ctx.stroke(); }
@@ -807,47 +816,93 @@
       });
     })();
 
+    function countOpenDirs(ex, ey) {
+      var count = 0;
+      for (var d = 0; d < 4; d++) {
+        if (canMoveEnemy(ex + DX[d], ey + DY[d], false)) count++;
+      }
+      return count;
+    }
+
     function moveEnemies() {
       enemies.forEach(function(enemy, idx) {
         if (enemy.inHouse) {
-          if (animFrame > 80 * (idx + 1)) {
-            enemy.inHouse = false; enemy.y = 11; enemy.x = 7; enemy.dir = 3;
+          if (animFrame > 90 * (idx + 1)) {
+            enemy.inHouse = false; enemy.y = 10; enemy.x = 7; enemy.dir = 3;
+            enemy.vx = 7; enemy.vy = 10;
           }
           return;
         }
-        if (animFrame % Math.round(12 / enemy.speed) !== 0) return;
-        var bestDir = enemy.dir; var bestDist = Infinity;
-        var targetX = player.x; var targetY = player.y;
+        // Smooth timer-based movement instead of frame-skip
+        enemy.moveTimer += enemy.speed;
+        if (enemy.moveTimer < 1) return;
+        enemy.moveTimer -= 1;
 
-        if (enemy.scared) {
-          bestDist = -Infinity;
-          for (var d = 0; d < 4; d++) {
-            if (d === (enemy.dir + 2) % 4) continue;
-            var tx = enemy.x + DX[d]; var ty = enemy.y + DY[d];
-            if (!canMoveEnemy(tx, ty, false)) continue;
-            var dist = Math.abs(tx - targetX) + Math.abs(ty - targetY);
-            if (dist > bestDist) { bestDist = dist; bestDir = d; }
-          }
-        } else {
-          switch (idx) {
-            case 0: break;
-            case 1: targetX = player.x + DX[player.dir] * 3; targetY = player.y + DY[player.dir] * 3; break;
-            case 2: if (Math.random() < 0.25) { targetX = Math.floor(Math.random() * COLS); targetY = Math.floor(Math.random() * ROWS); } break;
-            case 3: targetX = player.x; targetY = player.y + 3; break;
-            case 4: targetX = player.x + DX[player.dir] * 2 + (Math.random() > 0.5 ? 2 : -2); targetY = player.y + DY[player.dir] * 2; break;
-          }
-          for (var d2 = 0; d2 < 4; d2++) {
-            if (d2 === (enemy.dir + 2) % 4) continue;
-            var tx2 = enemy.x + DX[d2]; var ty2 = enemy.y + DY[d2];
-            if (!canMoveEnemy(tx2, ty2, false)) continue;
-            var dist2 = Math.abs(tx2 - targetX) + Math.abs(ty2 - targetY);
-            if (dist2 < bestDist) { bestDist = dist2; bestDir = d2; }
+        // Count available directions (not counting reverse)
+        var availDirs = [];
+        var reverseDir = (enemy.dir + 2) % 4;
+        for (var d = 0; d < 4; d++) {
+          var tx = enemy.x + DX[d]; var ty = enemy.y + DY[d];
+          if (canMoveEnemy(tx, ty, false) || checkPortal(tx, ty)) {
+            availDirs.push(d);
           }
         }
+        // Filter out reverse unless it's the only option (prevents getting stuck)
+        var nonReverse = availDirs.filter(function(d) { return d !== reverseDir; });
+        if (nonReverse.length > 0) availDirs = nonReverse;
+
+        if (availDirs.length === 0) return;
+
+        var targetX = player.x; var targetY = player.y;
+        var bestDir = enemy.dir; var bestDist;
+
+        if (enemy.scared) {
+          // Run away from player
+          bestDist = -Infinity;
+          availDirs.forEach(function(d) {
+            var tx = enemy.x + DX[d]; var ty = enemy.y + DY[d];
+            var dist = Math.abs(tx - targetX) + Math.abs(ty - targetY);
+            if (dist > bestDist) { bestDist = dist; bestDir = d; }
+          });
+        } else {
+          // Different targeting strategies per ghost
+          switch (idx) {
+            case 0: break; // Direct chase
+            case 1: // Ambush: target ahead of player
+              targetX = player.x + DX[player.dir] * 4;
+              targetY = player.y + DY[player.dir] * 4;
+              break;
+            case 2: // Random roam with occasional chase
+              if (Math.random() < 0.3) {
+                targetX = Math.floor(Math.random() * COLS);
+                targetY = Math.floor(Math.random() * ROWS);
+              }
+              break;
+            case 3: // Flanker: come from below
+              targetX = player.x + (Math.random() > 0.5 ? 3 : -3);
+              targetY = player.y + 3;
+              break;
+            case 4: // Pincer: cut off escape routes
+              targetX = player.x - DX[player.dir] * 3;
+              targetY = player.y - DY[player.dir] * 3;
+              break;
+          }
+          // At intersections (3+ choices), pick best direction
+          // On corridors (1-2 choices), just go forward or take the turn
+          bestDist = Infinity;
+          availDirs.forEach(function(d) {
+            var tx = enemy.x + DX[d]; var ty = enemy.y + DY[d];
+            var dist = Math.abs(tx - targetX) + Math.abs(ty - targetY);
+            // Add small random jitter to prevent identical paths
+            dist += Math.random() * 0.5;
+            if (dist < bestDist) { bestDist = dist; bestDir = d; }
+          });
+        }
+
         enemy.dir = bestDir;
         var newX = enemy.x + DX[enemy.dir]; var newY = enemy.y + DY[enemy.dir];
         var ePortal = checkPortal(newX, newY);
-        if (ePortal) { enemy.x = ePortal.x; enemy.y = ePortal.y; return; }
+        if (ePortal) { enemy.x = ePortal.x; enemy.y = ePortal.y; enemy.vx = enemy.x; enemy.vy = enemy.y; return; }
         if (canMoveEnemy(newX, newY, false)) { enemy.x = newX; enemy.y = newY; }
       });
 
@@ -863,7 +918,7 @@
         if (enemy.x === player.x && enemy.y === player.y) {
           if (enemy.scared) {
             score += 200;
-            enemy.x = 7; enemy.y = 13; enemy.inHouse = true; enemy.scared = false;
+            enemy.x = 7; enemy.y = 13; enemy.vx = 7; enemy.vy = 13; enemy.inHouse = true; enemy.scared = false;
           } else {
             lives--;
             updateHUD();
@@ -888,7 +943,7 @@
     var overlayWin = document.getElementById('winOverlay');
 
     function startGame() {
-      score = 0; lives = 3; level = 1; ghostScaredTimer = 0; animFrame = 0;
+      score = 0; lives = 3; level = 1; ghostScaredTimer = 0; animFrame = 0; lastLevelScore = 0;
       resetMaze(); resetPlayer(); initEnemies(); updateHUD();
       overlayPause.classList.add('hidden'); overlayGameOver.classList.add('hidden'); overlayWin.classList.add('hidden');
       gameRunning = true;
