@@ -169,9 +169,9 @@
         <h3>How to Play</h3>
         <ul>
           <li>Move with arrow keys, WASD, or joystick</li>
-          <li>Collect beans — they change color for more points</li>
-          <li>Power beans let you chase the Cloaks (they respawn!)</li>
-          <li>Cloaks get faster each level</li>
+          <li>Collect dots — 10 color tiers, each worth more points</li>
+          <li>Grab Bitcoin coins to chase the Cloaks!</li>
+          <li>Collect all 10 colors at every dot to win</li>
         </ul>
       </div>
       <div class="bottom-row">
@@ -255,6 +255,7 @@
     }
     CHARACTERS.forEach(function(c, i) { if (c.sprite) loadSprite('player_' + i, c.sprite); });
     ENEMIES.forEach(function(e, i) { if (e.sprite) loadSprite('enemy_' + i, e.sprite); });
+    loadSprite('btc_coin', 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b789666d4bd450e1a0eb21_btc_coin.png');
 
     var selectedCharacter = 0;
 
@@ -291,12 +292,12 @@
     // ================================
     // GAME CONSTANTS - bigger tiles, wider corridors
     // ================================
-    var TILE = 26;
+    var TILE = 28;
     var COLS = 15;
     var ROWS = 27;
-    var CANVAS_W = COLS * TILE;  // 390
-    var CANVAS_H = ROWS * TILE;  // 702
-    var SPRITE_SIZE = Math.round(TILE * 1.3);
+    var CANVAS_W = COLS * TILE;  // 420
+    var CANVAS_H = ROWS * TILE;  // 756
+    var SPRITE_SIZE = Math.round(TILE * 1.43); // 10% bigger than before
 
     var canvas = document.getElementById('gameCanvas');
     var ctx = canvas.getContext('2d');
@@ -310,46 +311,52 @@
       gate: '#c4a84d'
     };
 
-    // Dot color progression: each time you eat a dot, it respawns in next color tier
+    // Dot color progression: 10 tiers - collect all colors at every position to win!
     var DOT_COLORS = [
-      { color: '#FFD700', points: 10, name: 'gold' },
-      { color: '#00E676', points: 20, name: 'green' },
-      { color: '#00A3FF', points: 30, name: 'blue' },
-      { color: '#EB00FF', points: 50, name: 'purple' },
-      { color: '#FF5252', points: 80, name: 'red' }
+      { color: '#FFD700', points: 10, name: 'Gold' },
+      { color: '#00E676', points: 20, name: 'Green' },
+      { color: '#00A3FF', points: 30, name: 'Blue' },
+      { color: '#EB00FF', points: 50, name: 'Purple' },
+      { color: '#FF5252', points: 80, name: 'Red' },
+      { color: '#FF9100', points: 120, name: 'Orange' },
+      { color: '#00BCD4', points: 160, name: 'Cyan' },
+      { color: '#E040FB', points: 200, name: 'Pink' },
+      { color: '#FFFFFF', points: 300, name: 'White' },
+      { color: '#76FF03', points: 500, name: 'Neon' }
     ];
+    var MAX_TIER = DOT_COLORS.length; // tier goes 0..9, reaching 10 means completed
 
     // ================================
-    // MAZE (15 cols x 27 rows) - wider corridors, fewer dots, spaced apart
+    // MAZE (15 cols x 27 rows) - no dead ends, more dots closer together
     // 0=path, 1=wall, 2=dot, 3=power dot, 4=gate, 5=spawn
     // ================================
     var MAZE_TEMPLATE = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,2,0,2,0,2,0,1,0,2,0,2,0,2,1],
-      [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
-      [1,2,0,0,0,2,0,0,0,2,0,0,0,2,1],
-      [1,0,1,0,1,1,0,1,0,1,1,0,1,0,1],
-      [1,3,0,0,0,2,0,2,0,2,0,0,0,3,1],
-      [1,1,1,0,1,0,0,0,0,0,1,0,1,1,1],
-      [0,0,0,0,0,2,0,1,0,2,0,0,0,0,0],
-      [1,1,1,0,1,0,0,1,0,0,1,0,1,1,1],
-      [1,2,0,0,0,0,1,1,1,0,0,0,0,2,1],
-      [1,0,1,0,1,0,0,0,0,0,1,0,1,0,1],
-      [1,2,0,0,1,0,0,0,0,0,1,0,0,2,1],
-      [1,0,1,0,0,0,1,1,1,0,0,0,1,0,1],
-      [1,0,0,0,1,0,4,5,4,0,1,0,0,0,1],
-      [1,2,1,0,0,0,1,5,1,0,0,0,1,2,1],
-      [1,0,1,0,1,0,0,0,0,0,1,0,1,0,1],
-      [1,0,0,0,1,0,0,0,0,0,1,0,0,0,1],
-      [1,2,1,0,0,0,1,1,1,0,0,0,1,2,1],
-      [1,1,1,0,1,0,0,0,0,0,1,0,1,1,1],
-      [0,0,0,0,0,2,0,1,0,2,0,0,0,0,0],
-      [1,1,1,0,1,0,0,0,0,0,1,0,1,1,1],
-      [1,3,0,0,0,2,0,2,0,2,0,0,0,3,1],
-      [1,0,1,0,1,1,0,1,0,1,1,0,1,0,1],
-      [1,2,0,0,0,2,0,0,0,2,0,0,0,2,1],
-      [1,0,1,1,0,1,0,1,0,1,0,1,1,0,1],
-      [1,2,0,2,0,2,0,1,0,2,0,2,0,2,1],
+      [1,2,2,2,2,2,2,1,2,2,2,2,2,2,1],
+      [1,2,1,1,2,1,2,1,2,1,2,1,1,2,1],
+      [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1],
+      [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
+      [0,0,0,2,2,2,0,1,0,2,2,2,0,0,0],
+      [1,1,1,2,1,2,0,1,0,2,1,2,1,1,1],
+      [1,2,2,2,2,2,1,1,1,2,2,2,2,2,1],
+      [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
+      [1,2,2,2,2,2,0,0,0,2,2,2,2,2,1],
+      [1,2,1,2,1,2,1,1,1,2,1,2,1,2,1],
+      [1,2,2,2,2,0,4,5,4,0,2,2,2,2,1],
+      [1,2,1,2,1,0,1,5,1,0,1,2,1,2,1],
+      [1,2,2,2,2,2,0,0,0,2,2,2,2,2,1],
+      [1,2,1,2,1,2,0,0,0,2,1,2,1,2,1],
+      [1,2,2,2,2,2,1,1,1,2,2,2,2,2,1],
+      [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
+      [0,0,0,2,2,2,0,1,0,2,2,2,0,0,0],
+      [1,1,1,2,1,2,2,0,2,2,1,2,1,1,1],
+      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
+      [1,2,1,2,1,1,2,1,2,1,1,2,1,2,1],
+      [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1],
+      [1,2,1,1,2,1,2,0,2,1,2,1,1,2,1],
+      [1,2,2,2,2,2,2,0,2,2,2,2,2,2,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
 
@@ -357,8 +364,8 @@
     // ETH DIAMOND - proper SVG-style rendering
     // ================================
     function drawEthDiamond() {
-      var cx = 7.5 * TILE;
-      var cy = 13.5 * TILE;
+      var cx = 7 * TILE + TILE/2;
+      var cy = 13 * TILE + TILE/2;
       var scale = TILE * 0.18;
 
       ctx.save();
@@ -559,21 +566,30 @@
             var dc = DOT_COLORS[Math.min(tier, DOT_COLORS.length - 1)];
             ctx.fillStyle = dc.color;
             ctx.shadowColor = dc.color;
-            ctx.shadowBlur = 4;
+            ctx.shadowBlur = 5;
             ctx.beginPath();
-            ctx.arc(x + TILE/2, y + TILE/2, 4, 0, Math.PI * 2);
+            ctx.arc(x + TILE/2, y + TILE/2, 4.5, 0, Math.PI * 2);
             ctx.fill();
             ctx.shadowBlur = 0;
           } else if (cell === 3) {
-            // Power pellet
-            var pulse = 5.5 + Math.sin(animFrame * 0.12) * 2;
-            ctx.fillStyle = '#EB00FF';
-            ctx.shadowColor = '#EB00FF';
-            ctx.shadowBlur = 12;
-            ctx.beginPath();
-            ctx.arc(x + TILE/2, y + TILE/2, pulse, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
+            // Power pellet - Bitcoin coin
+            var btcImg = spriteImages['btc_coin'];
+            var btcSize = TILE * 0.85 + Math.sin(animFrame * 0.12) * 2;
+            if (btcImg) {
+              ctx.save();
+              ctx.shadowColor = '#F7931A';
+              ctx.shadowBlur = 10;
+              ctx.drawImage(btcImg, x + TILE/2 - btcSize/2, y + TILE/2 - btcSize/2, btcSize, btcSize);
+              ctx.restore();
+            } else {
+              ctx.fillStyle = '#F7931A';
+              ctx.shadowColor = '#F7931A';
+              ctx.shadowBlur = 12;
+              ctx.beginPath();
+              ctx.arc(x + TILE/2, y + TILE/2, btcSize/2, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.shadowBlur = 0;
+            }
           }
 
           // Power pellet respawning indicator (faint pulsing circle)
@@ -581,7 +597,7 @@
             var prog = 1 - (powerRespawn[r][c] / POWER_RESPAWN_FRAMES);
             if (prog > 0.7) {
               ctx.globalAlpha = (prog - 0.7) * 3 * (0.3 + Math.sin(animFrame * 0.2) * 0.15);
-              ctx.strokeStyle = '#EB00FF';
+              ctx.strokeStyle = '#F7931A';
               ctx.lineWidth = 1;
               ctx.beginPath();
               ctx.arc(x + TILE/2, y + TILE/2, 5, 0, Math.PI * 2);
@@ -693,18 +709,23 @@
       if (cell === 2) {
         // Eat dot: score based on tier, then advance tier and respawn dot
         var tier = dotTiers[player.y][player.x];
-        var dc = DOT_COLORS[Math.min(tier, DOT_COLORS.length - 1)];
-        score += dc.points;
-        // Advance to next color tier
-        dotTiers[player.y][player.x] = Math.min(tier + 1, DOT_COLORS.length - 1);
-        // Dot disappears briefly then comes back (immediate respawn, new color)
-        maze[player.y][player.x] = 0;
-        var dr = player.y, dcc = player.x;
-        setTimeout(function() {
-          if (maze[dr] && maze[dr][dcc] === 0 && MAZE_TEMPLATE[dr][dcc] === 2) {
-            maze[dr][dcc] = 2;
+        if (tier < MAX_TIER) {
+          var dc = DOT_COLORS[Math.min(tier, DOT_COLORS.length - 1)];
+          score += dc.points;
+          // Advance to next color tier
+          dotTiers[player.y][player.x] = tier + 1;
+          // Dot disappears briefly then comes back after 2 seconds (unless completed)
+          maze[player.y][player.x] = 0;
+          var dr = player.y, dcc = player.x;
+          if (dotTiers[dr][dcc] < MAX_TIER) {
+            setTimeout(function() {
+              if (maze[dr] && maze[dr][dcc] === 0 && MAZE_TEMPLATE[dr][dcc] === 2) {
+                maze[dr][dcc] = 2;
+              }
+            }, 2000);
           }
-        }, 2000);
+          checkWinCondition();
+        }
       } else if (cell === 3) {
         // Eat power pellet: trigger scared mode, pellet respawns after 10s
         score += 100;
@@ -726,6 +747,46 @@
             }
           }
         }
+      }
+    }
+
+    // Win condition: all dot positions have reached max tier
+    function checkWinCondition() {
+      for (var r = 0; r < ROWS; r++) {
+        for (var c = 0; c < COLS; c++) {
+          if (MAZE_TEMPLATE[r][c] === 2 && dotTiers[r][c] < MAX_TIER) return;
+        }
+      }
+      // All dots completed!
+      gameRunning = false;
+      score += 5000; // bonus for completing
+      var name = document.getElementById('playerName').value || 'Player';
+      document.getElementById('levelScore').textContent = 'Score: ' + score + ' - YOU WIN!';
+      overlayWin.querySelector('h2').textContent = 'You Win!';
+      overlayWin.classList.remove('hidden');
+      updateHUD();
+    }
+
+    // Draw color key/legend
+    function drawColorKey() {
+      var keyX = 4;
+      var keyY = CANVAS_H - (DOT_COLORS.length * 14) - 6;
+      ctx.globalAlpha = 0.7;
+      ctx.fillStyle = 'rgba(8,12,24,0.85)';
+      ctx.fillRect(keyX - 2, keyY - 2, 80, DOT_COLORS.length * 14 + 4);
+      ctx.globalAlpha = 1;
+      for (var i = 0; i < DOT_COLORS.length; i++) {
+        var ky = keyY + i * 14;
+        ctx.fillStyle = DOT_COLORS[i].color;
+        ctx.shadowColor = DOT_COLORS[i].color;
+        ctx.shadowBlur = 3;
+        ctx.beginPath();
+        ctx.arc(keyX + 6, ky + 6, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#d0d4f0';
+        ctx.font = '10px VT323, monospace';
+        ctx.fillText(DOT_COLORS[i].name + ' ' + DOT_COLORS[i].points + 'pt', keyX + 14, ky + 10);
       }
     }
 
@@ -914,6 +975,7 @@
 
       drawPlayer();
       enemies.forEach(drawEnemy);
+      drawColorKey();
       requestAnimationFrame(gameLoop);
     }
 
