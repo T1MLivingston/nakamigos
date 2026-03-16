@@ -493,15 +493,17 @@
 
     var player = { x: 7, y: 25, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1, vx: 7, vy: 25 };
     var enemies = [];
-    var LERP_SPEED = 0.28;
+    var LERP_SPEED = 0.35;
 
     function initEnemies() {
+      // Speed values: player moves every MOVE_RATE(7) frames = 0.143/frame
+      // Ghosts should be at or slightly below player speed
       enemies = [
-        { x: 7, y: 12, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.7, vx: 7, vy: 12, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.65, vx: 7, vy: 13, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.6, vx: 7, vy: 13, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.55, vx: 7, vy: 13, moveTimer: 0 },
-        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.5, vx: 7, vy: 13, moveTimer: 0 }
+        { x: 7, y: 12, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.14, vx: 7, vy: 12, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.13, vx: 7, vy: 13, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.12, vx: 7, vy: 13, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.11, vx: 7, vy: 13, moveTimer: 0 },
+        { x: 7, y: 13, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.10, vx: 7, vy: 13, moveTimer: 0 }
       ];
     }
 
@@ -827,7 +829,9 @@
     function moveEnemies() {
       enemies.forEach(function(enemy, idx) {
         if (enemy.inHouse) {
-          if (animFrame > 90 * (idx + 1)) {
+          // Release one at a time: first at 3s, then every 5s after
+          var releaseFrame = 180 + idx * 300; // ~3s, ~8s, ~13s, ~18s, ~23s
+          if (animFrame > releaseFrame) {
             enemy.inHouse = false; enemy.y = 10; enemy.x = 7; enemy.dir = 3;
             enemy.vx = 7; enemy.vy = 10;
           }
@@ -968,7 +972,7 @@
         level++;
         updateHUD();
         // Speed up enemies
-        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.06, 2); });
+        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.008, 0.16); });
       }
     }
 
