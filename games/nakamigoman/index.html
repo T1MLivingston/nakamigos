@@ -65,133 +65,143 @@
 
     /* ======================== INTRO SCREEN ======================== */
     .intro-screen {
-      width: 100%; padding: 20px 20px 40px;
-      display: flex; flex-direction: column; align-items: center; gap: 18px;
+      width: 100%; padding: 14px 16px 24px;
+      display: flex; flex-direction: column; align-items: center; gap: 12px;
     }
     .intro-screen.hidden { display: none; }
 
     /* Back arrow */
     .back-arrow {
       align-self: flex-start;
-      font-size: 1.2rem; color: #7a7eb0; background: none; border: none;
-      cursor: pointer; padding: 4px 8px; font-family: 'VT323', monospace;
-      letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; gap: 6px;
+      font-size: 1rem; color: #7a7eb0; background: none; border: none;
+      cursor: pointer; padding: 2px 6px; font-family: 'VT323', monospace;
+      letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; gap: 4px;
       transition: color 0.2s;
     }
     .back-arrow:hover { color: #FFD700; }
 
     /* Blackbird Header */
     .brand-header {
-      width: 100%; display: flex; align-items: center; gap: 14px; padding-bottom: 4px;
+      width: 100%; display: flex; align-items: center; gap: 12px;
     }
     .brand-logo {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: #1a1e2e; border: 2px solid rgba(255, 215, 0, 0.25);
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #ffffff; border: 2px solid rgba(255, 215, 0, 0.25);
       display: flex; align-items: center; justify-content: center;
       overflow: hidden; flex-shrink: 0;
     }
     .brand-logo img { width: 100%; height: 100%; object-fit: cover; }
     .brand-title {
-      font-family: 'Silkscreen', cursive; font-size: clamp(0.9rem, 3.8vw, 1.2rem);
+      font-family: 'Silkscreen', cursive; font-size: clamp(0.85rem, 3.5vw, 1.1rem);
       color: #e8e4d4; letter-spacing: 2px; text-transform: uppercase;
       text-shadow: 0 0 20px rgba(255, 215, 0, 0.15); flex: 1;
     }
 
-    /* Game Title */
+    /* Game Title Pill */
+    .game-title-pill {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 10px 36px; border-radius: 40px;
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(0, 163, 255, 0.08) 100%);
+      border: 2px solid rgba(255, 215, 0, 0.25);
+    }
     .game-title {
-      font-family: 'Silkscreen', cursive; font-size: clamp(1.8rem, 8vw, 2.6rem);
+      font-family: 'Silkscreen', cursive; font-size: clamp(2rem, 9vw, 2.8rem);
       background: linear-gradient(135deg, #FFD700 0%, #00A3FF 60%, #EB00FF 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      text-align: center; letter-spacing: 4px; text-transform: uppercase;
+      text-align: center; letter-spacing: 5px; text-transform: uppercase;
       filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.3));
     }
 
-    .intro-subtitle {
-      font-family: 'VT323', monospace; font-size: 1rem; color: #7a7eb0;
-      text-transform: uppercase; letter-spacing: 2px; text-align: center;
+    /* Decorative banner with flying character */
+    .deco-banner {
+      width: 100%; position: relative; height: 32px;
+      display: flex; align-items: center; overflow: hidden;
     }
+    .deco-line {
+      flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.3), transparent);
+    }
+    .deco-sprite {
+      width: 36px; height: 36px; flex-shrink: 0;
+      animation: fly-across 6s linear infinite;
+      image-rendering: auto;
+    }
+    @keyframes fly-across {
+      0%   { transform: translateX(-60px) scaleX(-1); }
+      49%  { transform: translateX(calc(100vw - 60px)) scaleX(-1); }
+      50%  { transform: translateX(calc(100vw - 60px)) scaleX(1); }
+      100% { transform: translateX(-60px) scaleX(1); }
+    }
+
     .intro-subtitle-gold {
-      font-family: 'VT323', monospace; font-size: 0.85rem; color: #c4a84d;
-      text-transform: uppercase; letter-spacing: 1px; text-align: center; line-height: 1.6;
+      font-family: 'VT323', monospace; font-size: 0.8rem; color: #c4a84d;
+      text-transform: uppercase; letter-spacing: 1px; text-align: center; line-height: 1.5;
     }
 
     /* Input Fields */
     .input-group {
-      width: 100%; display: flex; flex-direction: column; gap: 10px;
+      width: 100%; display: flex; flex-direction: column; gap: 8px;
     }
     .input-field {
-      width: 100%; display: flex; flex-direction: column; gap: 3px;
-      padding: 10px 14px; background: rgba(20, 24, 40, 0.8);
+      width: 100%; display: flex; flex-direction: column; gap: 2px;
+      padding: 8px 12px; background: rgba(20, 24, 40, 0.8);
       border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 8px;
     }
     .input-field label {
-      font-family: 'VT323', monospace; font-size: 0.8rem; color: #c4a84d;
+      font-family: 'VT323', monospace; font-size: 0.75rem; color: #c4a84d;
       text-transform: uppercase; letter-spacing: 1px;
     }
     .input-field input {
-      font-family: 'VT323', monospace; font-size: 1rem;
+      font-family: 'VT323', monospace; font-size: 0.95rem;
       background: transparent; border: none; color: #e8e4d4; outline: none;
-      letter-spacing: 1px; padding: 2px 0;
+      letter-spacing: 1px; padding: 1px 0;
     }
     .input-field input::placeholder { color: #4a4e6a; }
-    .input-row { display: flex; gap: 10px; }
+    .input-row { display: flex; gap: 8px; }
     .input-row .input-field { flex: 1; }
 
-    /* Character Selection - 2x2 Grid */
+    /* Character Selection - 3 across */
     .character-grid-label {
-      font-family: 'Silkscreen', cursive; font-size: 0.7rem; color: #7a7eb0;
+      font-family: 'Silkscreen', cursive; font-size: 0.65rem; color: #7a7eb0;
       text-transform: uppercase; letter-spacing: 2px; text-align: center;
     }
     .character-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
-      width: 100%; max-width: 320px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px;
+      width: 100%;
     }
     .character-card {
       aspect-ratio: 1; background: rgba(20, 24, 40, 0.8);
-      border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.1); border-radius: 10px;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       cursor: pointer; transition: all 0.2s; overflow: hidden; position: relative;
-      padding: 8px;
+      padding: 6px;
     }
-    .character-card:hover { border-color: rgba(255, 215, 0, 0.4); transform: scale(1.03); }
+    .character-card:hover { border-color: rgba(255, 215, 0, 0.4); transform: scale(1.04); }
     .character-card.selected {
-      border-color: #FFD700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.25);
+      border-color: #FFD700; box-shadow: 0 0 16px rgba(255, 215, 0, 0.25);
       background: rgba(255, 215, 0, 0.06);
     }
     .character-card.locked {
-      opacity: 0.35; cursor: default; filter: grayscale(0.8);
+      opacity: 0.3; cursor: default; filter: grayscale(0.8);
     }
     .character-card.locked:hover { border-color: rgba(255, 255, 255, 0.1); transform: none; }
     .character-card img {
-      width: 80%; height: auto; border-radius: 8px; image-rendering: auto;
+      width: 90%; height: auto; border-radius: 6px; image-rendering: auto;
       object-fit: contain;
     }
     .character-card .char-name {
-      font-family: 'VT323', monospace; font-size: 0.85rem; color: #7a7eb0;
-      text-transform: uppercase; letter-spacing: 1px; margin-top: 6px; text-align: center;
+      font-family: 'VT323', monospace; font-size: 0.7rem; color: #7a7eb0;
+      text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; text-align: center;
     }
     .character-card.selected .char-name { color: #FFD700; }
     .character-card .lock-icon {
-      font-family: 'Silkscreen', cursive; font-size: 3rem; color: #3a3e5a;
-    }
-
-    /* Leaderboard placeholder */
-    .leaderboard-preview {
-      width: 100%; padding: 14px 16px; background: rgba(20, 24, 40, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; text-align: center;
-    }
-    .leaderboard-preview h3 {
-      font-family: 'Silkscreen', cursive; font-size: 0.65rem; color: #5c608e;
-      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px;
-    }
-    .leaderboard-preview p {
-      font-family: 'VT323', monospace; font-size: 0.85rem; color: #4a4e6a;
+      font-family: 'Silkscreen', cursive; font-size: 2.2rem; color: #3a3e5a;
     }
 
     /* Play Button */
     .play-btn {
       width: 100%; font-family: 'Silkscreen', cursive; font-size: 1rem;
-      padding: 18px 32px; border-radius: 10px;
+      padding: 16px 32px; border-radius: 10px;
       border: 2px solid rgba(255, 215, 0, 0.35); cursor: pointer;
       letter-spacing: 3px; text-transform: uppercase;
       background: rgba(180, 155, 60, 0.12); color: #e8e4d4; transition: all 0.2s;
@@ -202,28 +212,31 @@
     }
     .play-btn:active { transform: scale(0.98); }
 
-    /* How to play */
+    /* How to play - compact */
     .how-to-play {
-      width: 100%; padding: 16px;
-      background: rgba(20, 24, 40, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px;
+      width: 100%; padding: 10px 14px;
+      background: rgba(20, 24, 40, 0.4); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 8px;
     }
     .how-to-play h3 {
-      font-family: 'Silkscreen', cursive; font-size: 0.65rem; color: #c4a84d;
-      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px;
+      font-family: 'Silkscreen', cursive; font-size: 0.6rem; color: #c4a84d;
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 5px;
     }
-    .how-to-play ul { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+    .how-to-play ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
     .how-to-play li {
-      font-family: 'VT323', monospace; font-size: 0.9rem; color: #7a7eb0;
-      padding-left: 16px; position: relative;
+      font-family: 'VT323', monospace; font-size: 0.8rem; color: #5c608e;
+      padding-left: 14px; position: relative;
     }
     .how-to-play li::before { content: '>'; position: absolute; left: 0; color: #c4a84d; }
 
-    /* Secondary button */
+    /* Bottom row: leaderboard + back */
+    .bottom-row {
+      width: 100%; display: flex; gap: 8px;
+    }
     .secondary-btn {
-      width: 100%; font-family: 'Silkscreen', cursive; font-size: 0.7rem;
-      padding: 12px 24px; border-radius: 8px;
+      flex: 1; font-family: 'Silkscreen', cursive; font-size: 0.6rem;
+      padding: 10px 12px; border-radius: 8px;
       border: 1px solid rgba(255, 255, 255, 0.1); cursor: pointer;
-      letter-spacing: 2px; text-transform: uppercase;
+      letter-spacing: 1px; text-transform: uppercase;
       background: transparent; color: #7a7eb0;
       text-decoration: none; text-align: center; display: block; transition: all 0.2s;
     }
@@ -238,7 +251,6 @@
     }
     .game-screen.hidden { display: none; }
 
-    /* HUD */
     .hud-bar {
       width: 100%; display: flex; justify-content: space-between; align-items: center;
       padding: 8px 14px; background: rgba(20, 24, 40, 0.8);
@@ -256,7 +268,6 @@
     .hud-value--lives { color: #EB00FF; text-shadow: 0 0 10px rgba(235, 0, 255, 0.4); }
     .hud-value--level { color: #00A3FF; text-shadow: 0 0 10px rgba(0, 163, 255, 0.4); }
 
-    /* Game Board */
     .game-board-wrapper {
       position: relative;
       background: linear-gradient(160deg, rgba(12, 14, 28, 0.95) 0%, rgba(6, 8, 18, 0.98) 100%);
@@ -270,7 +281,6 @@
     }
     #gameCanvas { display: block; border-radius: 4px; image-rendering: pixelated; }
 
-    /* Overlays */
     .game-overlay {
       position: absolute; inset: 8px;
       background: rgba(10, 14, 26, 0.94); border-radius: 4px;
@@ -300,7 +310,6 @@
     .overlay-btn:hover { background: rgba(180, 155, 60, 0.28); border-color: #FFD700; }
     .overlay-btn:active { transform: scale(0.96); }
 
-    /* Joystick */
     .controls-area {
       width: 100%; display: flex; align-items: center; justify-content: center;
       gap: 40px; padding: 6px 0;
@@ -345,7 +354,6 @@
     }
     .back-to-intro:hover { color: #FFD700; }
 
-    /* ======================== RESPONSIVE ======================== */
     @media (min-width: 601px) {
       .joystick-container, .action-buttons { display: none; }
     }
@@ -353,8 +361,9 @@
       .controls-hint { display: none; }
     }
     @media (max-width: 380px) {
-      .intro-screen { padding: 14px 10px 32px; }
-      .character-grid { gap: 8px; }
+      .intro-screen { padding: 10px 8px 20px; gap: 8px; }
+      .character-grid { gap: 6px; }
+      .game-title { font-size: 1.8rem; }
     }
   </style>
 </head>
@@ -373,8 +382,7 @@
     ============================ -->
     <div class="intro-screen" id="introScreen">
 
-      <!-- Back Arrow -->
-      <a href="/games/nakamigos/" class="back-arrow">&larr; Back to Games</a>
+      <a href="/games/nakamigos/" class="back-arrow">&larr; Back</a>
 
       <!-- Blackbird Header -->
       <div class="brand-header">
@@ -384,11 +392,19 @@
         <div class="brand-title">Blackbird Café Presents</div>
       </div>
 
-      <!-- Game Title -->
-      <div class="game-title">Migo Man</div>
+      <!-- Game Title in Pill -->
+      <div class="game-title-pill">
+        <div class="game-title">Migo Man</div>
+      </div>
+
+      <!-- Decorative banner with Adam sprite flying across -->
+      <div class="deco-banner">
+        <div class="deco-line"></div>
+        <img class="deco-sprite" src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b7e2dcb4185304f44_3648_Sprite.png" alt="">
+        <div class="deco-line"></div>
+      </div>
 
       <!-- Subtitle -->
-      <div class="intro-subtitle">Play a Nakamigos-Inspired Game to Earn</div>
       <div class="intro-subtitle-gold">Enter Name + Email or Wallet to Join Prize Leaderboard</div>
 
       <!-- Input Fields -->
@@ -409,38 +425,32 @@
         </div>
       </div>
 
-      <!-- Character Selection Label -->
+      <!-- Character Selection -->
       <div class="character-grid-label">Choose Your Migo</div>
 
-      <!-- 2x2 Character Grid -->
       <div class="character-grid" id="characterGrid">
         <!-- Rendered by JS -->
-      </div>
-
-      <!-- Leaderboard -->
-      <div class="leaderboard-preview">
-        <h3>Leaderboard</h3>
-        <p>Play to earn your spot on the board</p>
       </div>
 
       <!-- Play -->
       <button class="play-btn" id="playBtn">Play</button>
 
-      <!-- How to Play -->
+      <!-- How to Play - simplified -->
       <div class="how-to-play">
         <h3>How to Play</h3>
         <ul>
-          <li>Choose your Migo character above</li>
-          <li>Navigate the maze using arrow keys, WASD, or the joystick</li>
-          <li>Collect all the beans to clear the level</li>
-          <li>Grab power beans to turn the tables on the Cloaks</li>
-          <li>Avoid the Cloaks — they get faster each level!</li>
-          <li>Use the corner portals to escape danger</li>
-          <li>Earn the highest score to top the leaderboard</li>
+          <li>Move with arrow keys, WASD, or joystick</li>
+          <li>Collect all beans to clear the level</li>
+          <li>Power beans let you chase the Cloaks</li>
+          <li>Cloaks get faster each level</li>
         </ul>
       </div>
 
-      <a href="/games/nakamigos/" class="secondary-btn">Back to All Games</a>
+      <!-- Bottom row -->
+      <div class="bottom-row">
+        <button class="secondary-btn" id="leaderboardBtn">Leaderboard</button>
+        <a href="/games/nakamigos/" class="secondary-btn">All Games</a>
+      </div>
     </div>
 
     <!-- ============================
@@ -448,7 +458,6 @@
     ============================ -->
     <div class="game-screen hidden" id="gameScreen">
 
-      <!-- HUD -->
       <div class="hud-bar">
         <div class="hud-item">
           <span class="hud-label">Score</span>
@@ -468,7 +477,6 @@
         </div>
       </div>
 
-      <!-- Game Board -->
       <div class="game-board-wrapper">
         <canvas id="gameCanvas"></canvas>
 
@@ -493,7 +501,6 @@
         </div>
       </div>
 
-      <!-- Controls -->
       <p class="controls-hint">Arrow keys or WASD to move &middot; P to pause</p>
 
       <div class="controls-area">
@@ -536,7 +543,7 @@
         fallbackColor: '#FF8A00'
       },
       {
-        name: 'White Shag',
+        name: 'Shag',
         homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg',
         sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/691be24ee043e99baed366a1_n_17763.png',
         fallbackColor: '#AB47BC'
@@ -551,32 +558,27 @@
     var ENEMIES = [
       {
         name: '#16250',
-        homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b740d489f78e1795b4af06_16250%20Small.jpeg',
-        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b733910f87823c7b154de5_ghost_2.png',
+        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b7718e11c9590c5c2826ae_16250.png',
         fallbackColor: '#FF5252'
       },
       {
         name: '#2137',
-        homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b740612e370b1dab2e0e77_2137%20Small.jpeg',
-        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b758b2a24ee9adba938b04_2137_sprite.png',
+        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b7718e79e21070d9c6b9a8_2137.png',
         fallbackColor: '#EB00FF'
       },
       {
         name: '#16400',
-        homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b7406178dc6af73c211965_16400%20Small.jpeg',
-        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b757324fbe835da93fbbc3_16400_sprite.png',
+        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b77192b4a8c90b4f9f3f74_16400.png',
         fallbackColor: '#00E676'
       },
       {
         name: '#12242',
-        homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b74061bf9ae94d98979714_12242%20Small.jpeg',
-        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b7570388365294c2f7259f_12242_sprite.png',
+        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b7718e11491f4596ad741c_12242.png',
         fallbackColor: '#00A3FF'
       },
       {
         name: '#7651',
-        homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b74061e5b41141c0e89bb3_7651%20Small.jpeg',
-        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b756e975571d61757d4de1_7651_sprite.png',
+        sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b7718e89f78e1795b83f7e_7651.png',
         fallbackColor: '#FFD700'
       }
     ];
@@ -592,17 +594,11 @@
       spritesTotal++;
       var img = new Image();
       img.crossOrigin = 'anonymous';
-      img.onload = function() {
-        spriteImages[key] = img;
-        spritesLoaded++;
-      };
-      img.onerror = function() {
-        spritesLoaded++;
-      };
+      img.onload = function() { spriteImages[key] = img; spritesLoaded++; };
+      img.onerror = function() { spritesLoaded++; };
       img.src = url;
     }
 
-    // Load all sprites
     CHARACTERS.forEach(function(c, i) {
       if (c.sprite) loadSprite('player_' + i, c.sprite);
     });
@@ -629,7 +625,7 @@
           card.appendChild(lockEl);
           var nameEl = document.createElement('div');
           nameEl.className = 'char-name';
-          nameEl.textContent = 'Tip to Unlock';
+          nameEl.textContent = 'Tip';
           card.appendChild(nameEl);
         } else {
           var img = document.createElement('img');
@@ -685,8 +681,10 @@
     var TILE = 20;
     var COLS = 20;
     var ROWS = 36;
-    var CANVAS_W = COLS * TILE;  // 400
-    var CANVAS_H = ROWS * TILE;  // 720
+    var CANVAS_W = COLS * TILE;
+    var CANVAS_H = ROWS * TILE;
+    // Sprite size: 20% bigger than tile
+    var SPRITE_SIZE = Math.round(TILE * 1.4);
 
     var canvas = document.getElementById('gameCanvas');
     var ctx = canvas.getContext('2d');
@@ -699,13 +697,11 @@
       wallGlow: '#00A3FF',
       dot:      '#FFD700',
       powerDot: '#EB00FF',
-      gate:     '#c4a84d',
-      ethGlow:  'rgba(98, 126, 234, 0.12)'
+      gate:     '#c4a84d'
     };
 
     // ================================
     // MAZE TEMPLATE (20 cols x 36 rows)
-    // Slim tall board with central ETH diamond spawn house
     // 0=path, 1=wall, 2=dot, 3=power dot, 4=gate, 5=spawn
     // ================================
     var MAZE_TEMPLATE = [
@@ -751,16 +747,15 @@
     // ETH DIAMOND DRAWING (decorative)
     // ================================
     function drawEthDiamond() {
-      var cx = 10 * TILE;       // center X
-      var cy = 18 * TILE + 10;  // center Y (row 18 center of spawn)
-      var w = 5.5 * TILE;       // half-width
-      var topH = 6 * TILE;      // top triangle height
-      var botH = 4 * TILE;      // bottom triangle height
+      var cx = 10 * TILE;
+      var cy = 18 * TILE + 10;
+      var w = 5.5 * TILE;
+      var topH = 6 * TILE;
+      var botH = 4 * TILE;
 
       ctx.save();
       ctx.globalAlpha = 0.08;
 
-      // Top triangle (upper part of ETH diamond)
       ctx.fillStyle = '#627EEA';
       ctx.beginPath();
       ctx.moveTo(cx, cy - topH);
@@ -777,7 +772,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // Bottom triangle
       ctx.fillStyle = '#627EEA';
       ctx.beginPath();
       ctx.moveTo(cx, cy + botH);
@@ -794,7 +788,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // Middle line
       ctx.fillStyle = '#A9BAF5';
       ctx.globalAlpha = 0.06;
       ctx.beginPath();
@@ -805,7 +798,6 @@
       ctx.closePath();
       ctx.fill();
 
-      // Glow outline
       ctx.globalAlpha = 0.12;
       ctx.strokeStyle = '#627EEA';
       ctx.lineWidth = 1.5;
@@ -817,7 +809,6 @@
       ctx.closePath();
       ctx.stroke();
 
-      // Inner glow
       ctx.globalAlpha = 0.04;
       ctx.shadowColor = '#627EEA';
       ctx.shadowBlur = 30;
@@ -849,10 +840,7 @@
     var GHOST_SCARED_DURATION = 360;
     var animFrame = 0;
 
-    // Player
     var player = { x: 10, y: 34, dir: 3, nextDir: -1, mouthOpen: 0, mouthDir: 1 };
-
-    // Enemies
     var enemies = [];
 
     function initEnemies() {
@@ -866,9 +854,7 @@
     }
 
     function resetMaze() {
-      maze = [];
-      totalDots = 0;
-      dotsEaten = 0;
+      maze = []; totalDots = 0; dotsEaten = 0;
       for (var r = 0; r < ROWS; r++) {
         maze[r] = [];
         for (var c = 0; c < COLS; c++) {
@@ -879,21 +865,15 @@
     }
 
     function resetPlayer() {
-      player.x = 10;
-      player.y = 34;
-      player.dir = 3;
-      player.nextDir = -1;
+      player.x = 10; player.y = 34; player.dir = 3; player.nextDir = -1;
     }
 
     // ================================
     // PORTAL SYSTEM
-    // Corner portals + side tunnels
     // ================================
     var PORTALS = [
-      // Side tunnels at row 9
       { fromR: 9, fromC: -1, toR: 9, toC: COLS - 1 },
       { fromR: 9, fromC: COLS, toR: 9, toC: 0 },
-      // Side tunnels at row 27
       { fromR: 27, fromC: -1, toR: 27, toC: COLS - 1 },
       { fromR: 27, fromC: COLS, toR: 27, toC: 0 }
     ];
@@ -901,9 +881,7 @@
     function checkPortal(x, y) {
       for (var i = 0; i < PORTALS.length; i++) {
         var p = PORTALS[i];
-        if (x === p.fromC && y === p.fromR) {
-          return { x: p.toC, y: p.toR };
-        }
+        if (x === p.fromC && y === p.fromR) return { x: p.toC, y: p.toR };
       }
       return null;
     }
@@ -921,7 +899,6 @@
           if (cell === 1) {
             ctx.fillStyle = C.wall;
             ctx.fillRect(x, y, TILE, TILE);
-            // Glow edges
             ctx.strokeStyle = C.wallGlow;
             ctx.lineWidth = 0.8;
             ctx.globalAlpha = 0.3;
@@ -931,13 +908,11 @@
             if (c < COLS-1 && maze[r][c+1] !== 1) { ctx.beginPath(); ctx.moveTo(x + TILE - 0.5, y); ctx.lineTo(x + TILE - 0.5, y + TILE); ctx.stroke(); }
             ctx.globalAlpha = 1;
           } else if (cell === 4) {
-            // Gate
             ctx.fillStyle = C.gate;
             ctx.globalAlpha = 0.5 + Math.sin(animFrame * 0.08) * 0.2;
             ctx.fillRect(x, y + TILE/2 - 2, TILE, 4);
             ctx.globalAlpha = 1;
           } else if (cell === 5) {
-            // Spawn interior
             ctx.fillStyle = 'rgba(98, 126, 234, 0.04)';
             ctx.fillRect(x, y, TILE, TILE);
           } else if (cell === 2) {
@@ -963,26 +938,21 @@
       var px = player.x * TILE + TILE/2;
       var py = player.y * TILE + TILE/2;
       var ch = CHARACTERS[selectedCharacter] || CHARACTERS[0];
-      var sprKey = 'player_' + selectedCharacter;
-      var spr = spriteImages[sprKey];
+      var spr = spriteImages['player_' + selectedCharacter];
 
       if (spr) {
-        // Draw sprite image
-        var size = TILE + 4;
         ctx.save();
         ctx.shadowColor = ch.fallbackColor;
         ctx.shadowBlur = 8;
-        ctx.drawImage(spr, px - size/2, py - size/2, size, size);
+        ctx.drawImage(spr, px - SPRITE_SIZE/2, py - SPRITE_SIZE/2, SPRITE_SIZE, SPRITE_SIZE);
         ctx.restore();
       } else {
-        // Fallback: colored pac-man
         var r = TILE/2 - 1;
         player.mouthOpen += 0.15 * player.mouthDir;
         if (player.mouthOpen > 0.8) player.mouthDir = -1;
         if (player.mouthOpen < 0.05) player.mouthDir = 1;
         var mouthAngle = player.mouthOpen * 0.4;
         var startAngle = [0, Math.PI/2, Math.PI, -Math.PI/2][player.dir] || 0;
-
         ctx.shadowColor = ch.fallbackColor;
         ctx.shadowBlur = 10;
         ctx.fillStyle = ch.fallbackColor;
@@ -998,65 +968,45 @@
       var ex = enemy.x * TILE + TILE/2;
       var ey = enemy.y * TILE + TILE/2;
       var eData = ENEMIES[enemy.dataIdx] || ENEMIES[0];
+      var spr = spriteImages['enemy_' + enemy.dataIdx];
 
-      if (enemy.scared) {
-        // Scared: blue ghost shape
-        var r = TILE/2 - 1;
-        ctx.fillStyle = '#2222AA';
-        ctx.shadowColor = '#2222AA';
-        ctx.shadowBlur = 4;
-        ctx.beginPath();
-        ctx.arc(ex, ey - 2, r, Math.PI, 0);
-        ctx.lineTo(ex + r, ey + r);
-        var wave = Math.sin(animFrame * 0.2) * 2;
-        for (var i = r; i >= -r; i -= 4) {
-          ctx.lineTo(ex + i, ey + r + (i % 8 === 0 ? wave : -wave));
+      if (spr) {
+        ctx.save();
+        // Draw the sprite
+        ctx.shadowColor = enemy.scared ? '#2244CC' : eData.fallbackColor;
+        ctx.shadowBlur = enemy.scared ? 4 : 6;
+        ctx.drawImage(spr, ex - SPRITE_SIZE/2, ey - SPRITE_SIZE/2, SPRITE_SIZE, SPRITE_SIZE);
+
+        // If scared: flashing blue overlay on top of the sprite
+        if (enemy.scared) {
+          var flash = Math.sin(animFrame * 0.15) > 0 ? 0.5 : 0.3;
+          ctx.globalAlpha = flash;
+          ctx.fillStyle = '#2244CC';
+          ctx.beginPath();
+          ctx.arc(ex, ey, SPRITE_SIZE/2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
         }
-        ctx.lineTo(ex - r, ey - 2);
+        ctx.restore();
+      } else {
+        // Fallback ghost shape
+        var r2 = TILE/2 - 1;
+        var color = enemy.scared ? '#2244CC' : eData.fallbackColor;
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = enemy.scared ? 4 : 8;
+        ctx.beginPath();
+        ctx.arc(ex, ey - 2, r2, Math.PI, 0);
+        ctx.lineTo(ex + r2, ey + r2);
+        var wave = Math.sin(animFrame * 0.2) * 2;
+        for (var j = r2; j >= -r2; j -= 4) {
+          ctx.lineTo(ex + j, ey + r2 + (j % 8 === 0 ? wave : -wave));
+        }
+        ctx.lineTo(ex - r2, ey - 2);
         ctx.fill();
         ctx.shadowBlur = 0;
-        // Scared eyes
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(ex - 3, ey - 3, 2, 0, Math.PI * 2);
-        ctx.arc(ex + 3, ey - 3, 2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#fff';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(ex - 4, ey + 3);
-        for (var w = -4; w <= 4; w += 2) {
-          ctx.lineTo(ex + w, ey + 3 + (w % 4 === 0 ? -1.5 : 1.5));
-        }
-        ctx.stroke();
-      } else {
-        var sprKey = 'enemy_' + enemy.dataIdx;
-        var spr = spriteImages[sprKey];
 
-        if (spr) {
-          var size = TILE + 4;
-          ctx.save();
-          ctx.shadowColor = eData.fallbackColor;
-          ctx.shadowBlur = 6;
-          ctx.drawImage(spr, ex - size/2, ey - size/2, size, size);
-          ctx.restore();
-        } else {
-          // Fallback ghost shape
-          var r2 = TILE/2 - 1;
-          ctx.fillStyle = eData.fallbackColor;
-          ctx.shadowColor = eData.fallbackColor;
-          ctx.shadowBlur = 8;
-          ctx.beginPath();
-          ctx.arc(ex, ey - 2, r2, Math.PI, 0);
-          ctx.lineTo(ex + r2, ey + r2);
-          var wave2 = Math.sin(animFrame * 0.2) * 2;
-          for (var j = r2; j >= -r2; j -= 4) {
-            ctx.lineTo(ex + j, ey + r2 + (j % 8 === 0 ? wave2 : -wave2));
-          }
-          ctx.lineTo(ex - r2, ey - 2);
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          // Eyes
+        if (!enemy.scared) {
           var eOX = [2, 0, -2, 0][enemy.dir] || 0;
           var eOY = [0, 2, 0, -2][enemy.dir] || 0;
           ctx.fillStyle = '#fff';
@@ -1080,28 +1030,22 @@
     // ================================
     // MOVEMENT / COLLISION
     // ================================
-    var DX = [1, 0, -1, 0]; // right, down, left, up
+    var DX = [1, 0, -1, 0];
     var DY = [0, 1, 0, -1];
 
     function canMove(x, y) {
       if (y < 0 || y >= ROWS) return false;
-      // Side tunnel wrapping
-      if (x < 0 || x >= COLS) {
-        var portal = checkPortal(x, y);
-        return portal !== null;
-      }
+      if (x < 0 || x >= COLS) return checkPortal(x, y) !== null;
       var cell = maze[y][x];
       return cell !== 1 && cell !== 4;
     }
 
     function canMoveEnemy(x, y, isInHouse) {
       if (y < 0 || y >= ROWS) return false;
-      if (x < 0 || x >= COLS) {
-        return checkPortal(x, y) !== null;
-      }
+      if (x < 0 || x >= COLS) return checkPortal(x, y) !== null;
       var cell = maze[y][x];
       if (cell === 1) return false;
-      if (cell === 4 && isInHouse) return true; // can exit through gate
+      if (cell === 4 && isInHouse) return true;
       if (cell === 4) return false;
       return true;
     }
@@ -1115,53 +1059,31 @@
           player.nextDir = -1;
         }
       }
-
       var nx2 = player.x + DX[player.dir];
       var ny2 = player.y + DY[player.dir];
-
-      // Check portal
       var portal = checkPortal(nx2, ny2);
-      if (portal) {
-        player.x = portal.x;
-        player.y = portal.y;
-        return;
-      }
+      if (portal) { player.x = portal.x; player.y = portal.y; return; }
+      if (canMove(nx2, ny2)) { player.x = nx2; player.y = ny2; }
 
-      if (canMove(nx2, ny2)) {
-        player.x = nx2;
-        player.y = ny2;
-      }
-
-      // Eat dots
       var cell = maze[player.y][player.x];
       if (cell === 2) {
-        maze[player.y][player.x] = 0;
-        score += 10;
-        dotsEaten++;
+        maze[player.y][player.x] = 0; score += 10; dotsEaten++;
       } else if (cell === 3) {
-        maze[player.y][player.x] = 0;
-        score += 50;
-        dotsEaten++;
+        maze[player.y][player.x] = 0; score += 50; dotsEaten++;
         ghostScaredTimer = GHOST_SCARED_DURATION;
         enemies.forEach(function(e) { e.scared = true; });
       }
-
       if (dotsEaten >= totalDots) levelWin();
     }
 
     function moveEnemies() {
       enemies.forEach(function(enemy, idx) {
         if (enemy.inHouse) {
-          // Release enemies at staggered intervals
           if (animFrame > 80 * (idx + 1)) {
-            enemy.inHouse = false;
-            enemy.y = 14;
-            enemy.x = 10;
-            enemy.dir = 3;
+            enemy.inHouse = false; enemy.y = 14; enemy.x = 10; enemy.dir = 3;
           }
           return;
         }
-
         if (animFrame % Math.round(8 / enemy.speed) !== 0) return;
 
         var bestDir = enemy.dir;
@@ -1170,44 +1092,25 @@
         var targetY = player.y;
 
         if (enemy.scared) {
-          // Run away
           bestDist = -Infinity;
           for (var d = 0; d < 4; d++) {
             if (d === (enemy.dir + 2) % 4) continue;
-            var tx = enemy.x + DX[d];
-            var ty = enemy.y + DY[d];
+            var tx = enemy.x + DX[d]; var ty = enemy.y + DY[d];
             if (!canMoveEnemy(tx, ty, false)) continue;
             var dist = Math.abs(tx - targetX) + Math.abs(ty - targetY);
             if (dist > bestDist) { bestDist = dist; bestDir = d; }
           }
         } else {
-          // AI targeting
           switch (idx) {
-            case 0: break; // direct chase
-            case 1:
-              targetX = player.x + DX[player.dir] * 4;
-              targetY = player.y + DY[player.dir] * 4;
-              break;
-            case 2:
-              if (Math.random() < 0.25) {
-                targetX = Math.floor(Math.random() * COLS);
-                targetY = Math.floor(Math.random() * ROWS);
-              }
-              break;
-            case 3:
-              targetX = player.x;
-              targetY = player.y + 4;
-              break;
-            case 4:
-              // Ambush: aim ahead and to the side
-              targetX = player.x + DX[player.dir] * 2 + (Math.random() > 0.5 ? 3 : -3);
-              targetY = player.y + DY[player.dir] * 2;
-              break;
+            case 0: break;
+            case 1: targetX = player.x + DX[player.dir] * 4; targetY = player.y + DY[player.dir] * 4; break;
+            case 2: if (Math.random() < 0.25) { targetX = Math.floor(Math.random() * COLS); targetY = Math.floor(Math.random() * ROWS); } break;
+            case 3: targetX = player.x; targetY = player.y + 4; break;
+            case 4: targetX = player.x + DX[player.dir] * 2 + (Math.random() > 0.5 ? 3 : -3); targetY = player.y + DY[player.dir] * 2; break;
           }
           for (var d2 = 0; d2 < 4; d2++) {
             if (d2 === (enemy.dir + 2) % 4) continue;
-            var tx2 = enemy.x + DX[d2];
-            var ty2 = enemy.y + DY[d2];
+            var tx2 = enemy.x + DX[d2]; var ty2 = enemy.y + DY[d2];
             if (!canMoveEnemy(tx2, ty2, false)) continue;
             var dist2 = Math.abs(tx2 - targetX) + Math.abs(ty2 - targetY);
             if (dist2 < bestDist) { bestDist = dist2; bestDir = d2; }
@@ -1215,28 +1118,15 @@
         }
 
         enemy.dir = bestDir;
-        var newX = enemy.x + DX[enemy.dir];
-        var newY = enemy.y + DY[enemy.dir];
-
-        // Portal check for enemies
+        var newX = enemy.x + DX[enemy.dir]; var newY = enemy.y + DY[enemy.dir];
         var ePortal = checkPortal(newX, newY);
-        if (ePortal) {
-          enemy.x = ePortal.x;
-          enemy.y = ePortal.y;
-          return;
-        }
-
-        if (canMoveEnemy(newX, newY, false)) {
-          enemy.x = newX;
-          enemy.y = newY;
-        }
+        if (ePortal) { enemy.x = ePortal.x; enemy.y = ePortal.y; return; }
+        if (canMoveEnemy(newX, newY, false)) { enemy.x = newX; enemy.y = newY; }
       });
 
       if (ghostScaredTimer > 0) {
         ghostScaredTimer--;
-        if (ghostScaredTimer <= 0) {
-          enemies.forEach(function(e) { e.scared = false; });
-        }
+        if (ghostScaredTimer <= 0) enemies.forEach(function(e) { e.scared = false; });
       }
     }
 
@@ -1246,19 +1136,11 @@
         if (enemy.x === player.x && enemy.y === player.y) {
           if (enemy.scared) {
             score += 200;
-            enemy.x = 10;
-            enemy.y = 18;
-            enemy.inHouse = true;
-            enemy.scared = false;
+            enemy.x = 10; enemy.y = 18; enemy.inHouse = true; enemy.scared = false;
           } else {
             lives--;
             updateHUD();
-            if (lives <= 0) {
-              gameOver();
-            } else {
-              resetPlayer();
-              initEnemies();
-            }
+            if (lives <= 0) { gameOver(); } else { resetPlayer(); initEnemies(); }
           }
         }
       });
@@ -1271,10 +1153,7 @@
       document.getElementById('hudScore').textContent = score;
       document.getElementById('hudLives').textContent = lives;
       document.getElementById('hudLevel').textContent = level;
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('migoman_high', String(highScore));
-      }
+      if (score > highScore) { highScore = score; localStorage.setItem('migoman_high', String(highScore)); }
       document.getElementById('hudHigh').textContent = highScore;
     }
 
@@ -1286,8 +1165,7 @@
     var overlayWin = document.getElementById('winOverlay');
 
     function startGame() {
-      score = 0; lives = 3; level = 1;
-      ghostScaredTimer = 0; animFrame = 0;
+      score = 0; lives = 3; level = 1; ghostScaredTimer = 0; animFrame = 0;
       resetMaze(); resetPlayer(); initEnemies(); updateHUD();
       overlayPause.classList.add('hidden');
       overlayGameOver.classList.add('hidden');
@@ -1304,8 +1182,7 @@
     }
 
     function levelWin() {
-      gameRunning = false;
-      level++;
+      gameRunning = false; level++;
       document.getElementById('levelScore').textContent = 'Score: ' + score;
       overlayWin.classList.remove('hidden');
     }
@@ -1314,24 +1191,17 @@
       ghostScaredTimer = 0; animFrame = 0;
       resetMaze(); resetPlayer(); initEnemies();
       enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.08, 2); });
-      updateHUD();
-      overlayWin.classList.add('hidden');
-      gameRunning = true;
+      updateHUD(); overlayWin.classList.add('hidden'); gameRunning = true;
     }
 
     function togglePause() {
       if (!gameRunning && overlayPause.classList.contains('hidden')) return;
-      if (gameRunning) {
-        gameRunning = false;
-        overlayPause.classList.remove('hidden');
-      } else {
-        gameRunning = true;
-        overlayPause.classList.add('hidden');
-      }
+      if (gameRunning) { gameRunning = false; overlayPause.classList.remove('hidden'); }
+      else { gameRunning = true; overlayPause.classList.add('hidden'); }
     }
 
     // ================================
-    // INPUT - Keyboard
+    // INPUT
     // ================================
     document.addEventListener('keydown', function(e) {
       if (e.key === 'p' || e.key === 'P' || e.key === 'Escape') {
@@ -1346,43 +1216,28 @@
       }
     });
 
-    // ================================
-    // INPUT - Joystick (Mobile)
-    // ================================
+    // Joystick
     var joystickEl = document.getElementById('joystickContainer');
     var stickEl = document.getElementById('joystickStick');
     var joystickActive = false;
-    var joyCenterX = 0, joyCenterY = 0;
-    var JOY_RADIUS = 28;
+    var joyCX = 0, joyCY = 0, JOY_R = 28;
 
     function joyStart(cx, cy) {
       joystickActive = true;
       var rect = joystickEl.getBoundingClientRect();
-      joyCenterX = rect.left + rect.width / 2;
-      joyCenterY = rect.top + rect.height / 2;
+      joyCX = rect.left + rect.width / 2;
+      joyCY = rect.top + rect.height / 2;
       joyMove(cx, cy);
     }
-
     function joyMove(cx, cy) {
       if (!joystickActive) return;
-      var dx = cx - joyCenterX;
-      var dy = cy - joyCenterY;
+      var dx = cx - joyCX, dy = cy - joyCY;
       var dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist > JOY_RADIUS) { dx = (dx / dist) * JOY_RADIUS; dy = (dy / dist) * JOY_RADIUS; }
+      if (dist > JOY_R) { dx = (dx / dist) * JOY_R; dy = (dy / dist) * JOY_R; }
       stickEl.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px))';
-      if (dist > 10) {
-        if (Math.abs(dx) > Math.abs(dy)) {
-          player.nextDir = dx > 0 ? 0 : 2;
-        } else {
-          player.nextDir = dy > 0 ? 1 : 3;
-        }
-      }
+      if (dist > 10) { player.nextDir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 0 : 2) : (dy > 0 ? 1 : 3); }
     }
-
-    function joyEnd() {
-      joystickActive = false;
-      stickEl.style.transform = 'translate(-50%, -50%)';
-    }
+    function joyEnd() { joystickActive = false; stickEl.style.transform = 'translate(-50%, -50%)'; }
 
     joystickEl.addEventListener('touchstart', function(e) { e.preventDefault(); joyStart(e.touches[0].clientX, e.touches[0].clientY); });
     joystickEl.addEventListener('touchmove', function(e) { e.preventDefault(); joyMove(e.touches[0].clientX, e.touches[0].clientY); });
@@ -1405,18 +1260,13 @@
     function gameLoop() {
       ctx.fillStyle = C.bg;
       ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
-
       drawMaze();
       drawEthDiamond();
 
       if (gameRunning) {
         animFrame++;
         moveCounter++;
-        if (moveCounter >= MOVE_RATE) {
-          moveCounter = 0;
-          movePlayer();
-          checkCollisions();
-        }
+        if (moveCounter >= MOVE_RATE) { moveCounter = 0; movePlayer(); checkCollisions(); }
         moveEnemies();
         checkCollisions();
         updateHUD();
@@ -1424,15 +1274,10 @@
 
       drawPlayer();
       enemies.forEach(drawEnemy);
-
       requestAnimationFrame(gameLoop);
     }
 
-    // Init
-    resetMaze();
-    resetPlayer();
-    initEnemies();
-    updateHUD();
+    resetMaze(); resetPlayer(); initEnemies(); updateHUD();
     gameLoop();
 
   })();
