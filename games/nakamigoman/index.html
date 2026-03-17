@@ -135,6 +135,31 @@
     .back-to-intro { font-family: 'VT323', monospace; font-size: 0.85rem; color: #5c608e; background: none; border: none; cursor: pointer; letter-spacing: 1px; text-transform: uppercase; padding: 6px 14px; transition: color 0.2s; }
     .back-to-intro:hover { color: #FFD700; }
 
+    /* Leaderboard Modal */
+    .leaderboard-modal { position: fixed; inset: 0; background: rgba(10,14,26,0.95); z-index: 200; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 24px 16px; backdrop-filter: blur(10px); overflow-y: auto; }
+    .leaderboard-modal.hidden { display: none; }
+    .leaderboard-modal h2 { font-family: 'Silkscreen', cursive; font-size: clamp(1rem, 4vw, 1.4rem); background: linear-gradient(135deg, #FFD700 0%, #00A3FF 60%, #EB00FF 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 6px; }
+    .leaderboard-subtitle { font-family: 'VT323', monospace; font-size: 0.8rem; color: #5c608e; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .leaderboard-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .leaderboard-tab { font-family: 'Silkscreen', cursive; font-size: 0.55rem; padding: 7px 16px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; background: transparent; color: #7a7eb0; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
+    .leaderboard-tab.active { border-color: #FFD700; color: #FFD700; background: rgba(255,215,0,0.08); }
+    .leaderboard-tab:hover { border-color: rgba(255,215,0,0.4); color: #e8e4d4; }
+    .leaderboard-table { width: 100%; max-width: 420px; border-collapse: collapse; }
+    .leaderboard-table thead th { font-family: 'Silkscreen', cursive; font-size: 0.55rem; color: #5c608e; text-transform: uppercase; letter-spacing: 1px; padding: 6px 8px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .leaderboard-table thead th:last-child { text-align: right; }
+    .leaderboard-table tbody td { font-family: 'VT323', monospace; font-size: 0.9rem; color: #d0d4f0; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .leaderboard-table tbody td:last-child { text-align: right; font-family: 'Silkscreen', cursive; font-size: 0.7rem; color: #FFD700; }
+    .leaderboard-table tbody tr:nth-child(-n+3) td:first-child { color: #FFD700; }
+    .leaderboard-table tbody tr.lb-highlight { background: rgba(255,215,0,0.06); }
+    .lb-rank { width: 30px; text-align: center !important; }
+    .lb-rank-1 { color: #FFD700 !important; }
+    .lb-rank-2 { color: #C0C0C0 !important; }
+    .lb-rank-3 { color: #CD7F32 !important; }
+    .lb-empty { font-family: 'VT323', monospace; font-size: 0.9rem; color: #4a4e6a; text-align: center; padding: 32px 16px; }
+    .lb-loading { font-family: 'VT323', monospace; font-size: 0.9rem; color: #5c608e; text-align: center; padding: 32px 16px; }
+    .lb-close-btn { margin-top: 16px; font-family: 'Silkscreen', cursive; font-size: 0.6rem; padding: 10px 28px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15); cursor: pointer; background: transparent; color: #7a7eb0; letter-spacing: 1px; text-transform: uppercase; transition: all 0.2s; }
+    .lb-close-btn:hover { color: #e8e4d4; border-color: rgba(255,255,255,0.3); }
+
     @media (min-width: 601px) { .joystick-container { display: none; } }
     @media (max-width: 600px) { .controls-hint { display: none; } }
     @media (max-width: 380px) { .intro-screen { padding: 10px 8px 20px; gap: 8px; } .character-grid { gap: 6px; } .game-title { font-size: 1.8rem; } }
@@ -251,6 +276,21 @@
       </div>
     </div>
 
+    <!-- Leaderboard Modal -->
+    <div class="leaderboard-modal hidden" id="leaderboardModal">
+      <h2>Migo Man Leaderboard</h2>
+      <div class="leaderboard-subtitle">Nakamigo Man &mdash; Top Scores</div>
+      <div class="leaderboard-tabs">
+        <button class="leaderboard-tab active" data-period="all">All Time</button>
+        <button class="leaderboard-tab" data-period="daily">Today</button>
+        <button class="leaderboard-tab" data-period="weekly">This Week</button>
+      </div>
+      <div id="leaderboardContent">
+        <div class="lb-loading">Loading scores...</div>
+      </div>
+      <button class="lb-close-btn" id="lbCloseBtn">Close</button>
+    </div>
+
   </div>
 
   <script>
@@ -358,31 +398,31 @@
     var MAX_TIER = DOT_COLORS.length; // tier goes 0..6, reaching 7 means completed
 
     // ================================
-    // MAZE (15 cols x 21 rows) - matches reference screenshot
-    // 0=path, 1=wall, 2=dot, 3=power dot (BTC coin), 4=gate, 5=spawn, 7=emoji powerup
-    // E-shaped corridors top/bottom, vertical divider at col 8 top, large ETH center
+    // MAZE (15 cols x 21 rows) - Nakamigo Man map
+    // 0=path, 1=wall, 2=dot, 3=power pellet (BTC coin), 4=gate, 5=spawn, 6=player start, 7=emoji powerup
+    // Portals on left/right sides, white power pellets around ghost house, BTC coins in corners
     // ================================
     var MAZE_TEMPLATE = [
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-      [1,3,2,2,2,2,2,2,1,2,2,2,2,3,1],
-      [1,2,1,1,2,2,2,2,1,2,2,2,1,1,1],
-      [1,2,1,2,2,1,2,2,2,2,1,2,2,1,1],
-      [1,2,2,2,2,1,2,2,2,2,1,2,2,2,1],
-      [1,2,1,1,1,1,2,2,2,1,1,1,1,2,1],
-      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,2,2,7,2,2,0,2,2,7,2,2,2,1],
-      [1,2,2,2,2,0,0,0,0,0,2,2,2,2,1],
-      [1,2,2,2,2,0,4,5,4,0,2,2,2,2,1],
-      [1,2,2,2,2,0,0,5,0,0,2,2,2,2,1],
-      [1,2,2,2,7,2,0,0,0,2,7,2,2,2,1],
-      [1,2,2,2,2,2,2,0,2,2,2,2,2,2,1],
-      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,1,1,1,2,2,2,1,1,1,1,2,1],
-      [1,2,2,2,2,2,2,2,2,2,2,2,2,2,1],
-      [1,2,1,2,2,1,2,2,2,1,2,2,1,2,1],
+      [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1],
+      [1,2,1,1,1,2,2,2,2,2,1,1,1,2,1],
+      [1,2,1,1,1,2,1,1,1,2,1,1,1,2,1],
+      [1,2,2,2,2,2,1,2,1,2,2,2,2,2,1],
+      [1,2,1,1,2,2,1,2,1,2,2,1,1,2,1],
+      [1,2,1,1,2,1,1,2,1,1,2,1,1,2,1],
+      [1,2,2,2,2,3,2,0,2,3,2,2,2,2,1],
+      [1,2,1,1,2,0,0,0,0,0,2,1,1,2,1],
+      [1,2,1,1,2,0,4,5,4,0,2,1,1,2,1],
+      [0,0,2,2,2,0,0,5,0,0,2,2,2,0,0],
+      [1,2,1,1,2,0,0,0,0,0,2,1,1,2,1],
+      [1,2,2,2,2,3,2,0,2,3,2,2,2,2,1],
+      [1,2,1,1,2,1,1,2,1,1,2,1,1,2,1],
+      [1,2,1,1,2,2,1,2,1,2,2,1,1,2,1],
+      [1,2,2,2,2,2,1,2,1,2,2,2,2,2,1],
+      [1,2,1,1,1,2,1,1,1,2,1,1,1,2,1],
+      [1,2,1,1,1,2,2,2,2,2,1,1,1,2,1],
       [1,2,2,2,2,2,2,6,2,2,2,2,2,2,1],
-      [1,2,2,1,1,2,2,2,2,2,1,1,2,2,1],
-      [1,3,2,2,2,2,2,2,1,2,2,2,2,3,1],
+      [1,3,2,2,2,2,2,2,2,2,2,2,2,3,1],
       [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
     ];
 
@@ -655,8 +695,11 @@
       player.vx = 7; player.vy = 17;
     }
 
-    // No portal tunnels - enclosed board
-    var PORTALS = [];
+    // Portal tunnels on left/right sides at row 10
+    var PORTALS = [
+      { fromR: 10, fromC: -1, toR: 10, toC: 14 },
+      { fromR: 10, fromC: 15, toR: 10, toC: 0 }
+    ];
     function checkPortal(x, y) {
       for (var i = 0; i < PORTALS.length; i++) {
         var p = PORTALS[i];
@@ -1028,10 +1071,14 @@
       gameRunning = false;
       score += 5000; // bonus for completing
       var name = document.getElementById('playerName').value || 'Player';
+      var email = document.getElementById('playerEmail').value || '';
+      var wallet = document.getElementById('playerWallet').value || '';
+      var charName = (CHARACTERS[selectedCharacter] || CHARACTERS[0]).name;
       document.getElementById('levelScore').textContent = 'Score: ' + score + ' - YOU WIN!';
       overlayWin.querySelector('h2').textContent = 'You Win!';
       overlayWin.classList.remove('hidden');
       updateHUD();
+      submitScore(name, score, charName, level, email, wallet);
     }
 
     // Color key moved to menu popup
@@ -1050,8 +1097,8 @@
           // Release one at a time: first at 3s, then every 5s after
           var releaseFrame = 180 + idx * 300; // ~3s, ~8s, ~13s, ~18s, ~23s
           if (animFrame > releaseFrame) {
-            enemy.inHouse = false; enemy.y = 6; enemy.x = 7; enemy.dir = 3;
-            enemy.vx = 7; enemy.vy = 6;
+            enemy.inHouse = false; enemy.y = 7; enemy.x = 7; enemy.dir = 3;
+            enemy.vx = 7; enemy.vy = 7;
           }
           return;
         }
@@ -1176,9 +1223,13 @@
     function gameOver() {
       gameRunning = false;
       var name = document.getElementById('playerName').value || 'Player';
+      var email = document.getElementById('playerEmail').value || '';
+      var wallet = document.getElementById('playerWallet').value || '';
+      var charName = (CHARACTERS[selectedCharacter] || CHARACTERS[0]).name;
       document.getElementById('finalScore').textContent = 'Score: ' + score;
       document.getElementById('finalName').textContent = name + ' - Level ' + level;
       overlayGameOver.classList.remove('hidden');
+      submitScore(name, score, charName, level, email, wallet);
     }
 
     // Level advances based on score thresholds instead of clearing all dots
@@ -1285,6 +1336,134 @@
         item.appendChild(dot); item.appendChild(label); popup.appendChild(item);
       });
     })();
+
+    // ================================
+    // LEADERBOARD SYSTEM (Nakamigo Man)
+    // ================================
+    var LEADERBOARD_KEY = 'migoman_leaderboard';
+    var leaderboardModal = document.getElementById('leaderboardModal');
+    var leaderboardContent = document.getElementById('leaderboardContent');
+
+    // --- Backend API config (set your endpoint here) ---
+    var LEADERBOARD_API = ''; // e.g. 'https://your-api.com/api/leaderboard'
+
+    function getLocalLeaderboard() {
+      try { return JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || '[]'); }
+      catch(e) { return []; }
+    }
+
+    function saveLocalLeaderboard(entries) {
+      localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+    }
+
+    function submitScore(name, scoreVal, charName, levelVal, email, wallet) {
+      var entry = {
+        name: name || 'Anon',
+        score: scoreVal,
+        character: charName,
+        level: levelVal,
+        email: email || '',
+        wallet: wallet || '',
+        timestamp: Date.now()
+      };
+
+      // Always save locally
+      var local = getLocalLeaderboard();
+      local.push(entry);
+      local.sort(function(a, b) { return b.score - a.score; });
+      if (local.length > 100) local = local.slice(0, 100);
+      saveLocalLeaderboard(local);
+
+      // Submit to external API if configured
+      if (LEADERBOARD_API) {
+        fetch(LEADERBOARD_API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(entry)
+        }).catch(function() {});
+      }
+    }
+
+    function filterByPeriod(entries, period) {
+      if (period === 'all') return entries;
+      var now = Date.now();
+      var cutoff = period === 'daily' ? now - 86400000 : now - 604800000;
+      return entries.filter(function(e) { return e.timestamp >= cutoff; });
+    }
+
+    function renderLeaderboard(period) {
+      period = period || 'all';
+
+      if (LEADERBOARD_API) {
+        leaderboardContent.innerHTML = '<div class="lb-loading">Loading scores...</div>';
+        fetch(LEADERBOARD_API + '?period=' + period)
+          .then(function(r) { return r.json(); })
+          .then(function(data) { displayEntries(data.entries || data, period); })
+          .catch(function() {
+            // Fallback to local
+            displayEntries(filterByPeriod(getLocalLeaderboard(), period), period);
+          });
+      } else {
+        displayEntries(filterByPeriod(getLocalLeaderboard(), period), period);
+      }
+    }
+
+    function displayEntries(entries, period) {
+      entries.sort(function(a, b) { return b.score - a.score; });
+      var top = entries.slice(0, 25);
+
+      if (top.length === 0) {
+        leaderboardContent.innerHTML = '<div class="lb-empty">No scores yet. Be the first to play!</div>';
+        return;
+      }
+
+      var html = '<table class="leaderboard-table"><thead><tr>';
+      html += '<th class="lb-rank">#</th><th>Player</th><th>Lvl</th><th>Score</th>';
+      html += '</tr></thead><tbody>';
+
+      top.forEach(function(entry, i) {
+        var rankClass = i === 0 ? 'lb-rank-1' : i === 1 ? 'lb-rank-2' : i === 2 ? 'lb-rank-3' : '';
+        html += '<tr>';
+        html += '<td class="lb-rank ' + rankClass + '">' + (i + 1) + '</td>';
+        html += '<td>' + escapeHtml(entry.name) + '</td>';
+        html += '<td>' + (entry.level || 1) + '</td>';
+        html += '<td>' + entry.score.toLocaleString() + '</td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      leaderboardContent.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // Leaderboard button (intro screen)
+    document.getElementById('leaderboardBtn').addEventListener('click', function() {
+      leaderboardModal.classList.remove('hidden');
+      // Reset tab state
+      var tabs = document.querySelectorAll('.leaderboard-tab');
+      tabs.forEach(function(t) { t.classList.remove('active'); });
+      tabs[0].classList.add('active');
+      renderLeaderboard('all');
+    });
+
+    // Leaderboard tabs
+    document.querySelectorAll('.leaderboard-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('.leaderboard-tab').forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        renderLeaderboard(tab.getAttribute('data-period'));
+      });
+    });
+
+    // Close leaderboard
+    document.getElementById('lbCloseBtn').addEventListener('click', function() {
+      leaderboardModal.classList.add('hidden');
+    });
 
     // Player trail effect
     var trail = [];
