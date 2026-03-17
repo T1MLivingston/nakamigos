@@ -326,6 +326,21 @@
     ENEMIES.forEach(function(e, i) { if (e.sprite) loadSprite('enemy_' + i, e.sprite); });
     loadSprite('btc_coin', 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b789666d4bd450e1a0eb21_btc_coin.png');
 
+    // Breakfast item images for power-ups
+    var POWERUP_IMAGES = [
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692ab18ae3769a41c071c858_egg_mid.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692ab18a531365046c7173e2_bacon_mid.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692ab946391da8fd6f4f444b_beagle.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692abeb0a39e2ef3f227a537_egg.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692ab185662298ea56db3c81_capp.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692abf2e3d052fbcb107c745_cookie.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692abeb7d31f195460f25084_muffin.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692abde4af5da766d864c00c_cur.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692abd3b2b54d6b1e90b9a95_coffee_pot.png',
+      'https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/692ab8d07ab8a24c59257219_pancakes.png'
+    ];
+    POWERUP_IMAGES.forEach(function(url, i) { loadSprite('powerup_' + i, url); });
+
     var selectedCharacter = 0;
 
     // Render intro character grid
@@ -514,10 +529,8 @@
       [1,1,1,1,1,1,1,0,1,1,1,1,1,1,1]
     ];
 
-    // Breakfast emoji power-ups
-    var POWERUP_EMOJIS = ['\u2615', '\uD83E\uDD50', '\uD83C\uDF73', '\uD83E\uDDC7', '\uD83E\uDD5E', '\uD83C\uDF5E'];
-    // ☕ 🥐 🍳 🧇 🥞 🍞
-    var powerupTypes = {}; // keyed by "r,c" -> { emoji, is1up }
+    // Breakfast item power-ups (image-based)
+    var powerupTypes = {}; // keyed by "r,c" -> { imgIdx, is1up }
 
     function assignPowerups() {
       powerupTypes = {};
@@ -531,7 +544,7 @@
       var oneUpIdx = Math.floor(Math.random() * positions.length);
       for (var i = 0; i < positions.length; i++) {
         powerupTypes[positions[i]] = {
-          emoji: POWERUP_EMOJIS[Math.floor(Math.random() * POWERUP_EMOJIS.length)],
+          imgIdx: Math.floor(Math.random() * POWERUP_IMAGES.length),
           is1up: (i === oneUpIdx)
         };
       }
@@ -585,16 +598,18 @@
     var enemies = [];
     var LERP_SPEED = 0.18;
 
+    var releaseStartFrame = 0; // tracks when enemies were last put in house
+
     function initEnemies() {
-      // Speed values: player moves every MOVE_RATE(10) frames = 0.10/frame
-      // Ghosts match player speed — all slow and steady
+      // Speed values: ~10% slower than player (MOVE_RATE 10 = 0.10/frame)
       enemies = [
-        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.10, vx: 7, vy: 8, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.10, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.09, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.09, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.08, vx: 7, vy: 9, moveTimer: 0 }
+        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.09, vx: 7, vy: 8, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.09, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.081, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.081, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.072, vx: 7, vy: 9, moveTimer: 0 }
       ];
+      releaseStartFrame = animFrame;
     }
 
     function resetMaze() {
@@ -724,28 +739,36 @@
             ctx.fillStyle = 'rgba(255,215,0,0.04)';
             ctx.fillRect(x, y, TILE, TILE);
           } else if (cell === 7) {
-            // Emoji power-up (breakfast items or 1-UP)
+            // Breakfast item power-up (image-based)
             var pu = powerupTypes[r + ',' + c];
             if (pu) {
-              var puSize = TILE * 0.7 + Math.sin(animFrame * 0.06 + r + c) * 2;
+              var puSize = TILE * 0.85 + Math.sin(animFrame * 0.06 + r + c) * 2;
               ctx.save();
               if (pu.is1up) {
-                // 1-UP: green glow
                 ctx.shadowColor = '#00E676';
                 ctx.shadowBlur = 14;
-                ctx.fillStyle = '#00E676';
-                ctx.font = 'bold ' + Math.round(puSize * 0.8) + 'px Silkscreen, monospace';
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('1UP', x + TILE/2, y + TILE/2);
               } else {
-                // Breakfast emoji with warm glow
                 ctx.shadowColor = '#FFD700';
                 ctx.shadowBlur = 10;
-                ctx.font = Math.round(puSize) + 'px serif';
+              }
+              var puImg = spriteImages['powerup_' + pu.imgIdx];
+              if (puImg) {
+                ctx.drawImage(puImg, x + TILE/2 - puSize/2, y + TILE/2 - puSize/2, puSize, puSize);
+              } else {
+                // Fallback circle while loading
+                ctx.fillStyle = pu.is1up ? '#00E676' : '#FFD700';
+                ctx.beginPath();
+                ctx.arc(x + TILE/2, y + TILE/2, puSize/3, 0, Math.PI * 2);
+                ctx.fill();
+              }
+              if (pu.is1up) {
+                // Draw small 1UP label below
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = '#00E676';
+                ctx.font = 'bold ' + Math.round(TILE * 0.32) + 'px Silkscreen, monospace';
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText(pu.emoji, x + TILE/2, y + TILE/2 + 1);
+                ctx.textBaseline = 'top';
+                ctx.fillText('1UP', x + TILE/2, y + TILE/2 + puSize/2 - 2);
               }
               ctx.restore();
             }
@@ -766,6 +789,29 @@
           }
         }
       }
+
+      // Draw portal tunnel narrowing: partial walls to make openings tighter
+      var wc2 = getWallColors();
+      var portalGap = TILE * 0.55; // visible gap size
+      var portalWall = (TILE - portalGap) / 2;
+      // Horizontal portals (left/right edges)
+      var hPortalRows = [5, 10, 14];
+      for (var pi = 0; pi < hPortalRows.length; pi++) {
+        var pr = hPortalRows[pi];
+        // Left opening
+        ctx.fillStyle = wc2.wallDark;
+        ctx.fillRect(0, pr * TILE, TILE, portalWall);
+        ctx.fillRect(0, pr * TILE + TILE - portalWall, TILE, portalWall);
+        // Right opening
+        ctx.fillRect((COLS-1) * TILE, pr * TILE, TILE, portalWall);
+        ctx.fillRect((COLS-1) * TILE, pr * TILE + TILE - portalWall, TILE, portalWall);
+      }
+      // Vertical portals (top/bottom at col 7)
+      ctx.fillStyle = wc2.wallDark;
+      ctx.fillRect(7 * TILE, 0, portalWall, TILE);
+      ctx.fillRect(7 * TILE + TILE - portalWall, 0, portalWall, TILE);
+      ctx.fillRect(7 * TILE, (ROWS-1) * TILE, portalWall, TILE);
+      ctx.fillRect(7 * TILE + TILE - portalWall, (ROWS-1) * TILE, portalWall, TILE);
     }
 
     // Top and bottom decorative glow bars (like reference image)
@@ -1044,9 +1090,10 @@
     function moveEnemies() {
       enemies.forEach(function(enemy, idx) {
         if (enemy.inHouse) {
-          // Release one at a time: first at 3s, then every 5s after
-          var releaseFrame = 180 + idx * 300; // ~3s, ~8s, ~13s, ~18s, ~23s
-          if (animFrame > releaseFrame) {
+          // Release one at a time: first at 3s, then every 5s after (relative to last reset)
+          var framesSinceReset = animFrame - releaseStartFrame;
+          var releaseDelay = 180 + idx * 300; // ~3s, ~8s, ~13s, ~18s, ~23s
+          if (framesSinceReset > releaseDelay) {
             enemy.inHouse = false; enemy.y = 7; enemy.x = 7; enemy.dir = 3;
             enemy.vx = 7; enemy.vy = 7;
           }
@@ -1209,7 +1256,7 @@
         level++;
         updateHUD();
         // Slight speed up on level-up (keep it slow)
-        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.004, 0.12); });
+        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.004, 0.108); });
       }
     }
 
