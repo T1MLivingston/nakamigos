@@ -38,13 +38,11 @@
     /* INTRO */
     .intro-screen { width: 100%; padding: 10px 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
     .intro-screen.hidden { display: none; }
-    .back-arrow { align-self: flex-start; font-size: 1rem; color: #7a7eb0; background: none; border: none; cursor: pointer; padding: 2px 6px; font-family: 'VT323', monospace; letter-spacing: 1px; text-decoration: none; display: flex; align-items: center; gap: 4px; transition: color 0.2s; }
-    .back-arrow:hover { color: #FFD700; }
-    .brand-header { width: 100%; display: flex; align-items: center; gap: 12px; }
-    .brand-logo { width: 48px; height: 48px; border-radius: 50%; background: #fff; border: 2px solid rgba(255,215,0,0.25); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
+    .brand-header { width: 100%; display: flex; align-items: center; gap: 8px; }
+    .brand-logo { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 2px solid rgba(255,215,0,0.25); display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
     .brand-logo img { width: 100%; height: 100%; object-fit: cover; }
-    .brand-title { font-family: 'Silkscreen', cursive; font-size: clamp(0.85rem, 3.5vw, 1.1rem); color: #e8e4d4; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,215,0,0.15); flex: 1; }
-    .game-logo { width: 80%; max-width: 320px; height: auto; display: block; filter: drop-shadow(0 0 16px rgba(255,215,0,0.3)); }
+    .brand-title { font-family: 'Silkscreen', cursive; font-size: clamp(0.65rem, 2.8vw, 0.88rem); color: #e8e4d4; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,215,0,0.15); flex: 1; white-space: nowrap; }
+    .game-logo { width: 72%; max-width: 290px; height: auto; display: block; filter: drop-shadow(0 0 16px rgba(255,215,0,0.3)); }
     .deco-banner { width: 100%; position: relative; height: 32px; display: flex; align-items: center; overflow: hidden; }
     .deco-line { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent); }
     .deco-sprite { width: 36px; height: 36px; flex-shrink: 0; animation: fly-across 6s linear infinite; image-rendering: auto; }
@@ -71,13 +69,18 @@
     .play-btn { width: 100%; font-family: 'Silkscreen', cursive; font-size: 0.9rem; padding: 12px 24px; border-radius: 10px; border: 2px solid rgba(255,215,0,0.35); cursor: pointer; letter-spacing: 3px; text-transform: uppercase; background: rgba(180,155,60,0.12); color: #e8e4d4; transition: all 0.2s; }
     .play-btn:hover { background: rgba(180,155,60,0.28); border-color: #FFD700; box-shadow: 0 0 24px rgba(255,215,0,0.2); transform: scale(1.02); }
     .play-btn:active { transform: scale(0.98); }
-    .how-to-play { width: 100%; padding: 6px 10px; background: rgba(20,24,40,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; }
-    .how-to-play h3 { font-family: 'Silkscreen', cursive; font-size: 0.55rem; color: #c4a84d; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 3px; }
-    .how-to-play ul { list-style: none; display: flex; flex-direction: column; gap: 1px; }
-    .how-to-play li { font-family: 'VT323', monospace; font-size: 0.7rem; color: #5c608e; padding-left: 14px; position: relative; }
-    .how-to-play li::before { content: '>'; position: absolute; left: 0; color: #c4a84d; }
-    .bottom-row { width: 100%; display: flex; gap: 8px; }
-    .secondary-btn { flex: 1; font-family: 'Silkscreen', cursive; font-size: 0.6rem; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; background: transparent; color: #7a7eb0; text-decoration: none; text-align: center; display: block; transition: all 0.2s; }
+    .help-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(20,24,40,0.6); color: #7a7eb0; font-family: 'Silkscreen', cursive; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+    .help-btn:hover { color: #FFD700; border-color: rgba(255,215,0,0.3); }
+    .help-popup { display: none; position: fixed; inset: 0; background: rgba(10,14,26,0.92); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(6px); }
+    .help-popup.visible { display: flex; }
+    .help-popup-inner { width: 90%; max-width: 360px; padding: 18px 16px; background: rgba(20,24,40,0.95); border: 1px solid rgba(255,215,0,0.15); border-radius: 12px; }
+    .help-popup-inner h3 { font-family: 'Silkscreen', cursive; font-size: 0.7rem; color: #c4a84d; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+    .help-popup-inner ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .help-popup-inner li { font-family: 'VT323', monospace; font-size: 0.85rem; color: #7a7eb0; padding-left: 16px; position: relative; }
+    .help-popup-inner li::before { content: '>'; position: absolute; left: 0; color: #c4a84d; }
+    .help-popup-close { margin-top: 14px; width: 100%; font-family: 'Silkscreen', cursive; font-size: 0.65rem; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,215,0,0.25); cursor: pointer; background: rgba(180,155,60,0.1); color: #e8e4d4; text-transform: uppercase; letter-spacing: 1px; }
+    .bottom-row { width: 100%; display: flex; gap: 6px; align-items: center; }
+    .secondary-btn { flex: 1; font-family: 'Silkscreen', cursive; font-size: 0.55rem; padding: 8px 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; letter-spacing: 1px; text-transform: uppercase; background: transparent; color: #7a7eb0; text-decoration: none; text-align: center; display: block; transition: all 0.2s; }
     .secondary-btn:hover { color: #e8e4d4; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.03); }
 
     /* GAME */
@@ -161,7 +164,7 @@
 
     @media (min-width: 601px) { .joystick-container { display: none; } }
     @media (max-width: 600px) { .controls-hint { display: none; } }
-    @media (max-width: 380px) { .intro-screen { padding: 8px 6px 14px; gap: 6px; } .character-grid { gap: 5px; } .game-logo { width: 70%; } }
+    @media (max-width: 380px) { .intro-screen { padding: 8px 6px 14px; gap: 5px; } .character-grid { gap: 5px; } .game-logo { width: 65%; } .brand-logo { width: 36px; height: 36px; } }
   </style>
 </head>
 <body>
@@ -175,7 +178,6 @@
   <div class="main-wrapper">
 
     <div class="intro-screen" id="introScreen">
-      <a href="/games/nakamigos/" class="back-arrow">&larr; Back</a>
       <div class="brand-header">
         <div class="brand-logo">
           <img src="https://cdn.prod.website-files.com/687d960560ee14f74b3f0f52/69223d4039c1d4d4da41d036_qt%3Dq_95.webp" alt="Blackbird">
@@ -208,7 +210,15 @@
       <div class="character-grid-label">Choose Your Migo</div>
       <div class="character-grid" id="characterGrid"></div>
       <button class="play-btn" id="playBtn">Play</button>
-      <div class="how-to-play">
+      <div class="bottom-row">
+        <a href="/games/nakamigos/" class="secondary-btn">&larr; Back</a>
+        <button class="help-btn" id="helpBtn">?</button>
+        <button class="secondary-btn" id="leaderboardBtn">Leaderboard</button>
+      </div>
+    </div>
+
+    <div class="help-popup" id="helpPopup">
+      <div class="help-popup-inner">
         <h3>How to Play</h3>
         <ul>
           <li>Move with arrow keys, WASD, or joystick</li>
@@ -217,10 +227,7 @@
           <li>Grab breakfast power-ups for bonus points or a 1-UP!</li>
           <li>Collect all 5 colors at every dot to win</li>
         </ul>
-      </div>
-      <div class="bottom-row">
-        <button class="secondary-btn" id="leaderboardBtn">Leaderboard</button>
-        <a href="/games/nakamigos/" class="secondary-btn">All Games</a>
+        <button class="help-popup-close" id="helpCloseBtn">Got it</button>
       </div>
     </div>
 
@@ -370,6 +377,9 @@
     document.getElementById('playBtn').addEventListener('click', showGame);
     document.getElementById('backToMenuBtn').addEventListener('click', showIntro);
     document.getElementById('backToIntroBtn').addEventListener('click', showIntro);
+    document.getElementById('helpBtn').addEventListener('click', function() { document.getElementById('helpPopup').classList.add('visible'); });
+    document.getElementById('helpCloseBtn').addEventListener('click', function() { document.getElementById('helpPopup').classList.remove('visible'); });
+    document.getElementById('helpPopup').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('visible'); });
     document.getElementById('quitBtn').addEventListener('click', showIntro);
 
     // ================================
