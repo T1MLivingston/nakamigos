@@ -309,7 +309,7 @@
       { name: 'Angelo', homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b94fc8efa8f30918c_5187_Angelo_Homescreen.png', sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b85cd293af6395593_5187_sprite.png', fallbackColor: '#00C853' },
       { name: 'Adam', homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b8a47372c6b6ad53b_3648_Adam_Homescreen.png', sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b7e2dcb4185304f44_3648_Sprite.png', fallbackColor: '#FF8A00' },
       { name: 'Shag', homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg', sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/691be24ee043e99baed366a1_n_17763.png', fallbackColor: '#AB47BC' },
-      { name: '???', locked: true, fallbackColor: '#3a3e5a' }
+      { name: 'Tim', homescreen: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69bac12281e02641a4bc67e7_11993_small.png', sprite: 'https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69bac1248fea1df9c8040344_11993_sprite.png', fallbackColor: '#E91E63' }
     ];
 
     var ENEMIES = [
@@ -561,7 +561,8 @@
     var WALL_THEMES = {
       0: { wall: '#0a1a40', wallLight: '#153060', wallDark: '#060e28' },       // Angelo: darker blue
       1: { wall: '#1a3a60', wallLight: '#2a5580', wallDark: '#0c2040' },       // Adam: light blue
-      2: { wall: '#5a1a1a', wallLight: '#7a2a2a', wallDark: '#3a0a0a' }        // Shag: red brick
+      2: { wall: '#5a1a1a', wallLight: '#7a2a2a', wallDark: '#3a0a0a' },       // Shag: red brick
+      3: { wall: '#3a1a3a', wallLight: '#5a2a5a', wallDark: '#200a20' }        // Tim: deep purple
     };
 
     function getWallColors() {
@@ -612,11 +613,11 @@
     function initEnemies() {
       // Speed values: noticeably slower than player for smooth, easy flow
       enemies = [
-        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.07, vx: 7, vy: 8, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.07, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.065, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.065, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.06, vx: 7, vy: 9, moveTimer: 0 }
+        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.045, vx: 7, vy: 8, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.045, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.04, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.04, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.035, vx: 7, vy: 9, moveTimer: 0 }
       ];
       releaseStartFrame = animFrame;
     }
@@ -1278,7 +1279,7 @@
         level++;
         updateHUD();
         // Slight speed up on level-up (keep it slow)
-        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.003, 0.09); });
+        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.002, 0.07); });
       }
     }
 
