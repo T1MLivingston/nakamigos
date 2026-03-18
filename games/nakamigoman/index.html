@@ -488,15 +488,13 @@
       if (bgMusicAudio) { bgMusicAudio.pause(); }
     }
 
-    // Dot color progression: 7 tiers - collect all colors at every position to win!
+    // Dot color progression: 5 tiers - collect all colors at every position to win!
     var DOT_COLORS = [
       { color: '#FFD700', points: 10, name: 'Gold' },
-      { color: '#00E676', points: 25, name: 'Green' },
-      { color: '#00A3FF', points: 50, name: 'Blue' },
-      { color: '#EB00FF', points: 80, name: 'Purple' },
-      { color: '#FF5252', points: 150, name: 'Red' },
-      { color: '#FFFFFF', points: 300, name: 'White' },
-      { color: '#76FF03', points: 500, name: 'Neon' }
+      { color: '#00E676', points: 30, name: 'Green' },
+      { color: '#00A3FF', points: 75, name: 'Blue' },
+      { color: '#EB00FF', points: 150, name: 'Purple' },
+      { color: '#FF5252', points: 300, name: 'Red' }
     ];
     var MAX_TIER = DOT_COLORS.length; // tier goes 0..6, reaching 7 means completed
 
@@ -595,19 +593,21 @@
     var animFrame = 0;
 
     var player = { x: 7, y: 17, dir: -1, nextDir: -1, mouthOpen: 0, mouthDir: 1, vx: 7, vy: 17, moving: false };
+    var invincibleTimer = 0; // frames of invincibility remaining
+    var INVINCIBLE_DURATION = 180; // ~3 seconds at 60fps
     var enemies = [];
-    var LERP_SPEED = 0.18;
+    var LERP_SPEED = 0.14;
 
     var releaseStartFrame = 0; // tracks when enemies were last put in house
 
     function initEnemies() {
-      // Speed values: ~10% slower than player (MOVE_RATE 10 = 0.10/frame)
+      // Speed values: noticeably slower than player for smooth, easy flow
       enemies = [
-        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.09, vx: 7, vy: 8, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.09, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.081, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.081, vx: 7, vy: 9, moveTimer: 0 },
-        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.072, vx: 7, vy: 9, moveTimer: 0 }
+        { x: 7, y: 8, dir: 3, dataIdx: 0, scared: false, inHouse: false, speed: 0.07, vx: 7, vy: 8, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 1, scared: false, inHouse: true, speed: 0.07, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 2, scared: false, inHouse: true, speed: 0.065, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 3, scared: false, inHouse: true, speed: 0.065, vx: 7, vy: 9, moveTimer: 0 },
+        { x: 7, y: 9, dir: 3, dataIdx: 4, scared: false, inHouse: true, speed: 0.06, vx: 7, vy: 9, moveTimer: 0 }
       ];
       releaseStartFrame = animFrame;
     }
@@ -877,6 +877,11 @@
       var ch = CHARACTERS[selectedCharacter] || CHARACTERS[0];
       var spr = spriteImages['player_' + selectedCharacter];
 
+      // Flash when invincible
+      if (invincibleTimer > 0) {
+        ctx.globalAlpha = Math.sin(animFrame * 0.4) > 0 ? 1.0 : 0.2;
+      }
+
       if (spr) {
         ctx.save();
         ctx.shadowColor = ch.fallbackColor; ctx.shadowBlur = 8;
@@ -901,6 +906,7 @@
         ctx.beginPath(); ctx.arc(px, py, r, sa + ma, sa + Math.PI * 2 - ma); ctx.lineTo(px, py); ctx.fill();
         ctx.shadowBlur = 0;
       }
+      ctx.globalAlpha = 1;
     }
 
     function drawEnemy(enemy) {
@@ -1199,10 +1205,17 @@
             score += 200;
             sfxGhostEat();
             enemy.x = 7; enemy.y = 9; enemy.vx = 7; enemy.vy = 9; enemy.inHouse = true; enemy.scared = false;
-          } else {
+          } else if (invincibleTimer <= 0) {
             lives--;
             updateHUD(); updateLivesDisplay();
-            if (lives <= 0) { gameOver(); } else { sfxDeath(); resetPlayer(); initEnemies(); ghostScaredTimer = 0; trail = []; }
+            if (lives <= 0) { gameOver(); } else {
+              sfxDeath();
+              invincibleTimer = INVINCIBLE_DURATION;
+              ghostScaredTimer = 0;
+              // Send all ghosts back to house, release one by one
+              enemies.forEach(function(e) { e.x = 7; e.y = 9; e.vx = 7; e.vy = 9; e.inHouse = true; e.scared = false; e.moveTimer = 0; });
+              releaseStartFrame = animFrame;
+            }
           }
         }
       });
@@ -1256,7 +1269,7 @@
         level++;
         updateHUD();
         // Slight speed up on level-up (keep it slow)
-        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.004, 0.108); });
+        enemies.forEach(function(e) { e.speed = Math.min(e.speed + 0.003, 0.09); });
       }
     }
 
@@ -1523,6 +1536,7 @@
         animFrame++;
         moveCounter++;
         if (moveCounter >= MOVE_RATE) { moveCounter = 0; movePlayer(); checkCollisions(); }
+        if (invincibleTimer > 0) invincibleTimer--;
         moveEnemies();
         updatePowerRespawns();
         checkCollisions();
