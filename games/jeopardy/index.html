@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Nakamigos Jeopardy</title>
+  <meta name="description" content="Test your Nakamigos knowledge! A Jeopardy-style trivia game about the Nakamigos community, NFTs, crypto culture, and blockchain lore.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=VT323&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #0a0e1a; color: #d0d4f0;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden;
+    }
+
+    .bg-grid { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .bg-grid-floor {
+      position: absolute; bottom: -20%; left: -50%; width: 200%; height: 80%;
+      background: linear-gradient(rgba(0,163,255,0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(0,163,255,0.12) 1px, transparent 1px);
+      background-size: 60px 60px; transform: perspective(400px) rotateX(60deg); transform-origin: center top;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 70%);
+      animation: grid-scroll 8s linear infinite;
+    }
+    @keyframes grid-scroll { 0% { background-position: 0 0, 0 0; } 100% { background-position: 0 60px, 0 60px; } }
+    .bg-grid-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, transparent 0%, #0a0e1a 100%); }
+
+    .main-wrapper { position: relative; z-index: 1; width: 100%; max-width: 900px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 16px; }
+
+    /* HEADER */
+    .game-header {
+      width: 100%; display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; margin-bottom: 12px;
+      background: rgba(20,24,40,0.8); border: 1px solid rgba(255,215,0,0.15); border-radius: 10px;
+    }
+    .game-title { font-family: 'Silkscreen', cursive; font-size: clamp(0.9rem, 3vw, 1.3rem); color: #FFD700; letter-spacing: 2px; text-transform: uppercase; text-shadow: 0 0 20px rgba(255,215,0,0.3); }
+    .score-display { font-family: 'VT323', monospace; font-size: 1.4rem; color: #00ff88; }
+    .score-display.negative { color: #ff4444; }
+
+    /* INTRO SCREEN */
+    .intro-screen {
+      width: 100%; max-width: 500px; padding: 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 20px;
+      background: rgba(20,24,40,0.8); border: 1px solid rgba(255,215,0,0.15); border-radius: 16px; margin-top: 40px;
+    }
+    .intro-screen.hidden { display: none; }
+    .intro-title { font-family: 'Silkscreen', cursive; font-size: clamp(1.5rem, 5vw, 2.2rem); color: #FFD700; text-align: center; text-shadow: 0 0 30px rgba(255,215,0,0.3); }
+    .intro-subtitle { font-family: 'VT323', monospace; font-size: 1.1rem; color: #7a7eb0; text-align: center; line-height: 1.5; }
+    .intro-input {
+      width: 100%; padding: 10px 14px; font-family: 'VT323', monospace; font-size: 1.1rem;
+      background: rgba(10,14,26,0.8); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px;
+      color: #e8e4d4; outline: none; text-align: center; letter-spacing: 1px;
+    }
+    .intro-input::placeholder { color: #4a4e6a; }
+    .intro-input:focus { border-color: rgba(255,215,0,0.5); }
+    .play-btn {
+      width: 100%; font-family: 'Silkscreen', cursive; font-size: 1rem; padding: 14px 24px;
+      border-radius: 10px; border: 2px solid rgba(255,215,0,0.35); cursor: pointer;
+      letter-spacing: 3px; text-transform: uppercase; background: rgba(180,155,60,0.12);
+      color: #e8e4d4; transition: all 0.2s;
+    }
+    .play-btn:hover { background: rgba(180,155,60,0.28); border-color: #FFD700; box-shadow: 0 0 24px rgba(255,215,0,0.2); transform: scale(1.02); }
+    .play-btn:active { transform: scale(0.98); }
+
+    /* BOARD */
+    .board-container { width: 100%; display: none; }
+    .board-container.active { display: block; }
+
+    .category-headers {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin-bottom: 4px;
+    }
+    .category-header {
+      background: rgba(20,24,80,0.9); border: 1px solid rgba(0,163,255,0.3);
+      padding: 10px 4px; text-align: center; border-radius: 6px;
+      font-family: 'Silkscreen', cursive; font-size: clamp(0.45rem, 1.4vw, 0.65rem);
+      color: #FFD700; text-transform: uppercase; letter-spacing: 0.5px;
+      text-shadow: 0 0 8px rgba(255,215,0,0.2); line-height: 1.3;
+    }
+
+    .board-grid {
+      display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+    }
+    .board-cell {
+      aspect-ratio: 1.3; background: rgba(20,24,60,0.85); border: 1px solid rgba(0,163,255,0.2);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all 0.2s; position: relative;
+      font-family: 'VT323', monospace; font-size: clamp(1.2rem, 3vw, 1.8rem); color: #FFD700;
+      text-shadow: 0 0 10px rgba(255,215,0,0.4);
+    }
+    .board-cell:hover { background: rgba(40,44,100,0.9); border-color: rgba(255,215,0,0.4); transform: scale(1.05); }
+    .board-cell.used {
+      background: rgba(10,14,26,0.5); border-color: rgba(255,255,255,0.05);
+      color: rgba(255,215,0,0.1); cursor: default; pointer-events: none;
+    }
+
+    /* CLUE MODAL */
+    .clue-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(10,14,26,0.92);
+      z-index: 100; align-items: center; justify-content: center; backdrop-filter: blur(6px);
+    }
+    .clue-overlay.visible { display: flex; }
+    .clue-card {
+      width: 90%; max-width: 550px; padding: 28px 24px;
+      background: rgba(20,24,60,0.95); border: 2px solid rgba(0,163,255,0.3); border-radius: 16px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .clue-category { font-family: 'Silkscreen', cursive; font-size: 0.65rem; color: #00a3ff; text-transform: uppercase; letter-spacing: 2px; }
+    .clue-value { font-family: 'VT323', monospace; font-size: 1.2rem; color: #FFD700; }
+    .clue-text { font-family: 'VT323', monospace; font-size: clamp(1.1rem, 3vw, 1.5rem); color: #e8e4d4; line-height: 1.5; text-align: center; padding: 12px 0; }
+    .clue-timer { font-family: 'VT323', monospace; font-size: 1.1rem; color: #ff6b6b; text-align: center; }
+    .clue-timer.warning { animation: pulse-red 0.5s ease-in-out infinite; }
+    @keyframes pulse-red { 0%, 100% { color: #ff6b6b; } 50% { color: #ff0000; } }
+
+    .answer-form { display: flex; gap: 8px; }
+    .answer-input {
+      flex: 1; padding: 10px 14px; font-family: 'VT323', monospace; font-size: 1.1rem;
+      background: rgba(10,14,26,0.8); border: 1px solid rgba(255,215,0,0.2); border-radius: 8px;
+      color: #e8e4d4; outline: none; letter-spacing: 1px;
+    }
+    .answer-input:focus { border-color: rgba(255,215,0,0.5); }
+    .submit-btn {
+      padding: 10px 20px; font-family: 'Silkscreen', cursive; font-size: 0.7rem;
+      background: rgba(0,163,255,0.15); border: 1px solid rgba(0,163,255,0.3); border-radius: 8px;
+      color: #00a3ff; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+    }
+    .submit-btn:hover { background: rgba(0,163,255,0.3); border-color: #00a3ff; }
+
+    .clue-result {
+      text-align: center; padding: 12px; border-radius: 8px; display: none;
+      font-family: 'VT323', monospace; font-size: 1.2rem;
+    }
+    .clue-result.correct { display: block; background: rgba(0,255,136,0.1); border: 1px solid rgba(0,255,136,0.3); color: #00ff88; }
+    .clue-result.incorrect { display: block; background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3); color: #ff4444; }
+    .clue-result.timeout { display: block; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: #ffa500; }
+
+    .close-clue-btn {
+      align-self: center; padding: 8px 24px; font-family: 'Silkscreen', cursive; font-size: 0.65rem;
+      background: transparent; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px;
+      color: #7a7eb0; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s;
+    }
+    .close-clue-btn:hover { color: #FFD700; border-color: rgba(255,215,0,0.3); }
+
+    /* GAME OVER */
+    .game-over {
+      width: 100%; max-width: 500px; padding: 40px 24px; display: none; flex-direction: column;
+      align-items: center; gap: 16px; background: rgba(20,24,40,0.8);
+      border: 1px solid rgba(255,215,0,0.15); border-radius: 16px; margin-top: 40px;
+    }
+    .game-over.active { display: flex; }
+    .game-over-title { font-family: 'Silkscreen', cursive; font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.3); }
+    .final-score { font-family: 'VT323', monospace; font-size: 2.5rem; color: #00ff88; }
+    .final-score.negative { color: #ff4444; }
+    .stats-row { display: flex; gap: 24px; }
+    .stat { text-align: center; }
+    .stat-val { font-family: 'VT323', monospace; font-size: 1.8rem; color: #FFD700; }
+    .stat-label { font-family: 'VT323', monospace; font-size: 0.8rem; color: #7a7eb0; text-transform: uppercase; }
+
+    .back-link {
+      margin-top: 20px; font-family: 'VT323', monospace; font-size: 0.9rem;
+      color: #7a7eb0; text-decoration: none; transition: color 0.2s;
+    }
+    .back-link:hover { color: #FFD700; }
+
+    /* DAILY DOUBLE */
+    .daily-double-splash {
+      display: none; position: fixed; inset: 0; background: rgba(10,14,26,0.95);
+      z-index: 150; align-items: center; justify-content: center;
+    }
+    .daily-double-splash.visible { display: flex; }
+    .daily-double-text {
+      font-family: 'Silkscreen', cursive; font-size: clamp(2rem, 6vw, 3.5rem);
+      color: #FFD700; text-shadow: 0 0 40px rgba(255,215,0,0.5), 0 0 80px rgba(255,215,0,0.2);
+      animation: dd-pulse 0.6s ease-in-out 3;
+    }
+    @keyframes dd-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.15); opacity: 0.8; } }
+    .wager-form {
+      display: none; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px;
+    }
+    .wager-form.visible { display: flex; }
+    .wager-label { font-family: 'VT323', monospace; font-size: 1.1rem; color: #7a7eb0; }
+    .wager-input {
+      width: 150px; padding: 10px; font-family: 'VT323', monospace; font-size: 1.3rem;
+      background: rgba(10,14,26,0.8); border: 1px solid rgba(255,215,0,0.3); border-radius: 8px;
+      color: #FFD700; text-align: center; outline: none;
+    }
+    .wager-submit {
+      padding: 10px 24px; font-family: 'Silkscreen', cursive; font-size: 0.7rem;
+      background: rgba(255,215,0,0.1); border: 1px solid rgba(255,215,0,0.3); border-radius: 8px;
+      color: #FFD700; cursor: pointer; text-transform: uppercase;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 600px) {
+      .category-header { font-size: 0.4rem; padding: 6px 2px; }
+      .board-cell { font-size: 1rem; }
+      .clue-card { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-grid">
+  <div class="bg-grid-floor"></div>
+  <div class="bg-grid-vignette"></div>
+</div>
+
+<div class="main-wrapper">
+  <!-- INTRO -->
+  <div class="intro-screen" id="introScreen">
+    <div class="game-title" style="font-size: clamp(1.5rem, 5vw, 2.2rem); text-align: center;">NAKAMIGOS<br>JEOPARDY!</div>
+    <p class="intro-subtitle">Test your knowledge of the Nakamigos universe, NFTs, crypto culture, and blockchain history.</p>
+    <input class="intro-input" id="playerName" type="text" placeholder="Enter your name" maxlength="20">
+    <button class="play-btn" id="startBtn">Start Game</button>
+    <a href="/" class="back-link">&larr; Back to Hub</a>
+  </div>
+
+  <!-- GAME HEADER -->
+  <div class="game-header" id="gameHeader" style="display: none;">
+    <div>
+      <span class="game-title">Jeopardy!</span>
+      <span id="playerLabel" style="font-family: 'VT323', monospace; font-size: 0.9rem; color: #7a7eb0; margin-left: 12px;"></span>
+    </div>
+    <div class="score-display" id="scoreDisplay">$0</div>
+  </div>
+
+  <!-- BOARD -->
+  <div class="board-container" id="boardContainer">
+    <div class="category-headers" id="categoryHeaders"></div>
+    <div class="board-grid" id="boardGrid"></div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div class="game-over" id="gameOver">
+    <div class="game-over-title">Game Over!</div>
+    <div class="final-score" id="finalScore">$0</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="statCorrect">0</div><div class="stat-label">Correct</div></div>
+      <div class="stat"><div class="stat-val" id="statWrong">0</div><div class="stat-label">Wrong</div></div>
+      <div class="stat"><div class="stat-val" id="statSkipped">0</div><div class="stat-label">Skipped</div></div>
+    </div>
+    <button class="play-btn" id="playAgainBtn">Play Again</button>
+    <a href="/" class="back-link">&larr; Back to Hub</a>
+  </div>
+</div>
+
+<!-- CLUE OVERLAY -->
+<div class="clue-overlay" id="clueOverlay">
+  <div class="clue-card">
+    <div class="clue-category" id="clueCategory"></div>
+    <div class="clue-value" id="clueValue"></div>
+    <div class="clue-text" id="clueText"></div>
+    <div class="clue-timer" id="clueTimer">30s</div>
+    <form class="answer-form" id="answerForm">
+      <input class="answer-input" id="answerInput" type="text" placeholder="What is..." autocomplete="off">
+      <button class="submit-btn" type="submit">Answer</button>
+    </form>
+    <div class="clue-result" id="clueResult"></div>
+    <button class="close-clue-btn" id="closeClueBtn" style="display: none;">Continue</button>
+  </div>
+</div>
+
+<!-- DAILY DOUBLE SPLASH -->
+<div class="daily-double-splash" id="dailyDoubleSplash">
+  <div style="text-align: center;">
+    <div class="daily-double-text">DAILY DOUBLE!</div>
+    <div class="wager-form" id="wagerForm">
+      <div class="wager-label">How much will you wager?</div>
+      <input class="wager-input" id="wagerInput" type="number" min="0" placeholder="0">
+      <button class="wager-submit" id="wagerSubmit" type="button">Lock It In</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── GAME DATA ───────────────────────────────────────────
+const CATEGORIES = [
+  {
+    name: "Nakamigos Lore",
+    clues: [
+      { value: 200, q: "This is the total supply of the original Nakamigos NFT collection.", a: ["20000", "20,000", "twenty thousand"] },
+      { value: 400, q: "Nakamigos was created by this well-known NFT brand, also behind another famous PFP project.", a: ["yuga labs", "yuga"] },
+      { value: 600, q: "The blockchain network where Nakamigos NFTs live.", a: ["ethereum", "eth"] },
+      { value: 800, q: "This meme token is associated with the Nakamigos ecosystem and community.", a: ["meegs", "meeg", "$meegs"] },
+      { value: 1000, q: "The year that the Nakamigos collection officially launched.", a: ["2023"] },
+    ]
+  },
+  {
+    name: "Crypto Culture",
+    clues: [
+      { value: 200, q: "This slang term means holding your crypto instead of selling, originating from a famous typo.", a: ["hodl", "hodling"] },
+      { value: 400, q: "The term for a sharp, sustained downturn in the crypto market.", a: ["bear market", "crypto winter"] },
+      { value: 600, q: "This acronym describes the fear of missing out on a crypto pump.", a: ["fomo"] },
+      { value: 800, q: "When someone sells all their crypto in a panic, they are said to have 'paper' these.", a: ["hands", "paper hands"] },
+      { value: 1000, q: "The term for a newly launched token that drastically increases in value.", a: ["moonshot", "moon", "mooning", "to the moon"] },
+    ]
+  },
+  {
+    name: "NFT Basics",
+    clues: [
+      { value: 200, q: "NFT stands for this three-word phrase.", a: ["non fungible token", "non-fungible token"] },
+      { value: 400, q: "This is the most common token standard for NFTs on Ethereum.", a: ["erc-721", "erc721", "erc 721"] },
+      { value: 600, q: "The term for creating a new NFT and putting it on the blockchain for the first time.", a: ["minting", "mint"] },
+      { value: 800, q: "This marketplace was once the dominant platform for buying and selling NFTs.", a: ["opensea", "open sea"] },
+      { value: 1000, q: "This technology stores NFT images off-chain in a decentralized way, abbreviated IPFS.", a: ["interplanetary file system", "ipfs"] },
+    ]
+  },
+  {
+    name: "Blockchain History",
+    clues: [
+      { value: 200, q: "This person (or group) published the Bitcoin whitepaper in 2008.", a: ["satoshi nakamoto", "satoshi"] },
+      { value: 400, q: "This blockchain introduced smart contracts and was co-founded by Vitalik Buterin.", a: ["ethereum", "eth"] },
+      { value: 600, q: "The first real-world purchase made with Bitcoin was for two of these food items.", a: ["pizza", "pizzas"] },
+      { value: 800, q: "This event cuts the Bitcoin mining reward in half roughly every four years.", a: ["halving", "the halving", "halvening"] },
+      { value: 1000, q: "This infamous exchange collapsed in 2022, with its founder later convicted of fraud.", a: ["ftx"] },
+    ]
+  },
+  {
+    name: "PFP Projects",
+    clues: [
+      { value: 200, q: "This 10,000-piece pixelated collection from Larva Labs is considered the OG PFP project.", a: ["cryptopunks", "crypto punks", "punks"] },
+      { value: 400, q: "BAYC stands for this yacht-themed ape collection.", a: ["bored ape yacht club", "bored apes"] },
+      { value: 600, q: "This Yuga Labs metaverse project is tied to the BAYC ecosystem.", a: ["otherside", "the otherside", "otherdeed"] },
+      { value: 800, q: "This CC0 owl-themed PFP project became a cultural movement in 2022.", a: ["moonbirds", "moon birds"] },
+      { value: 1000, q: "This anime-inspired PFP collection by Chiru Labs pioneered the ERC-721A standard.", a: ["azuki", "azukis"] },
+    ]
+  },
+  {
+    name: "DeFi & Web3",
+    clues: [
+      { value: 200, q: "DeFi is short for this two-word term.", a: ["decentralized finance"] },
+      { value: 400, q: "This is the most widely used stablecoin, pegged to the US dollar and issued by Tether.", a: ["usdt", "tether"] },
+      { value: 600, q: "This protocol lets users swap tokens directly on Ethereum without an order book.", a: ["uniswap", "uni"] },
+      { value: 800, q: "A DAO is a Decentralized Autonomous one of these.", a: ["organization"] },
+      { value: 1000, q: "This Layer 2 scaling solution uses optimistic rollups and has its own OP token.", a: ["optimism", "op"] },
+    ]
+  }
+];
+
+// ─── GAME STATE ──────────────────────────────────────────
+let score = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let skippedCount = 0;
+let answeredCount = 0;
+let totalClues = 0;
+let timerInterval = null;
+let timeLeft = 30;
+let currentClue = null;
+let currentWager = 0;
+let dailyDoublePos = -1;
+let playerName = '';
+
+// ─── DOM REFS ────────────────────────────────────────────
+const introScreen = document.getElementById('introScreen');
+const startBtn = document.getElementById('startBtn');
+const playerNameInput = document.getElementById('playerName');
+const gameHeader = document.getElementById('gameHeader');
+const playerLabel = document.getElementById('playerLabel');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const boardContainer = document.getElementById('boardContainer');
+const categoryHeaders = document.getElementById('categoryHeaders');
+const boardGrid = document.getElementById('boardGrid');
+const clueOverlay = document.getElementById('clueOverlay');
+const clueCategory = document.getElementById('clueCategory');
+const clueValue = document.getElementById('clueValue');
+const clueText = document.getElementById('clueText');
+const clueTimer = document.getElementById('clueTimer');
+const answerForm = document.getElementById('answerForm');
+const answerInput = document.getElementById('answerInput');
+const clueResult = document.getElementById('clueResult');
+const closeClueBtn = document.getElementById('closeClueBtn');
+const gameOver = document.getElementById('gameOver');
+const finalScore = document.getElementById('finalScore');
+const statCorrect = document.getElementById('statCorrect');
+const statWrong = document.getElementById('statWrong');
+const statSkipped = document.getElementById('statSkipped');
+const playAgainBtn = document.getElementById('playAgainBtn');
+const dailyDoubleSplash = document.getElementById('dailyDoubleSplash');
+const wagerForm = document.getElementById('wagerForm');
+const wagerInput = document.getElementById('wagerInput');
+const wagerSubmit = document.getElementById('wagerSubmit');
+
+// ─── INIT ────────────────────────────────────────────────
+startBtn.addEventListener('click', startGame);
+playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') startGame(); });
+answerForm.addEventListener('submit', e => { e.preventDefault(); submitAnswer(); });
+closeClueBtn.addEventListener('click', closeClue);
+playAgainBtn.addEventListener('click', () => location.reload());
+wagerSubmit.addEventListener('click', lockWager);
+
+function startGame() {
+  playerName = playerNameInput.value.trim() || 'Player';
+  playerLabel.textContent = playerName;
+  introScreen.classList.add('hidden');
+  gameHeader.style.display = 'flex';
+  boardContainer.classList.add('active');
+  buildBoard();
+}
+
+function buildBoard() {
+  categoryHeaders.innerHTML = '';
+  boardGrid.innerHTML = '';
+  totalClues = CATEGORIES.length * 5;
+  answeredCount = 0;
+
+  // Pick one random daily double
+  dailyDoublePos = Math.floor(Math.random() * totalClues);
+
+  CATEGORIES.forEach(cat => {
+    const header = document.createElement('div');
+    header.className = 'category-header';
+    header.textContent = cat.name;
+    categoryHeaders.appendChild(header);
+  });
+
+  // Build grid row by row (5 rows x 6 cols)
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col < CATEGORIES.length; col++) {
+      const clue = CATEGORIES[col].clues[row];
+      const cell = document.createElement('div');
+      cell.className = 'board-cell';
+      cell.textContent = '$' + clue.value;
+      cell.dataset.col = col;
+      cell.dataset.row = row;
+      cell.dataset.idx = row * CATEGORIES.length + col;
+      cell.addEventListener('click', () => openClue(col, row, cell));
+      boardGrid.appendChild(cell);
+    }
+  }
+}
+
+function openClue(col, row, cell) {
+  if (cell.classList.contains('used')) return;
+  const cat = CATEGORIES[col];
+  const clue = cat.clues[row];
+  currentClue = { col, row, cell, clue, category: cat.name };
+
+  const idx = parseInt(cell.dataset.idx);
+  if (idx === dailyDoublePos) {
+    showDailyDouble();
+    return;
+  }
+  currentWager = clue.value;
+  showClueModal(cat.name, clue);
+}
+
+function showDailyDouble() {
+  dailyDoubleSplash.classList.add('visible');
+  wagerInput.max = Math.max(score, 1000);
+  wagerInput.value = '';
+  setTimeout(() => { wagerForm.classList.add('visible'); wagerInput.focus(); }, 1800);
+}
+
+function lockWager() {
+  let w = parseInt(wagerInput.value) || 0;
+  const maxWager = Math.max(score, 1000);
+  if (w < 0) w = 0;
+  if (w > maxWager) w = maxWager;
+  currentWager = w;
+  dailyDoubleSplash.classList.remove('visible');
+  wagerForm.classList.remove('visible');
+  showClueModal(currentClue.category, currentClue.clue);
+}
+
+function showClueModal(catName, clue) {
+  clueCategory.textContent = catName;
+  clueValue.textContent = '$' + currentWager;
+  clueText.textContent = clue.q;
+  clueResult.className = 'clue-result';
+  clueResult.textContent = '';
+  clueResult.style.display = 'none';
+  answerForm.style.display = 'flex';
+  closeClueBtn.style.display = 'none';
+  answerInput.value = '';
+  timeLeft = 30;
+  clueTimer.textContent = '30s';
+  clueTimer.classList.remove('warning');
+  clueOverlay.classList.add('visible');
+  answerInput.focus();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    clueTimer.textContent = timeLeft + 's';
+    if (timeLeft <= 5) clueTimer.classList.add('warning');
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      handleTimeout();
+    }
+  }, 1000);
+}
+
+function submitAnswer() {
+  clearInterval(timerInterval);
+  const userAnswer = answerInput.value.trim().toLowerCase()
+    .replace(/^(what|who|where|when|why|how)\s+(is|are|was|were|did)\s+/i, '')
+    .replace(/[?.,!]/g, '')
+    .trim();
+  const correct = currentClue.clue.a.some(a => {
+    const accepted = a.toLowerCase();
+    return userAnswer === accepted || userAnswer.includes(accepted) || accepted.includes(userAnswer);
+  });
+
+  if (correct) {
+    score += currentWager;
+    correctCount++;
+    clueResult.className = 'clue-result correct';
+    clueResult.textContent = 'Correct! +$' + currentWager;
+  } else {
+    score -= currentWager;
+    wrongCount++;
+    clueResult.className = 'clue-result incorrect';
+    clueResult.textContent = 'Wrong! The answer was: ' + currentClue.clue.a[0] + ' (-$' + currentWager + ')';
+  }
+  clueResult.style.display = 'block';
+  answerForm.style.display = 'none';
+  clueTimer.textContent = '';
+  closeClueBtn.style.display = 'block';
+  updateScore();
+}
+
+function handleTimeout() {
+  skippedCount++;
+  score -= currentWager;
+  clueResult.className = 'clue-result timeout';
+  clueResult.textContent = "Time's up! The answer was: " + currentClue.clue.a[0] + ' (-$' + currentWager + ')';
+  clueResult.style.display = 'block';
+  answerForm.style.display = 'none';
+  clueTimer.textContent = '';
+  closeClueBtn.style.display = 'block';
+  updateScore();
+}
+
+function closeClue() {
+  clueOverlay.classList.remove('visible');
+  currentClue.cell.classList.add('used');
+  currentClue.cell.textContent = '';
+  answeredCount++;
+  if (answeredCount >= totalClues) {
+    endGame();
+  }
+}
+
+function updateScore() {
+  scoreDisplay.textContent = (score < 0 ? '-$' + Math.abs(score) : '$' + score);
+  scoreDisplay.className = 'score-display' + (score < 0 ? ' negative' : '');
+}
+
+function endGame() {
+  boardContainer.classList.remove('active');
+  gameHeader.style.display = 'none';
+  gameOver.classList.add('active');
+  finalScore.textContent = (score < 0 ? '-$' + Math.abs(score) : '$' + score);
+  finalScore.className = 'final-score' + (score < 0 ? ' negative' : '');
+  statCorrect.textContent = correctCount;
+  statWrong.textContent = wrongCount;
+  statSkipped.textContent = skippedCount;
+}
+</script>
+</body>
+</html>
