@@ -211,6 +211,10 @@
       padding: 24px;
       transition: border-color 0.3s, box-shadow 0.3s;
       overflow: hidden;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 24px;
+      align-items: start;
     }
     .naka-hero-right:hover {
       border-color: rgba(0, 163, 255, 0.3);
@@ -223,30 +227,32 @@
       border: 2px solid rgba(0, 163, 255, 0.2);
       object-fit: cover;
       display: block;
-      margin: 0 auto 18px auto;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 24px rgba(0, 163, 255, 0.1);
       transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      background: rgba(100, 160, 220, 0.15);
     }
     .naka-hero-token-img:hover {
       transform: scale(1.04);
       border-color: rgba(0, 163, 255, 0.5);
       box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 163, 255, 0.15);
     }
+    .naka-hero-token-info {
+      display: flex;
+      flex-direction: column;
+    }
     .naka-hero-token-title {
       font-family: 'Silkscreen', cursive;
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       color: #fff;
-      text-align: center;
       text-shadow: 0 0 12px rgba(0, 163, 255, 0.2);
       margin-bottom: 2px;
     }
     .naka-hero-token-subtitle {
       font-family: 'VT323', monospace;
-      font-size: 0.85rem;
+      font-size: 1rem;
       color: #EB00FF;
       letter-spacing: 2px;
       text-transform: uppercase;
-      text-align: center;
       margin-bottom: 18px;
     }
     .naka-hero-info-details {
@@ -258,21 +264,20 @@
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(0, 163, 255, 0.06);
+      padding: 10px 0;
+      border-top: 1px solid rgba(0, 163, 255, 0.08);
     }
-    .naka-hero-info-row:last-child { border-bottom: none; }
     .naka-hero-info-key {
       font-family: 'VT323', monospace;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #5c608e;
       letter-spacing: 1px;
       text-transform: uppercase;
     }
     .naka-hero-info-val {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #b8bce0;
-      font-weight: 500;
+      font-weight: 600;
       text-align: right;
       word-break: break-all;
     }
@@ -299,6 +304,7 @@
       text-align: center;
     }
     @media (max-width: 700px) {
+      .naka-hero-right { grid-template-columns: 1fr; justify-items: center; }
       .naka-hero-token-img { width: 180px; height: 180px; }
     }
     /* ========================
@@ -422,7 +428,7 @@
     ======================== */
     .naka-games-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
     }
     .naka-game-card {
@@ -435,6 +441,9 @@
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
     }
     .naka-game-card::before {
       content: '';
@@ -726,7 +735,7 @@
     /* ========================
        RESPONSIVE
     ======================== */
-    @media (max-width: 800px) {
+    @media (max-width: 960px) {
       .naka-games-grid { grid-template-columns: 1fr 1fr; }
       .naka-links-section { grid-template-columns: 1fr; gap: 24px; }
       .naka-section-with-char { flex-direction: column; gap: 20px; }
@@ -786,27 +795,29 @@
       <p>The Nakamigos community, the games being built, the MEEGSTR strategy token, the whitepaper, and the lore that ties it all together.</p>
     </div>
     <div class="naka-hero-right" id="token">
-      <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="Nakamigo #17763" class="naka-hero-token-img">
-      <div class="naka-hero-token-title">MEEGSTR</div>
-      <div class="naka-hero-token-subtitle">Strategy Token</div>
-      <div class="naka-hero-info-details">
-        <div class="naka-hero-info-row">
-          <span class="naka-hero-info-key">Chain</span>
-          <span class="naka-hero-info-val">Base (ERC-20)</span>
+      <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b8a47372c6b6ad53b_3648_Adam_Homescreen.png" alt="White Shag Nakamigo" class="naka-hero-token-img">
+      <div class="naka-hero-token-info">
+        <div class="naka-hero-token-title">MEEGSTR</div>
+        <div class="naka-hero-token-subtitle">Strategy Token</div>
+        <div class="naka-hero-info-details">
+          <div class="naka-hero-info-row">
+            <span class="naka-hero-info-key">Chain</span>
+            <span class="naka-hero-info-val">Base (ERC-20)</span>
+          </div>
+          <div class="naka-hero-info-row">
+            <span class="naka-hero-info-key">Contract</span>
+            <span class="naka-hero-info-val"><a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer">0x4f1dE1...14B77</a></span>
+          </div>
+          <div class="naka-hero-info-row">
+            <span class="naka-hero-info-key">Staking</span>
+            <span class="naka-hero-info-val naka-hero-info-val--live">Live</span>
+          </div>
         </div>
-        <div class="naka-hero-info-row">
-          <span class="naka-hero-info-key">Contract</span>
-          <span class="naka-hero-info-val"><a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer">0x4f1dE1...14B77</a></span>
+        <div class="naka-hero-info-actions">
+          <a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Basescan</a>
+          <a href="https://dexscreener.com/base/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Dexscreener</a>
+          <a href="https://nakamigo.ai/wp" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary naka-btn--small">Whitepaper</a>
         </div>
-        <div class="naka-hero-info-row">
-          <span class="naka-hero-info-key">Staking</span>
-          <span class="naka-hero-info-val naka-hero-info-val--live">Live</span>
-        </div>
-      </div>
-      <div class="naka-hero-info-actions">
-        <a href="https://basescan.org/address/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Basescan</a>
-        <a href="https://dexscreener.com/base/0x4f1dE1f444BCAC64364e6BF2f6c0FE09d5614B77" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--ghost naka-btn--small">Dexscreener</a>
-        <a href="https://nakamigo.ai/wp" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary naka-btn--small">Whitepaper</a>
       </div>
     </div>
   </header>
@@ -866,24 +877,20 @@
     <p class="naka-subheading">Community-built games. Pick one and play.</p>
     <div class="naka-games-grid">
       <!-- Bean Wars (Featured) -->
-      <article class="naka-game-card naka-game-card--featured">
+      <a href="https://bean-wars.vercel.app/" target="_blank" rel="noopener noreferrer" class="naka-game-card naka-game-card--featured">
         <img
-          src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/699e759c474f4e9bcd66b9d9_image.jpeg"
-          alt="Bean Wars game poster"
+          src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69bceb92f8bdca06fea24176_cloaksvmigos.png"
+          alt="Bean Wars - Cloaks vs Migos"
           class="naka-game-poster"
         >
         <div class="naka-game-body">
           <span class="naka-badge">FEATURED</span>
           <h3>Bean Wars</h3>
           <p>Cloaks vs Migos battle arena. Choose a side, build your loadout, and survive the bean battlefield.</p>
-          <div class="naka-game-actions">
-            <a href="https://bean-wars.vercel.app/" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary">Play</a>
-            <a href="#" class="naka-btn naka-btn--ghost">How to Play</a>
-          </div>
         </div>
-      </article>
-      <!-- Nakamigo Man (zoomed White Shag as poster) -->
-      <article class="naka-game-card">
+      </a>
+      <!-- Nakamigo Man -->
+      <a href="/games/nakamigoman" class="naka-game-card">
         <img
           src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69ba059a22abeed4bafff2ca_7bc54a1b-2a98-4659-a334-15957ae075ad.png"
           alt="Nakamigo Man"
@@ -892,26 +899,33 @@
         <div class="naka-game-body">
           <h3>Nakamigo Man</h3>
           <p>Retro arcade runner. Collect crypto tokens, dodge enemies, and chase the high score.</p>
-          <div class="naka-game-actions">
-            <a href="/games/nakamigoman" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary">Play</a>
-            <a href="#" class="naka-btn naka-btn--ghost">How to Play</a>
-          </div>
         </div>
-      </article>
+      </a>
       <!-- Nakamigos Jeopardy -->
-      <article class="naka-game-card">
-        <div class="naka-game-poster-placeholder" style="background: linear-gradient(135deg, rgba(0,163,255,0.2), rgba(255,215,0,0.15)); display: flex; align-items: center; justify-content: center; aspect-ratio: 16/9; border-radius: 10px 10px 0 0;">
-          <span style="font-family: 'Silkscreen', cursive; font-size: 1.5rem; color: #FFD700; text-shadow: 0 0 20px rgba(255,215,0,0.4); letter-spacing: 2px;">JEOPARDY!</span>
-        </div>
+      <a href="/games/jeopardy" class="naka-game-card">
+        <img
+          src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69bcef289902cca8e4d66868_7c36fec0-d6e3-4f37-b666-5554b126889e.png"
+          alt="Nakamigos Jeopardy"
+          class="naka-game-poster"
+        >
         <div class="naka-game-body">
           <span class="naka-badge">NEW</span>
           <h3>Nakamigos Jeopardy</h3>
-          <p>Test your knowledge of Nakamigos lore, crypto culture, NFTs, and blockchain history in this trivia game.</p>
-          <div class="naka-game-actions">
-            <a href="/games/jeopardy" target="_blank" rel="noopener noreferrer" class="naka-btn naka-btn--primary">Play</a>
-          </div>
+          <p>Test your knowledge of Nakamigos lore, crypto culture, NFTs, and blockchain history. Single player or multiplayer!</p>
         </div>
-      </article>
+      </a>
+      <!-- Web3 Headbands -->
+      <a href="/games/headbands" class="naka-game-card">
+        <div class="naka-game-poster-placeholder" style="background: linear-gradient(135deg, rgba(235,0,255,0.15), rgba(0,163,255,0.15)); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;">
+          <span style="font-family: 'Silkscreen', cursive; font-size: 1.2rem; color: #EB00FF; text-shadow: 0 0 20px rgba(235,0,255,0.4); letter-spacing: 2px;">WEB3</span>
+          <span style="font-family: 'Silkscreen', cursive; font-size: 1.5rem; color: #00A3FF; text-shadow: 0 0 20px rgba(0,163,255,0.4); letter-spacing: 2px;">HEADBANDS</span>
+        </div>
+        <div class="naka-game-body">
+          <span class="naka-badge">NEW</span>
+          <h3>Web3 Headbands</h3>
+          <p>Hold your phone on your forehead and guess the Web3 term from your friends' clues. Tilt to score!</p>
+        </div>
+      </a>
     </div>
   </section>
   <hr class="naka-divider">
@@ -974,9 +988,6 @@
           <div class="naka-links-col">
             <h3>Community</h3>
             <div class="naka-links-list">
-              <a href="https://nakamigo.ai" target="_blank" rel="noopener noreferrer" class="naka-link-item">
-                Nakamigo.ai <span class="naka-link-label">community hub</span>
-              </a>
               <a href="https://bean-wars.vercel.app/" target="_blank" rel="noopener noreferrer" class="naka-link-item">
                 Cloaks vs Migos <span class="naka-link-label">bean wars</span>
               </a>
@@ -988,6 +999,9 @@
               </a>
               <a href="https://etherscan.io/token/0xd774557b647330c91bf44cfeab205095f7e6c367" target="_blank" rel="noopener noreferrer" class="naka-link-item">
                 NKMGS NFT Contract <span class="naka-link-label">etherscan</span>
+              </a>
+              <a href="https://www.beeple-crap.com" target="_blank" rel="noopener noreferrer" class="naka-link-item">
+                Beeple Artwork <span class="naka-link-label">beeple-crap.com</span>
               </a>
               <a href="https://x.com/beeple" target="_blank" rel="noopener noreferrer" class="naka-link-item">
                 Beeple <span class="naka-link-label">@beeple</span>

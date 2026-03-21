@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WEB3 HEADBANDS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0e1a;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  -webkit-user-select: none; user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-image:
+    linear-gradient(rgba(0,163,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,163,255,.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+.screen.active { display: flex; flex-direction: column; align-items: center; }
+
+/* ---- Hub Link ---- */
+.hub-link {
+  position: fixed; top: 12px; left: 12px; z-index: 100;
+  color: #00a3ff; text-decoration: none; font-family: 'Silkscreen', cursive;
+  font-size: 13px; padding: 6px 12px;
+  border: 1px solid rgba(0,163,255,.3); border-radius: 6px;
+  background: rgba(10,14,26,.8); backdrop-filter: blur(6px);
+  transition: .2s;
+}
+.hub-link:hover { background: rgba(0,163,255,.15); }
+
+/* ---- INTRO ---- */
+#intro { justify-content: center; gap: 20px; padding: 24px; text-align: center; }
+#intro .title { font-family: 'Silkscreen', cursive; font-size: clamp(32px,8vw,56px); color: #FFD700; text-shadow: 0 0 30px rgba(255,215,0,.4); line-height: 1.1; }
+#intro .subtitle { font-family: 'VT323', monospace; font-size: clamp(18px,4vw,26px); color: #ccc; max-width: 500px; margin-top: 4px; }
+#intro .host { margin-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+#intro .host img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #FFD700; object-fit: cover; }
+#intro .host span { font-family: 'VT323', monospace; font-size: 22px; color: #FFD700; }
+.btn {
+  font-family: 'Silkscreen', cursive; font-size: 18px; padding: 14px 36px;
+  border: 2px solid #FFD700; border-radius: 8px; color: #FFD700;
+  background: rgba(255,215,0,.08); cursor: pointer; transition: .2s;
+}
+.btn:hover, .btn:active { background: rgba(255,215,0,.2); transform: scale(1.03); }
+.btn.primary { background: #FFD700; color: #0a0e1a; }
+.btn.primary:hover { background: #ffe44d; }
+
+/* ---- SETUP ---- */
+#setup { justify-content: center; gap: 28px; padding: 24px; text-align: center; }
+#setup h2 { font-family: 'Silkscreen', cursive; font-size: 28px; color: #FFD700; }
+.option-group { display: flex; flex-direction: column; gap: 10px; align-items: center; }
+.option-group label { font-family: 'VT323', monospace; font-size: 22px; color: #00a3ff; }
+.pills { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.pill {
+  font-family: 'VT323', monospace; font-size: 20px; padding: 10px 20px;
+  border: 2px solid rgba(0,163,255,.4); border-radius: 8px; color: #fff;
+  background: rgba(0,163,255,.08); cursor: pointer; transition: .2s;
+}
+.pill.selected { border-color: #FFD700; background: rgba(255,215,0,.15); color: #FFD700; }
+.pill:hover { background: rgba(0,163,255,.18); }
+
+/* ---- GAME ---- */
+#game {
+  justify-content: center; align-items: center; gap: 0;
+  padding: 0; transition: background .3s;
+}
+#game.correct-flash { background: rgba(0,200,80,.35) !important; }
+#game.skip-flash { background: rgba(220,40,40,.35) !important; }
+
+.game-hud {
+  position: absolute; top: 0; left: 0; right: 0;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 20px; font-family: 'VT323', monospace; font-size: 28px;
+}
+.game-hud .timer { color: #FFD700; }
+.game-hud .score { color: #00a3ff; }
+
+.game-word {
+  font-family: 'Silkscreen', cursive; font-size: clamp(32px,9vw,64px);
+  color: #fff; text-align: center; padding: 0 24px;
+  text-shadow: 0 0 20px rgba(0,163,255,.3);
+  max-width: 100%; word-wrap: break-word;
+}
+
+.tilt-hint {
+  position: absolute; bottom: 100px;
+  font-family: 'VT323', monospace; font-size: 18px; color: rgba(255,255,255,.35);
+  text-align: center; padding: 0 20px;
+}
+
+.desktop-buttons {
+  position: absolute; bottom: 20px; left: 0; right: 0;
+  display: flex; justify-content: center; gap: 20px; padding: 0 20px;
+}
+.desktop-buttons button {
+  font-family: 'Silkscreen', cursive; font-size: 16px; padding: 14px 28px;
+  border: none; border-radius: 8px; cursor: pointer; flex: 1; max-width: 200px;
+  transition: .15s;
+}
+.btn-correct { background: #16a34a; color: #fff; }
+.btn-correct:hover { background: #22c55e; }
+.btn-skip { background: #dc2626; color: #fff; }
+.btn-skip:hover { background: #ef4444; }
+
+/* ---- COUNTDOWN ---- */
+#countdown {
+  justify-content: center; align-items: center;
+  font-family: 'Silkscreen', cursive; font-size: 96px; color: #FFD700;
+  text-shadow: 0 0 40px rgba(255,215,0,.5);
+}
+
+/* ---- RESULTS ---- */
+#results { justify-content: flex-start; align-items: center; padding: 32px 20px; gap: 20px; overflow-y: auto; }
+#results h2 { font-family: 'Silkscreen', cursive; font-size: 32px; color: #FFD700; }
+#results .final-score { font-family: 'VT323', monospace; font-size: 48px; color: #00a3ff; }
+.word-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 6px; }
+.word-item {
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: 'VT323', monospace; font-size: 22px;
+  padding: 8px 14px; border-radius: 6px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+}
+.word-item.correct-word { border-color: rgba(0,200,80,.3); color: #4ade80; }
+.word-item.skipped-word { border-color: rgba(220,40,40,.3); color: #f87171; }
+.word-item .icon { font-size: 20px; }
+
+/* landscape nudge */
+@media (orientation: portrait) {
+  .tilt-hint::after {
+    content: ' (Rotate to landscape for best experience!)';
+    color: rgba(255,215,0,.4);
+  }
+}
+</style>
+</head>
+<body>
+
+<a href="/" class="hub-link">&#8592; Back to Hub</a>
+
+<!-- ======== INTRO ======== -->
+<div id="intro" class="screen active">
+  <div class="title">WEB3<br>HEADBANDS</div>
+  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Tilt DOWN for correct, tilt UP to pass!</div>
+  <div class="host">
+    <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b8a47372c6b6ad53b_3648_Adam_Homescreen.png" alt="White Shag">
+    <span>Hosted by White Shag</span>
+  </div>
+  <button class="btn primary" onclick="showScreen('setup')">PLAY</button>
+</div>
+
+<!-- ======== SETUP ======== -->
+<div id="setup" class="screen">
+  <h2>GAME SETUP</h2>
+  <div class="option-group">
+    <label>Round Timer</label>
+    <div class="pills" id="timer-pills">
+      <div class="pill" data-time="30" onclick="selectTimer(this)">30s</div>
+      <div class="pill selected" data-time="60" onclick="selectTimer(this)">60s</div>
+      <div class="pill" data-time="90" onclick="selectTimer(this)">90s</div>
+    </div>
+  </div>
+  <div class="option-group">
+    <label>Category</label>
+    <div class="pills" id="cat-pills">
+      <div class="pill selected" data-cat="all" onclick="selectCat(this)">All Categories</div>
+      <div class="pill" data-cat="nft" onclick="selectCat(this)">NFT Projects</div>
+      <div class="pill" data-cat="defi" onclick="selectCat(this)">DeFi Terms</div>
+      <div class="pill" data-cat="slang" onclick="selectCat(this)">Crypto Slang</div>
+      <div class="pill" data-cat="blockchain" onclick="selectCat(this)">Blockchain Concepts</div>
+      <div class="pill" data-cat="people" onclick="selectCat(this)">Crypto People</div>
+    </div>
+  </div>
+  <button class="btn primary" onclick="startGame()">START</button>
+</div>
+
+<!-- ======== COUNTDOWN ======== -->
+<div id="countdown" class="screen">
+  <div id="countdown-num">3</div>
+</div>
+
+<!-- ======== GAME ======== -->
+<div id="game" class="screen">
+  <div class="game-hud">
+    <div class="timer" id="timer-display">60</div>
+    <div class="score" id="score-display">0</div>
+  </div>
+  <div class="game-word" id="game-word">LOADING...</div>
+  <div class="tilt-hint">Tilt DOWN = Correct &nbsp;|&nbsp; Tilt UP = Pass</div>
+  <div class="desktop-buttons" id="desktop-buttons">
+    <button class="btn-skip" onclick="handleSkip()">PASS</button>
+    <button class="btn-correct" onclick="handleCorrect()">CORRECT</button>
+  </div>
+</div>
+
+<!-- ======== RESULTS ======== -->
+<div id="results" class="screen">
+  <h2>TIME'S UP!</h2>
+  <div class="final-score" id="final-score">0</div>
+  <div class="word-list" id="word-list"></div>
+  <button class="btn primary" onclick="showScreen('setup')">PLAY AGAIN</button>
+</div>
+
+<script>
+// ===================== WORD BANKS =====================
+const WORDS = {
+  nft: [
+    'CryptoPunks','Bored Ape Yacht Club','Azuki','Pudgy Penguins','Doodles',
+    'CloneX','Moonbirds','Nakamigos','Art Blocks','Fidenza','Chromie Squiggle',
+    'World of Women','Cool Cats','VeeFriends','Meebits','Autoglyphs',
+    'Nouns','Loot','DeGods','y00ts','Milady','Checks VV',
+    'Opepen','Cryptoadz','Mutant Ape Yacht Club','Otherdeed','Forgotten Runes',
+    'Invisible Friends','Goblintown','Mfers','Genuine Undead','Crypto Coven',
+    'Beanz','Elementals','Captainz','Kanpai Pandas','Sproto Gremlins',
+    'Sappy Seals','Redacted Remilio','Llamaverse'
+  ],
+  defi: [
+    'Yield Farming','Liquidity Pool','DEX','AMM','Flash Loan',
+    'Impermanent Loss','Staking','Slippage','TVL','Airdrop',
+    'Governance Token','Lending Protocol','Wrapped Token','Vault Strategy','Rug Pull',
+    'Token Swap','Liquidity Mining','Interest Rate Swap','Collateral Ratio','Overcollateralized',
+    'Uniswap','Aave','Compound','MakerDAO','Curve Finance',
+    'Yearn Finance','SushiSwap','Pancakeswap','Balancer','dYdX',
+    'Lido','Convex Finance','Frax','Olympus DAO','Pendle',
+    'EigenLayer','Restaking','Liquid Staking','Automated Market Maker','Leveraged Yield'
+  ],
+  slang: [
+    'HODL','WAGMI','NGMI','Rug Pull','Diamond Hands',
+    'Paper Hands','Ape In','DYOR','NFA','To The Moon',
+    'Whale','Degen','Probably Nothing','Looks Rare','GM',
+    'GN','Fren','Cope','Shill','Alpha',
+    'Based','Rekt','Ser','Anon','No-Coiner',
+    'Bag Holder','Pump and Dump','FUD','Wen Lambo','Floor Price',
+    'Mint','Sweep the Floor','Flip','Gas War','Reveal',
+    'Copium','Up Only','Few Understand','Right Click Save','LFG'
+  ],
+  blockchain: [
+    'Smart Contract','Gas Fee','Merkle Tree','Consensus Mechanism','Mining',
+    'Proof of Stake','Layer 2','Rollup','Bridge','Oracle',
+    'Validator','Node','Block Explorer','Mainnet','Testnet',
+    'Hard Fork','Soft Fork','Sidechain','Sharding','Zero Knowledge Proof',
+    'Solidity','EVM','Nonce','Private Key','Seed Phrase',
+    'Wallet','Cold Storage','Hot Wallet','Multisig','DAO',
+    'Token Standard','ERC-721','ERC-20','IPFS','Metadata',
+    'State Channel','Plasma','Optimistic Rollup','zk-Rollup','Account Abstraction'
+  ],
+  people: [
+    'Satoshi Nakamoto','Vitalik Buterin','CZ','SBF','Do Kwon',
+    'Andre Cronje','Beeple','Gary Vee','Mark Cuban','Jack Dorsey',
+    'Michael Saylor','Punk 6529','Farokh','Gmoney','Pranksy',
+    'Charles Hoskinson','Gavin Wood','Hayden Adams','Stani Kulechov','Robert Leshner',
+    'Brian Armstrong','Anatoly Yakovenko','Sam Williams','Silvio Micali','Justin Sun',
+    'Richard Heart','Daniele Sestagalli','Zeus (Ohm)','Tetranode','Cobie',
+    'ZachXBT','Hsaka','GCR','Arthur Hayes','Su Zhu'
+  ]
+};
+
+// ===================== STATE =====================
+let selectedTime = 60;
+let selectedCat = 'all';
+let gameWords = [];
+let currentIndex = 0;
+let score = 0;
+let results = []; // { word, status: 'correct'|'skipped' }
+let timerInterval = null;
+let timeLeft = 0;
+let tiltActive = false;
+let hasTilt = false;
+let lastAction = 0; // debounce timestamp
+
+// ===================== NAVIGATION =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===================== SETUP =====================
+function selectTimer(el) {
+  document.querySelectorAll('#timer-pills .pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedTime = parseInt(el.dataset.time);
+}
+
+function selectCat(el) {
+  document.querySelectorAll('#cat-pills .pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCat = el.dataset.cat;
+}
+
+// ===================== SHUFFLE =====================
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===================== GAME START =====================
+async function startGame() {
+  // build word pool
+  let pool = [];
+  if (selectedCat === 'all') {
+    Object.values(WORDS).forEach(arr => pool.push(...arr));
+  } else {
+    pool = [...WORDS[selectedCat]];
+  }
+  gameWords = shuffle(pool);
+  currentIndex = 0;
+  score = 0;
+  results = [];
+  timeLeft = selectedTime;
+
+  // request tilt permission on iOS
+  await requestTiltPermission();
+
+  // countdown
+  showScreen('countdown');
+  let c = 3;
+  document.getElementById('countdown-num').textContent = c;
+  await new Promise(resolve => {
+    const ci = setInterval(() => {
+      c--;
+      if (c <= 0) { clearInterval(ci); resolve(); }
+      else document.getElementById('countdown-num').textContent = c;
+    }, 800);
+  });
+
+  // start game
+  showScreen('game');
+  document.getElementById('score-display').textContent = '0';
+  showWord();
+  startTimer();
+  startTilt();
+}
+
+function showWord() {
+  if (currentIndex >= gameWords.length) {
+    // wrap around if we exhaust all words
+    gameWords = shuffle(gameWords);
+    currentIndex = 0;
+  }
+  document.getElementById('game-word').textContent = gameWords[currentIndex];
+}
+
+function startTimer() {
+  document.getElementById('timer-display').textContent = timeLeft;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    document.getElementById('timer-display').textContent = timeLeft;
+    if (timeLeft <= 0) {
+      endGame();
+    }
+  }, 1000);
+}
+
+// ===================== ACTIONS =====================
+function handleCorrect() {
+  if (Date.now() - lastAction < 600) return;
+  lastAction = Date.now();
+  score++;
+  results.push({ word: gameWords[currentIndex], status: 'correct' });
+  document.getElementById('score-display').textContent = score;
+  flashBg('correct-flash');
+  currentIndex++;
+  showWord();
+}
+
+function handleSkip() {
+  if (Date.now() - lastAction < 600) return;
+  lastAction = Date.now();
+  results.push({ word: gameWords[currentIndex], status: 'skipped' });
+  flashBg('skip-flash');
+  currentIndex++;
+  showWord();
+}
+
+function flashBg(cls) {
+  const el = document.getElementById('game');
+  el.classList.add(cls);
+  setTimeout(() => el.classList.remove(cls), 400);
+}
+
+// ===================== TILT =====================
+async function requestTiltPermission() {
+  if (typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function') {
+    try {
+      const perm = await DeviceOrientationEvent.requestPermission();
+      if (perm === 'granted') hasTilt = true;
+    } catch (e) {
+      hasTilt = false;
+    }
+  } else if ('DeviceOrientationEvent' in window) {
+    hasTilt = true;
+  }
+  // Show/hide desktop buttons
+  document.getElementById('desktop-buttons').style.display = hasTilt ? 'none' : 'flex';
+}
+
+function startTilt() {
+  if (!hasTilt) return;
+  tiltActive = true;
+  window.addEventListener('deviceorientation', onTilt);
+}
+
+function stopTilt() {
+  tiltActive = false;
+  window.removeEventListener('deviceorientation', onTilt);
+}
+
+let tiltTriggered = false;
+function onTilt(e) {
+  if (!tiltActive) return;
+  const beta = e.beta; // front-back tilt: -180..180
+  if (beta === null) return;
+
+  // Tilt forward (down) past threshold = correct
+  if (beta > 50 && !tiltTriggered) {
+    tiltTriggered = true;
+    handleCorrect();
+    setTimeout(() => { tiltTriggered = false; }, 800);
+  }
+  // Tilt back (up) past threshold = skip
+  else if (beta < -20 && !tiltTriggered) {
+    tiltTriggered = true;
+    handleSkip();
+    setTimeout(() => { tiltTriggered = false; }, 800);
+  }
+}
+
+// ===================== END GAME =====================
+function endGame() {
+  clearInterval(timerInterval);
+  stopTilt();
+
+  document.getElementById('final-score').textContent = score + ' / ' + results.length;
+  const list = document.getElementById('word-list');
+  list.innerHTML = '';
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'word-item ' + (r.status === 'correct' ? 'correct-word' : 'skipped-word');
+    div.innerHTML = '<span>' + r.word + '</span><span class="icon">' +
+      (r.status === 'correct' ? '&#10003;' : '&#10007;') + '</span>';
+    list.appendChild(div);
+  });
+  showScreen('results');
+}
+
+// ===================== KEEP SCREEN AWAKE =====================
+async function requestWakeLock() {
+  try {
+    if ('wakeLock' in navigator) {
+      await navigator.wakeLock.request('screen');
+    }
+  } catch (e) { /* silent */ }
+}
+requestWakeLock();
+</script>
+</body>
+</html>
