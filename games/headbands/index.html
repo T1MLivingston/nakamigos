@@ -57,9 +57,9 @@ body {
 .btn.primary { background: #FFD700; color: #0a0e1a; }
 .btn.primary:hover { background: #ffe44d; }
 
-/* ---- SETUP ---- */
-#setup { justify-content: center; gap: 28px; padding: 24px; text-align: center; }
-#setup h2 { font-family: 'Silkscreen', cursive; font-size: 28px; color: #FFD700; }
+/* ---- CATEGORY SELECT ---- */
+#category-select { justify-content: center; gap: 28px; padding: 24px; text-align: center; }
+#category-select h2 { font-family: 'Silkscreen', cursive; font-size: 28px; color: #FFD700; }
 .option-group { display: flex; flex-direction: column; gap: 10px; align-items: center; }
 .option-group label { font-family: 'VT323', monospace; font-size: 22px; color: #00a3ff; }
 .pills { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
@@ -85,7 +85,9 @@ body {
   padding: 14px 20px; font-family: 'VT323', monospace; font-size: 28px;
 }
 .game-hud .timer { color: #FFD700; }
-.game-hud .score { color: #00a3ff; }
+.game-hud .score-area { display: flex; gap: 16px; align-items: center; }
+.game-hud .score-correct { color: #4ade80; }
+.game-hud .score-incorrect { color: #f87171; }
 
 .game-word {
   font-family: 'Silkscreen', cursive; font-size: clamp(32px,9vw,64px);
@@ -98,6 +100,12 @@ body {
   position: absolute; bottom: 100px;
   font-family: 'VT323', monospace; font-size: 18px; color: rgba(255,255,255,.35);
   text-align: center; padding: 0 20px;
+}
+
+.tap-hint {
+  position: absolute; bottom: 60px;
+  font-family: 'VT323', monospace; font-size: 16px; color: rgba(255,215,0,.3);
+  text-align: center;
 }
 
 .desktop-buttons {
@@ -152,27 +160,18 @@ body {
 <!-- ======== INTRO ======== -->
 <div id="intro" class="screen active">
   <div class="title">WEB3<br>HEADBANDS</div>
-  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Tilt DOWN for correct, tilt UP to pass!</div>
+  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Tilt DOWN for correct, tilt UP to pass! Tap screen to skip.</div>
   <div class="host">
     <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/69b23b8b8a47372c6b6ad53b_3648_Adam_Homescreen.png" alt="White Shag">
     <span>Hosted by White Shag</span>
   </div>
-  <button class="btn primary" onclick="showScreen('setup')">PLAY</button>
+  <button class="btn primary" onclick="showScreen('category-select')">PLAY</button>
 </div>
 
-<!-- ======== SETUP ======== -->
-<div id="setup" class="screen">
-  <h2>GAME SETUP</h2>
+<!-- ======== CATEGORY SELECT ======== -->
+<div id="category-select" class="screen">
+  <h2>PICK A CATEGORY</h2>
   <div class="option-group">
-    <label>Round Timer</label>
-    <div class="pills" id="timer-pills">
-      <div class="pill" data-time="30" onclick="selectTimer(this)">30s</div>
-      <div class="pill selected" data-time="60" onclick="selectTimer(this)">60s</div>
-      <div class="pill" data-time="90" onclick="selectTimer(this)">90s</div>
-    </div>
-  </div>
-  <div class="option-group">
-    <label>Category</label>
     <div class="pills" id="cat-pills">
       <div class="pill selected" data-cat="all" onclick="selectCat(this)">All Categories</div>
       <div class="pill" data-cat="nft" onclick="selectCat(this)">NFT Projects</div>
@@ -194,10 +193,14 @@ body {
 <div id="game" class="screen">
   <div class="game-hud">
     <div class="timer" id="timer-display">60</div>
-    <div class="score" id="score-display">0</div>
+    <div class="score-area">
+      <div class="score-correct" id="correct-display">&#10003; 0</div>
+      <div class="score-incorrect" id="incorrect-display">&#10007; 0</div>
+    </div>
   </div>
   <div class="game-word" id="game-word">LOADING...</div>
   <div class="tilt-hint">Tilt DOWN = Correct &nbsp;|&nbsp; Tilt UP = Pass</div>
+  <div class="tap-hint">Tap screen to skip</div>
   <div class="desktop-buttons" id="desktop-buttons">
     <button class="btn-skip" onclick="handleSkip()">PASS</button>
     <button class="btn-correct" onclick="handleCorrect()">CORRECT</button>
@@ -209,10 +212,62 @@ body {
   <h2>TIME'S UP!</h2>
   <div class="final-score" id="final-score">0</div>
   <div class="word-list" id="word-list"></div>
-  <button class="btn primary" onclick="showScreen('setup')">PLAY AGAIN</button>
+  <button class="btn primary" onclick="showScreen('category-select')">PLAY AGAIN</button>
 </div>
 
 <script>
+// ===================== SOUND EFFECTS (Web Audio API) =====================
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playCorrectSound() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
+    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.08); // E5
+    osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.16); // G5
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.35);
+  } catch (e) { /* silent */ }
+}
+
+function playSkipSound() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(200, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.25);
+  } catch (e) { /* silent */ }
+}
+
+function playTimesUpSound() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(220, audioCtx.currentTime + 0.5);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + 0.6);
+  } catch (e) { /* silent */ }
+}
+
 // ===================== WORD BANKS =====================
 const WORDS = {
   nft: [
@@ -267,17 +322,19 @@ const WORDS = {
 };
 
 // ===================== STATE =====================
-let selectedTime = 60;
+const GAME_TIME = 60;
 let selectedCat = 'all';
 let gameWords = [];
 let currentIndex = 0;
-let score = 0;
-let results = []; // { word, status: 'correct'|'skipped' }
+let correctCount = 0;
+let incorrectCount = 0;
+let results = [];
 let timerInterval = null;
 let timeLeft = 0;
 let tiltActive = false;
 let hasTilt = false;
-let lastAction = 0; // debounce timestamp
+let lastAction = 0;
+let gameRunning = false;
 
 // ===================== NAVIGATION =====================
 function showScreen(id) {
@@ -286,12 +343,6 @@ function showScreen(id) {
 }
 
 // ===================== SETUP =====================
-function selectTimer(el) {
-  document.querySelectorAll('#timer-pills .pill').forEach(p => p.classList.remove('selected'));
-  el.classList.add('selected');
-  selectedTime = parseInt(el.dataset.time);
-}
-
 function selectCat(el) {
   document.querySelectorAll('#cat-pills .pill').forEach(p => p.classList.remove('selected'));
   el.classList.add('selected');
@@ -310,7 +361,9 @@ function shuffle(arr) {
 
 // ===================== GAME START =====================
 async function startGame() {
-  // build word pool
+  // Resume audio context (needed after user gesture on mobile)
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
   let pool = [];
   if (selectedCat === 'all') {
     Object.values(WORDS).forEach(arr => pool.push(...arr));
@@ -319,11 +372,11 @@ async function startGame() {
   }
   gameWords = shuffle(pool);
   currentIndex = 0;
-  score = 0;
+  correctCount = 0;
+  incorrectCount = 0;
   results = [];
-  timeLeft = selectedTime;
+  timeLeft = GAME_TIME;
 
-  // request tilt permission on iOS
   await requestTiltPermission();
 
   // countdown
@@ -340,7 +393,8 @@ async function startGame() {
 
   // start game
   showScreen('game');
-  document.getElementById('score-display').textContent = '0';
+  gameRunning = true;
+  updateScoreDisplay();
   showWord();
   startTimer();
   startTilt();
@@ -348,11 +402,15 @@ async function startGame() {
 
 function showWord() {
   if (currentIndex >= gameWords.length) {
-    // wrap around if we exhaust all words
     gameWords = shuffle(gameWords);
     currentIndex = 0;
   }
   document.getElementById('game-word').textContent = gameWords[currentIndex];
+}
+
+function updateScoreDisplay() {
+  document.getElementById('correct-display').innerHTML = '&#10003; ' + correctCount;
+  document.getElementById('incorrect-display').innerHTML = '&#10007; ' + incorrectCount;
 }
 
 function startTimer() {
@@ -367,22 +425,30 @@ function startTimer() {
 }
 
 // ===================== ACTIONS =====================
+const ACTION_COOLDOWN = 1200; // 1.2s cooldown to prevent rapid jumping
+
 function handleCorrect() {
-  if (Date.now() - lastAction < 600) return;
+  if (!gameRunning) return;
+  if (Date.now() - lastAction < ACTION_COOLDOWN) return;
   lastAction = Date.now();
-  score++;
+  correctCount++;
   results.push({ word: gameWords[currentIndex], status: 'correct' });
-  document.getElementById('score-display').textContent = score;
+  updateScoreDisplay();
   flashBg('correct-flash');
+  playCorrectSound();
   currentIndex++;
   showWord();
 }
 
 function handleSkip() {
-  if (Date.now() - lastAction < 600) return;
+  if (!gameRunning) return;
+  if (Date.now() - lastAction < ACTION_COOLDOWN) return;
   lastAction = Date.now();
+  incorrectCount++;
   results.push({ word: gameWords[currentIndex], status: 'skipped' });
+  updateScoreDisplay();
   flashBg('skip-flash');
+  playSkipSound();
   currentIndex++;
   showWord();
 }
@@ -390,8 +456,19 @@ function handleSkip() {
 function flashBg(cls) {
   const el = document.getElementById('game');
   el.classList.add(cls);
-  setTimeout(() => el.classList.remove(cls), 400);
+  setTimeout(() => el.classList.remove(cls), 500);
 }
+
+// ===================== TAP TO SKIP =====================
+document.addEventListener('DOMContentLoaded', () => {
+  const gameEl = document.getElementById('game');
+  gameEl.addEventListener('click', (e) => {
+    // Don't trigger on desktop button clicks
+    if (e.target.closest('.desktop-buttons') || e.target.closest('.hub-link')) return;
+    if (!gameRunning) return;
+    handleSkip();
+  });
+});
 
 // ===================== TILT =====================
 async function requestTiltPermission() {
@@ -406,7 +483,6 @@ async function requestTiltPermission() {
   } else if ('DeviceOrientationEvent' in window) {
     hasTilt = true;
   }
-  // Show/hide desktop buttons
   document.getElementById('desktop-buttons').style.display = hasTilt ? 'none' : 'flex';
 }
 
@@ -423,21 +499,21 @@ function stopTilt() {
 
 let tiltTriggered = false;
 function onTilt(e) {
-  if (!tiltActive) return;
+  if (!tiltActive || !gameRunning) return;
   const beta = e.beta; // front-back tilt: -180..180
   if (beta === null) return;
 
-  // Tilt forward (down) past threshold = correct
-  if (beta > 50 && !tiltTriggered) {
+  // Require a more significant tilt (65 degrees down, -35 degrees up)
+  if (beta > 65 && !tiltTriggered) {
     tiltTriggered = true;
     handleCorrect();
-    setTimeout(() => { tiltTriggered = false; }, 800);
+    // Long cooldown before tilt can trigger again - gives time to reset position
+    setTimeout(() => { tiltTriggered = false; }, 1500);
   }
-  // Tilt back (up) past threshold = skip
-  else if (beta < -20 && !tiltTriggered) {
+  else if (beta < -35 && !tiltTriggered) {
     tiltTriggered = true;
     handleSkip();
-    setTimeout(() => { tiltTriggered = false; }, 800);
+    setTimeout(() => { tiltTriggered = false; }, 1500);
   }
 }
 
@@ -445,8 +521,10 @@ function onTilt(e) {
 function endGame() {
   clearInterval(timerInterval);
   stopTilt();
+  gameRunning = false;
+  playTimesUpSound();
 
-  document.getElementById('final-score').textContent = score + ' / ' + results.length;
+  document.getElementById('final-score').textContent = correctCount + ' correct / ' + (correctCount + incorrectCount) + ' total';
   const list = document.getElementById('word-list');
   list.innerHTML = '';
   results.forEach(r => {
