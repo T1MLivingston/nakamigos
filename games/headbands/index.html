@@ -2,8 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>WEB3 HEADBANDS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0e1a">
+<title>NakaNoggin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Silkscreen:wght@400;700&family=VT323&display=swap" rel="stylesheet">
@@ -18,6 +22,8 @@ html, body {
   font-family: 'Inter', sans-serif;
   -webkit-user-select: none; user-select: none;
   -webkit-tap-highlight-color: transparent;
+  /* Cover safe areas on notched phones */
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 body {
@@ -83,44 +89,61 @@ body {
   position: absolute; top: 0; left: 0; right: 0;
   display: flex; justify-content: space-between; align-items: center;
   padding: 14px 20px; font-family: 'VT323', monospace; font-size: 28px;
+  z-index: 10;
 }
 .game-hud .timer { color: #FFD700; }
 .game-hud .score-area { display: flex; gap: 16px; align-items: center; }
 .game-hud .score-correct { color: #4ade80; }
 .game-hud .score-incorrect { color: #f87171; }
 
+/* ---- TOUCH ZONES (left = skip, right = correct) ---- */
+.game-touch-zones {
+  position: absolute; inset: 0;
+  display: flex;
+  z-index: 1;
+}
+.touch-zone {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.touch-zone-left {
+  border-right: 1px solid rgba(255,255,255,.06);
+}
+.touch-zone-right {
+  border-left: 1px solid rgba(255,255,255,.06);
+}
+.touch-zone-label {
+  position: absolute;
+  bottom: 24px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  color: rgba(255,255,255,.2);
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+.touch-zone-left .touch-zone-label { color: rgba(248,113,113,.25); }
+.touch-zone-right .touch-zone-label { color: rgba(74,222,128,.25); }
+
 .game-word {
-  font-family: 'Silkscreen', cursive; font-size: clamp(32px,9vw,64px);
-  color: #fff; text-align: center; padding: 0 24px;
-  text-shadow: 0 0 20px rgba(0,163,255,.3);
+  font-family: 'Silkscreen', cursive;
+  font-size: clamp(40px, 12vw, 80px);
+  color: #fff; text-align: center;
+  padding: 0 32px;
+  text-shadow: 0 0 24px rgba(0,163,255,.3);
   max-width: 100%; word-wrap: break-word;
+  position: relative; z-index: 5;
+  pointer-events: none;
 }
 
 .tilt-hint {
-  position: absolute; bottom: 100px;
-  font-family: 'VT323', monospace; font-size: 18px; color: rgba(255,255,255,.35);
-  text-align: center; padding: 0 20px;
-}
-
-.tap-hint {
   position: absolute; bottom: 60px;
-  font-family: 'VT323', monospace; font-size: 16px; color: rgba(255,215,0,.3);
-  text-align: center;
+  font-family: 'VT323', monospace; font-size: 18px; color: rgba(255,255,255,.25);
+  text-align: center; padding: 0 20px;
+  z-index: 10; pointer-events: none;
 }
-
-.desktop-buttons {
-  position: absolute; bottom: 20px; left: 0; right: 0;
-  display: flex; justify-content: center; gap: 20px; padding: 0 20px;
-}
-.desktop-buttons button {
-  font-family: 'Silkscreen', cursive; font-size: 16px; padding: 14px 28px;
-  border: none; border-radius: 8px; cursor: pointer; flex: 1; max-width: 200px;
-  transition: .15s;
-}
-.btn-correct { background: #16a34a; color: #fff; }
-.btn-correct:hover { background: #22c55e; }
-.btn-skip { background: #dc2626; color: #fff; }
-.btn-skip:hover { background: #ef4444; }
 
 /* ---- COUNTDOWN ---- */
 #countdown {
@@ -143,14 +166,6 @@ body {
 .word-item.correct-word { border-color: rgba(0,200,80,.3); color: #4ade80; }
 .word-item.skipped-word { border-color: rgba(220,40,40,.3); color: #f87171; }
 .word-item .icon { font-size: 20px; }
-
-/* landscape nudge */
-@media (orientation: portrait) {
-  .tilt-hint::after {
-    content: ' (Rotate to landscape for best experience!)';
-    color: rgba(255,215,0,.4);
-  }
-}
 </style>
 </head>
 <body>
@@ -159,8 +174,8 @@ body {
 
 <!-- ======== INTRO ======== -->
 <div id="intro" class="screen active">
-  <div class="title">WEB3<br>HEADBANDS</div>
-  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Tilt DOWN for correct, tilt UP to pass! Tap screen to skip.</div>
+  <div class="title">NAKA<br>NOGGIN</div>
+  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Flip UP = correct, flip DOWN = pass. Or tap left/right. Double-tap to skip!</div>
   <div class="host">
     <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="White Shag">
     <span>Hosted by White Shag</span>
@@ -198,13 +213,16 @@ body {
       <div class="score-incorrect" id="incorrect-display">&#10007; 0</div>
     </div>
   </div>
-  <div class="game-word" id="game-word">LOADING...</div>
-  <div class="tilt-hint">Tilt DOWN = Correct &nbsp;|&nbsp; Tilt UP = Pass</div>
-  <div class="tap-hint">Tap screen to skip</div>
-  <div class="desktop-buttons" id="desktop-buttons">
-    <button class="btn-skip" onclick="handleSkip()">PASS</button>
-    <button class="btn-correct" onclick="handleCorrect()">CORRECT</button>
+  <div class="game-touch-zones">
+    <div class="touch-zone touch-zone-left" id="zone-left">
+      <span class="touch-zone-label">PASS</span>
+    </div>
+    <div class="touch-zone touch-zone-right" id="zone-right">
+      <span class="touch-zone-label">CORRECT</span>
+    </div>
   </div>
+  <div class="game-word" id="game-word">LOADING...</div>
+  <div class="tilt-hint">Flip UP = Correct &nbsp;|&nbsp; Flip DOWN = Pass &nbsp;|&nbsp; Double-tap = Skip</div>
 </div>
 
 <!-- ======== RESULTS ======== -->
@@ -216,6 +234,15 @@ body {
 </div>
 
 <script>
+// ===================== FULLSCREEN =====================
+function goFullscreen() {
+  const el = document.documentElement;
+  const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+  if (rfs) {
+    rfs.call(el).catch(() => {});
+  }
+}
+
 // ===================== SOUND EFFECTS (Web Audio API) =====================
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -226,9 +253,9 @@ function playCorrectSound() {
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(523, audioCtx.currentTime); // C5
-    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.08); // E5
-    osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.16); // G5
+    osc.frequency.setValueAtTime(523, audioCtx.currentTime);
+    osc.frequency.setValueAtTime(659, audioCtx.currentTime + 0.08);
+    osc.frequency.setValueAtTime(784, audioCtx.currentTime + 0.16);
     gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
     osc.start(audioCtx.currentTime);
@@ -361,8 +388,8 @@ function shuffle(arr) {
 
 // ===================== GAME START =====================
 async function startGame() {
-  // Resume audio context (needed after user gesture on mobile)
   if (audioCtx.state === 'suspended') audioCtx.resume();
+  goFullscreen();
 
   let pool = [];
   if (selectedCat === 'all') {
@@ -425,7 +452,7 @@ function startTimer() {
 }
 
 // ===================== ACTIONS =====================
-const ACTION_COOLDOWN = 1200; // 1.2s cooldown to prevent rapid jumping
+const ACTION_COOLDOWN = 1200;
 
 function handleCorrect() {
   if (!gameRunning) return;
@@ -459,15 +486,50 @@ function flashBg(cls) {
   setTimeout(() => el.classList.remove(cls), 500);
 }
 
-// ===================== TAP TO SKIP =====================
+// ===================== TOUCH ZONES + DOUBLE-TAP SKIP =====================
 document.addEventListener('DOMContentLoaded', () => {
-  const gameEl = document.getElementById('game');
-  gameEl.addEventListener('click', (e) => {
-    // Don't trigger on desktop button clicks
-    if (e.target.closest('.desktop-buttons') || e.target.closest('.hub-link')) return;
+  const zoneLeft = document.getElementById('zone-left');
+  const zoneRight = document.getElementById('zone-right');
+
+  let lastTapTime = 0;
+  const DOUBLE_TAP_MS = 400;
+
+  function handleTap(zone) {
     if (!gameRunning) return;
-    handleSkip();
+    const now = Date.now();
+    if (now - lastTapTime < DOUBLE_TAP_MS) {
+      // Double-tap = skip (pass without penalty, just move on)
+      lastTapTime = 0;
+      handleSkip();
+      return;
+    }
+    lastTapTime = now;
+
+    // Single tap with slight delay to check for double
+    setTimeout(() => {
+      if (lastTapTime === 0) return; // was consumed by double-tap
+      if (Date.now() - lastTapTime < DOUBLE_TAP_MS) return; // still waiting
+      if (zone === 'left') {
+        handleSkip();
+      } else {
+        handleCorrect();
+      }
+    }, DOUBLE_TAP_MS + 10);
+  }
+
+  zoneLeft.addEventListener('click', (e) => {
+    e.preventDefault();
+    handleTap('left');
   });
+  zoneRight.addEventListener('click', (e) => {
+    e.preventDefault();
+    handleTap('right');
+  });
+
+  // Prevent pull-to-refresh and bounce scrolling during game
+  document.addEventListener('touchmove', (e) => {
+    if (gameRunning) e.preventDefault();
+  }, { passive: false });
 });
 
 // ===================== TILT =====================
@@ -483,7 +545,6 @@ async function requestTiltPermission() {
   } else if ('DeviceOrientationEvent' in window) {
     hasTilt = true;
   }
-  document.getElementById('desktop-buttons').style.display = hasTilt ? 'none' : 'flex';
 }
 
 function startTilt() {
@@ -497,19 +558,22 @@ function stopTilt() {
   window.removeEventListener('deviceorientation', onTilt);
 }
 
+// Phone is on forehead in landscape-ish position, screen facing away.
+// "Flip up" (nod forward, tilt screen toward ceiling) = correct
+// "Flip down" (tilt screen toward floor) = pass/wrong
 let tiltTriggered = false;
 function onTilt(e) {
   if (!tiltActive || !gameRunning) return;
-  const beta = e.beta; // front-back tilt: -180..180
+  const beta = e.beta;
   if (beta === null) return;
 
-  // Require a more significant tilt (65 degrees down, -35 degrees up)
+  // Flip UP (tilt forward/up past 65°) = CORRECT
   if (beta > 65 && !tiltTriggered) {
     tiltTriggered = true;
     handleCorrect();
-    // Long cooldown before tilt can trigger again - gives time to reset position
     setTimeout(() => { tiltTriggered = false; }, 1500);
   }
+  // Flip DOWN (tilt back past -35°) = PASS
   else if (beta < -35 && !tiltTriggered) {
     tiltTriggered = true;
     handleSkip();
@@ -523,6 +587,11 @@ function endGame() {
   stopTilt();
   gameRunning = false;
   playTimesUpSound();
+
+  // Exit fullscreen
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  }
 
   document.getElementById('final-score').textContent = correctCount + ' correct / ' + (correctCount + incorrectCount) + ' total';
   const list = document.getElementById('word-list');
