@@ -598,54 +598,88 @@ async function requestTiltPermission() {
 }
 
 let tiltTriggered = false;
-let baselineBeta = null;
+let baselineGravity = null;
 let calibrationSamples = [];
 
 function startTilt() {
   if (!hasTilt) return;
   tiltActive = true;
-  baselineBeta = null;
+  baselineGravity = null;
   calibrationSamples = [];
+  // Use devicemotion for raw accelerometer - works in any orientation
+  window.addEventListener('devicemotion', onMotion);
+  // Fallback to deviceorientation
   window.addEventListener('deviceorientation', onTilt);
 }
 
 function stopTilt() {
   tiltActive = false;
+  window.removeEventListener('devicemotion', onMotion);
   window.removeEventListener('deviceorientation', onTilt);
 }
 
-function onTilt(e) {
+// PRIMARY: Use accelerometer gravity (works regardless of screen orientation)
+// accelerationIncludingGravity gives us the gravity vector
+// Phone on forehead, screen out: gravity pulls mostly on Z axis
+// Tilt forward (nod down): Y gravity becomes more negative (gravity pulls down through top of phone)
+// Tilt backward (look up): Y gravity becomes more positive
+function onMotion(e) {
   if (!tiltActive || !gameRunning) return;
-  const beta = e.beta;   // -180 to 180, front-back tilt
-  const gamma = e.gamma;  // -90 to 90, left-right tilt
-  if (beta === null) return;
+  const ag = e.accelerationIncludingGravity;
+  if (!ag || ag.x === null) return;
 
-  // Use whichever axis has more range based on orientation
-  // In portrait: beta is front-back. In landscape: gamma is front-back.
-  const isLandscape = window.innerWidth > window.innerHeight;
-  let tiltValue = isLandscape ? gamma : beta;
-  if (tiltValue === null) tiltValue = beta;
+  // We care about the tilt angle. Use atan2 of y vs z to get the forward/back angle.
+  // This works regardless of landscape/portrait because we're using raw sensor data.
+  const angle = Math.atan2(ag.y, ag.z) * (180 / Math.PI);
 
-  // Calibrate: capture baseline during first 0.5s (phone held on forehead)
-  if (baselineBeta === null) {
-    calibrationSamples.push(tiltValue);
-    if (calibrationSamples.length >= 10) {
-      baselineBeta = calibrationSamples.reduce((a, b) => a + b, 0) / calibrationSamples.length;
+  // Calibrate baseline
+  if (baselineGravity === null) {
+    calibrationSamples.push(angle);
+    if (calibrationSamples.length >= 8) {
+      baselineGravity = calibrationSamples.reduce((a, b) => a + b, 0) / calibrationSamples.length;
     }
     return;
   }
 
-  const delta = tiltValue - baselineBeta;
-  const THRESHOLD = 30; // degrees of tilt from baseline needed to trigger
+  let delta = angle - baselineGravity;
+  // Normalize delta to -180..180
+  if (delta > 180) delta -= 360;
+  if (delta < -180) delta += 360;
 
-  // Tilt forward (positive delta from baseline) = CORRECT
+  const THRESHOLD = 25; // degrees from baseline
+
+  // Tilt forward (nod down) = CORRECT
   if (delta > THRESHOLD && !tiltTriggered) {
     tiltTriggered = true;
     handleCorrect();
     setTimeout(() => { tiltTriggered = false; }, 1500);
   }
-  // Tilt backward (negative delta from baseline) = PASS
+  // Tilt backward (look up) = PASS/INCORRECT
   else if (delta < -THRESHOLD && !tiltTriggered) {
+    tiltTriggered = true;
+    handleSkip();
+    setTimeout(() => { tiltTriggered = false; }, 1500);
+  }
+}
+
+// FALLBACK: deviceorientation (in case devicemotion doesn't fire)
+function onTilt(e) {
+  // If devicemotion is working (has baseline), skip this fallback
+  if (baselineGravity !== null) return;
+  if (!tiltActive || !gameRunning) return;
+  const beta = e.beta;
+  if (beta === null) return;
+
+  // Simple absolute thresholds as fallback
+  // Phone on forehead in portrait: beta ~90 at rest
+  // Tilt forward: beta > 120
+  // Tilt backward: beta < 60
+  if (beta > 120 && !tiltTriggered) {
+    tiltTriggered = true;
+    handleCorrect();
+    setTimeout(() => { tiltTriggered = false; }, 1500);
+  }
+  else if (beta < 60 && beta > -30 && !tiltTriggered) {
     tiltTriggered = true;
     handleSkip();
     setTimeout(() => { tiltTriggered = false; }, 1500);
