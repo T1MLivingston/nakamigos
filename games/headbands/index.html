@@ -16,24 +16,23 @@
 
 html, body {
   width: 100%; height: 100%;
-  overflow: hidden;
   background: #0a0e1a;
   color: #fff;
   font-family: 'Inter', sans-serif;
   -webkit-user-select: none; user-select: none;
   -webkit-tap-highlight-color: transparent;
-  /* Cover safe areas on notched phones */
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 body {
+  overflow-y: auto;
+  overflow-x: hidden;
   background-image:
     linear-gradient(rgba(0,163,255,.04) 1px, transparent 1px),
     linear-gradient(90deg, rgba(0,163,255,.04) 1px, transparent 1px);
   background-size: 40px 40px;
 }
 
-.screen { display: none; width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
+.screen { display: none; width: 100%; min-height: 100%; }
 .screen.active { display: flex; flex-direction: column; align-items: center; }
 
 /* ---- Hub Link ---- */
@@ -48,12 +47,17 @@ body {
 .hub-link:hover { background: rgba(0,163,255,.15); }
 
 /* ---- INTRO ---- */
-#intro { justify-content: center; gap: 20px; padding: 24px; text-align: center; }
-#intro .title { font-family: 'Silkscreen', cursive; font-size: clamp(32px,8vw,56px); color: #FFD700; text-shadow: 0 0 30px rgba(255,215,0,.4); line-height: 1.1; }
-#intro .subtitle { font-family: 'VT323', monospace; font-size: clamp(18px,4vw,26px); color: #ccc; max-width: 500px; margin-top: 4px; }
-#intro .host { margin-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
-#intro .host img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #FFD700; object-fit: cover; }
-#intro .host span { font-family: 'VT323', monospace; font-size: 22px; color: #FFD700; }
+#intro { justify-content: center; gap: 16px; padding: 24px; text-align: center; min-height: 100vh; }
+#intro .title { font-family: 'Silkscreen', cursive; font-size: clamp(28px,7vw,48px); color: #FFD700; text-shadow: 0 0 30px rgba(255,215,0,.4); line-height: 1.1; }
+#intro .subtitle { font-family: 'VT323', monospace; font-size: clamp(16px,3.5vw,22px); color: #ccc; max-width: 460px; margin-top: 4px; line-height: 1.4; }
+#intro .hero-row {
+  display: flex; align-items: center; justify-content: center; gap: 16px;
+  margin-top: 10px;
+}
+#intro .hero-row img {
+  width: 80px; height: 80px; border-radius: 50%;
+  border: 3px solid #FFD700; object-fit: cover; flex-shrink: 0;
+}
 .btn {
   font-family: 'Silkscreen', cursive; font-size: 18px; padding: 14px 36px;
   border: 2px solid #FFD700; border-radius: 8px; color: #FFD700;
@@ -64,31 +68,52 @@ body {
 .btn.primary:hover { background: #ffe44d; }
 
 /* ---- CATEGORY SELECT ---- */
-#category-select { justify-content: center; gap: 28px; padding: 24px; text-align: center; }
-#category-select h2 { font-family: 'Silkscreen', cursive; font-size: 28px; color: #FFD700; }
-.option-group { display: flex; flex-direction: column; gap: 10px; align-items: center; }
-.option-group label { font-family: 'VT323', monospace; font-size: 22px; color: #00a3ff; }
-.pills { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+#category-select { justify-content: center; gap: 24px; padding: 24px; text-align: center; min-height: 100vh; }
+#category-select h2 { font-family: 'Silkscreen', cursive; font-size: 24px; color: #FFD700; }
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 360px;
+  width: 100%;
+}
 .pill {
-  font-family: 'VT323', monospace; font-size: 20px; padding: 10px 20px;
+  font-family: 'VT323', monospace; font-size: 18px; padding: 12px 8px;
   border: 2px solid rgba(0,163,255,.4); border-radius: 8px; color: #fff;
   background: rgba(0,163,255,.08); cursor: pointer; transition: .2s;
+  text-align: center;
 }
 .pill.selected { border-color: #FFD700; background: rgba(255,215,0,.15); color: #FFD700; }
 .pill:hover { background: rgba(0,163,255,.18); }
 
-/* ---- GAME ---- */
+/* ---- GAME (fullscreen, forced landscape via CSS) ---- */
 #game {
+  position: fixed; inset: 0; z-index: 200;
   justify-content: center; align-items: center; gap: 0;
   padding: 0; transition: background .3s;
+  background: #0a0e1a;
 }
 #game.correct-flash { background: rgba(0,200,80,.35) !important; }
 #game.skip-flash { background: rgba(220,40,40,.35) !important; }
 
+/* Force landscape rotation when in portrait */
+@media (orientation: portrait) {
+  #game.active {
+    transform: rotate(90deg);
+    transform-origin: center center;
+    width: 100vh;
+    height: 100vw;
+    position: fixed;
+    top: 50%; left: 50%;
+    margin-top: calc(-50vw);
+    margin-left: calc(-50vh);
+  }
+}
+
 .game-hud {
   position: absolute; top: 0; left: 0; right: 0;
   display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 20px; font-family: 'VT323', monospace; font-size: 28px;
+  padding: 10px 20px; font-family: 'VT323', monospace; font-size: 28px;
   z-index: 10;
 }
 .game-hud .timer { color: #FFD700; }
@@ -96,7 +121,7 @@ body {
 .game-hud .score-correct { color: #4ade80; }
 .game-hud .score-incorrect { color: #f87171; }
 
-/* ---- TOUCH ZONES (left = skip, right = correct) ---- */
+/* ---- TOUCH ZONES ---- */
 .game-touch-zones {
   position: absolute; inset: 0;
   display: flex;
@@ -104,56 +129,54 @@ body {
 }
 .touch-zone {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   cursor: pointer;
+  position: relative;
 }
-.touch-zone-left {
-  border-right: 1px solid rgba(255,255,255,.06);
-}
-.touch-zone-right {
-  border-left: 1px solid rgba(255,255,255,.06);
-}
+.touch-zone-left { border-right: 2px solid rgba(255,255,255,.08); }
+.touch-zone-right { border-left: 2px solid rgba(255,255,255,.08); }
 .touch-zone-label {
-  position: absolute;
-  bottom: 24px;
-  font-family: 'VT323', monospace;
-  font-size: 18px;
-  color: rgba(255,255,255,.2);
-  letter-spacing: 1px;
-  pointer-events: none;
+  position: absolute; bottom: 20px;
+  font-family: 'VT323', monospace; font-size: 20px;
+  letter-spacing: 2px; pointer-events: none;
 }
-.touch-zone-left .touch-zone-label { color: rgba(248,113,113,.25); }
-.touch-zone-right .touch-zone-label { color: rgba(74,222,128,.25); }
+.touch-zone-left .touch-zone-label { color: rgba(248,113,113,.3); }
+.touch-zone-right .touch-zone-label { color: rgba(74,222,128,.3); }
 
 .game-word {
   font-family: 'Silkscreen', cursive;
-  font-size: clamp(40px, 12vw, 80px);
+  font-size: clamp(44px, 14vw, 90px);
   color: #fff; text-align: center;
-  padding: 0 32px;
-  text-shadow: 0 0 24px rgba(0,163,255,.3);
+  padding: 0 40px;
+  text-shadow: 0 0 30px rgba(0,163,255,.35);
   max-width: 100%; word-wrap: break-word;
   position: relative; z-index: 5;
   pointer-events: none;
+  line-height: 1.2;
 }
 
 .tilt-hint {
-  position: absolute; bottom: 60px;
-  font-family: 'VT323', monospace; font-size: 18px; color: rgba(255,255,255,.25);
+  position: absolute; bottom: 50px;
+  font-family: 'VT323', monospace; font-size: 16px; color: rgba(255,255,255,.2);
   text-align: center; padding: 0 20px;
   z-index: 10; pointer-events: none;
 }
 
 /* ---- COUNTDOWN ---- */
 #countdown {
+  position: fixed; inset: 0; z-index: 200;
   justify-content: center; align-items: center;
   font-family: 'Silkscreen', cursive; font-size: 96px; color: #FFD700;
   text-shadow: 0 0 40px rgba(255,215,0,.5);
+  background: #0a0e1a;
 }
 
 /* ---- RESULTS ---- */
-#results { justify-content: flex-start; align-items: center; padding: 32px 20px; gap: 20px; overflow-y: auto; }
+#results {
+  justify-content: flex-start; align-items: center;
+  padding: 32px 20px; gap: 20px;
+  min-height: 100vh;
+}
 #results h2 { font-family: 'Silkscreen', cursive; font-size: 32px; color: #FFD700; }
 #results .final-score { font-family: 'VT323', monospace; font-size: 48px; color: #00a3ff; }
 .word-list { width: 100%; max-width: 400px; display: flex; flex-direction: column; gap: 6px; }
@@ -175,26 +198,23 @@ body {
 <!-- ======== INTRO ======== -->
 <div id="intro" class="screen active">
   <div class="title">NAKA<br>NOGGIN</div>
-  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Flip UP = correct, flip DOWN = pass. Or tap left/right. Double-tap to skip!</div>
-  <div class="host">
+  <div class="subtitle">Hold the phone on your forehead. Friends give clues. Tilt forward = correct, tilt back = pass. Tap left/right or double-tap to skip!</div>
+  <div class="hero-row">
     <img src="https://cdn.prod.website-files.com/64aa957da446d8dc44869f81/694e9a4fbdd7184b657c0f77_n_17763%20Small.jpeg" alt="White Shag">
-    <span>Hosted by White Shag</span>
+    <button class="btn primary" onclick="showScreen('category-select')">PLAY</button>
   </div>
-  <button class="btn primary" onclick="showScreen('category-select')">PLAY</button>
 </div>
 
 <!-- ======== CATEGORY SELECT ======== -->
 <div id="category-select" class="screen">
   <h2>PICK A CATEGORY</h2>
-  <div class="option-group">
-    <div class="pills" id="cat-pills">
-      <div class="pill selected" data-cat="all" onclick="selectCat(this)">All Categories</div>
-      <div class="pill" data-cat="nft" onclick="selectCat(this)">NFT Projects</div>
-      <div class="pill" data-cat="defi" onclick="selectCat(this)">DeFi Terms</div>
-      <div class="pill" data-cat="slang" onclick="selectCat(this)">Crypto Slang</div>
-      <div class="pill" data-cat="blockchain" onclick="selectCat(this)">Blockchain Concepts</div>
-      <div class="pill" data-cat="people" onclick="selectCat(this)">Crypto People</div>
-    </div>
+  <div class="cat-grid" id="cat-pills">
+    <div class="pill selected" data-cat="all" onclick="selectCat(this)">All</div>
+    <div class="pill" data-cat="nft" onclick="selectCat(this)">NFTs</div>
+    <div class="pill" data-cat="defi" onclick="selectCat(this)">DeFi</div>
+    <div class="pill" data-cat="slang" onclick="selectCat(this)">Slang</div>
+    <div class="pill" data-cat="blockchain" onclick="selectCat(this)">Blockchain</div>
+    <div class="pill" data-cat="people" onclick="selectCat(this)">People</div>
   </div>
   <button class="btn primary" onclick="startGame()">START</button>
 </div>
@@ -222,7 +242,7 @@ body {
     </div>
   </div>
   <div class="game-word" id="game-word">LOADING...</div>
-  <div class="tilt-hint">Flip UP = Correct &nbsp;|&nbsp; Flip DOWN = Pass &nbsp;|&nbsp; Double-tap = Skip</div>
+  <div class="tilt-hint">Tilt forward = Correct &nbsp;|&nbsp; Tilt back = Pass</div>
 </div>
 
 <!-- ======== RESULTS ======== -->
@@ -234,12 +254,26 @@ body {
 </div>
 
 <script>
-// ===================== FULLSCREEN =====================
+// ===================== FULLSCREEN + ORIENTATION LOCK =====================
 function goFullscreen() {
   const el = document.documentElement;
   const rfs = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
   if (rfs) {
-    rfs.call(el).catch(() => {});
+    rfs.call(el).then(() => {
+      // Try to lock to landscape after entering fullscreen
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+      }
+    }).catch(() => {});
+  }
+}
+
+function exitFullscreen() {
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
+  }
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    (document.exitFullscreen || document.webkitExitFullscreen).call(document).catch(() => {});
   }
 }
 
@@ -260,7 +294,7 @@ function playCorrectSound() {
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.35);
     osc.start(audioCtx.currentTime);
     osc.stop(audioCtx.currentTime + 0.35);
-  } catch (e) { /* silent */ }
+  } catch (e) {}
 }
 
 function playSkipSound() {
@@ -276,7 +310,7 @@ function playSkipSound() {
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
     osc.start(audioCtx.currentTime);
     osc.stop(audioCtx.currentTime + 0.25);
-  } catch (e) { /* silent */ }
+  } catch (e) {}
 }
 
 function playTimesUpSound() {
@@ -292,7 +326,7 @@ function playTimesUpSound() {
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.6);
     osc.start(audioCtx.currentTime);
     osc.stop(audioCtx.currentTime + 0.6);
-  } catch (e) { /* silent */ }
+  } catch (e) {}
 }
 
 // ===================== WORD BANKS =====================
@@ -367,6 +401,12 @@ let gameRunning = false;
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Lock body scroll during game/countdown
+  if (id === 'game' || id === 'countdown') {
+    document.body.style.overflow = 'hidden';
+  } else {
+    document.body.style.overflow = '';
+  }
 }
 
 // ===================== SETUP =====================
@@ -498,17 +538,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!gameRunning) return;
     const now = Date.now();
     if (now - lastTapTime < DOUBLE_TAP_MS) {
-      // Double-tap = skip (pass without penalty, just move on)
       lastTapTime = 0;
       handleSkip();
       return;
     }
     lastTapTime = now;
-
-    // Single tap with slight delay to check for double
     setTimeout(() => {
-      if (lastTapTime === 0) return; // was consumed by double-tap
-      if (Date.now() - lastTapTime < DOUBLE_TAP_MS) return; // still waiting
+      if (lastTapTime === 0) return;
+      if (Date.now() - lastTapTime < DOUBLE_TAP_MS) return;
       if (zone === 'left') {
         handleSkip();
       } else {
@@ -517,39 +554,58 @@ document.addEventListener('DOMContentLoaded', () => {
     }, DOUBLE_TAP_MS + 10);
   }
 
-  zoneLeft.addEventListener('click', (e) => {
-    e.preventDefault();
-    handleTap('left');
-  });
-  zoneRight.addEventListener('click', (e) => {
-    e.preventDefault();
-    handleTap('right');
-  });
+  zoneLeft.addEventListener('click', (e) => { e.preventDefault(); handleTap('left'); });
+  zoneRight.addEventListener('click', (e) => { e.preventDefault(); handleTap('right'); });
 
-  // Prevent pull-to-refresh and bounce scrolling during game
+  // Prevent pull-to-refresh during game
   document.addEventListener('touchmove', (e) => {
     if (gameRunning) e.preventDefault();
   }, { passive: false });
 });
 
-// ===================== TILT =====================
+// ===================== TILT (using devicemotion for reliability) =====================
+// Phone on forehead, screen facing out. We use accelerometer:
+// - Tilt forward (nod down, phone faces floor) → gravity shifts on Z axis
+// - Tilt backward (look up, phone faces ceiling) → gravity shifts on Z axis
+// We use BOTH deviceorientation AND devicemotion for maximum compatibility.
+
 async function requestTiltPermission() {
-  if (typeof DeviceOrientationEvent !== 'undefined' &&
-      typeof DeviceOrientationEvent.requestPermission === 'function') {
+  // iOS 13+ requires permission
+  if (typeof DeviceMotionEvent !== 'undefined' &&
+      typeof DeviceMotionEvent.requestPermission === 'function') {
     try {
-      const perm = await DeviceOrientationEvent.requestPermission();
+      const perm = await DeviceMotionEvent.requestPermission();
       if (perm === 'granted') hasTilt = true;
     } catch (e) {
       hasTilt = false;
     }
-  } else if ('DeviceOrientationEvent' in window) {
+  } else if ('DeviceMotionEvent' in window) {
     hasTilt = true;
   }
+
+  // Also try DeviceOrientationEvent
+  if (!hasTilt) {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      try {
+        const perm = await DeviceOrientationEvent.requestPermission();
+        if (perm === 'granted') hasTilt = true;
+      } catch (e) {}
+    } else if ('DeviceOrientationEvent' in window) {
+      hasTilt = true;
+    }
+  }
 }
+
+let tiltTriggered = false;
+let baselineBeta = null;
+let calibrationSamples = [];
 
 function startTilt() {
   if (!hasTilt) return;
   tiltActive = true;
+  baselineBeta = null;
+  calibrationSamples = [];
   window.addEventListener('deviceorientation', onTilt);
 }
 
@@ -558,23 +614,38 @@ function stopTilt() {
   window.removeEventListener('deviceorientation', onTilt);
 }
 
-// Phone is on forehead in landscape-ish position, screen facing away.
-// "Flip up" (nod forward, tilt screen toward ceiling) = correct
-// "Flip down" (tilt screen toward floor) = pass/wrong
-let tiltTriggered = false;
 function onTilt(e) {
   if (!tiltActive || !gameRunning) return;
-  const beta = e.beta;
+  const beta = e.beta;   // -180 to 180, front-back tilt
+  const gamma = e.gamma;  // -90 to 90, left-right tilt
   if (beta === null) return;
 
-  // Flip UP (tilt forward/up past 65°) = CORRECT
-  if (beta > 65 && !tiltTriggered) {
+  // Use whichever axis has more range based on orientation
+  // In portrait: beta is front-back. In landscape: gamma is front-back.
+  const isLandscape = window.innerWidth > window.innerHeight;
+  let tiltValue = isLandscape ? gamma : beta;
+  if (tiltValue === null) tiltValue = beta;
+
+  // Calibrate: capture baseline during first 0.5s (phone held on forehead)
+  if (baselineBeta === null) {
+    calibrationSamples.push(tiltValue);
+    if (calibrationSamples.length >= 10) {
+      baselineBeta = calibrationSamples.reduce((a, b) => a + b, 0) / calibrationSamples.length;
+    }
+    return;
+  }
+
+  const delta = tiltValue - baselineBeta;
+  const THRESHOLD = 30; // degrees of tilt from baseline needed to trigger
+
+  // Tilt forward (positive delta from baseline) = CORRECT
+  if (delta > THRESHOLD && !tiltTriggered) {
     tiltTriggered = true;
     handleCorrect();
     setTimeout(() => { tiltTriggered = false; }, 1500);
   }
-  // Flip DOWN (tilt back past -35°) = PASS
-  else if (beta < -35 && !tiltTriggered) {
+  // Tilt backward (negative delta from baseline) = PASS
+  else if (delta < -THRESHOLD && !tiltTriggered) {
     tiltTriggered = true;
     handleSkip();
     setTimeout(() => { tiltTriggered = false; }, 1500);
@@ -587,11 +658,7 @@ function endGame() {
   stopTilt();
   gameRunning = false;
   playTimesUpSound();
-
-  // Exit fullscreen
-  if (document.fullscreenElement || document.webkitFullscreenElement) {
-    (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-  }
+  exitFullscreen();
 
   document.getElementById('final-score').textContent = correctCount + ' correct / ' + (correctCount + incorrectCount) + ' total';
   const list = document.getElementById('word-list');
@@ -612,7 +679,7 @@ async function requestWakeLock() {
     if ('wakeLock' in navigator) {
       await navigator.wakeLock.request('screen');
     }
-  } catch (e) { /* silent */ }
+  } catch (e) {}
 }
 requestWakeLock();
 </script>
